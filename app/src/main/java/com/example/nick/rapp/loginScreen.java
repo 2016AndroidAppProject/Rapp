@@ -58,10 +58,6 @@ public class loginScreen extends AppCompatActivity {
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong Credentials",Toast.LENGTH_SHORT).show();
 
-                    testText.setVisibility(View.VISIBLE);
-                    testText.setBackgroundColor(Color.RED);
-                    testText.setText("Incorrect Credentials");
-
                 }
             }
         });
