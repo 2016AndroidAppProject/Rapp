@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.nick.rapp.practiceItems"
+    android:background="#90CAF9"
+    android:weightSum="6"
+    >
+
+    <!--
+    <ImageButton android:id="@+id/batButton"
+        android:layout_width="201dp"
+        android:layout_height="13237dp"
+        android:layout_marginTop="50dip"
+        android:layout_marginLeft="50dip"
+        android:padding="100dip"
+        android:src="@drawable/bat"
+        />
+
+    <ImageButton android:id="@+id/hatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dip"
+        android:layout_marginLeft="50dip"
+        android:layout_weight="4"
+        android:padding="100dip"
+        android:src="@drawable/size-7-1-4"
+        />
+
+-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_margin="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <ImageButton
+            android:id="@+id/answer1"
+            android:src="@drawable/catPic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.25"
+            />
+
+        <ImageButton
+            android:id="@+id/answer2"
+            android:scaleType="fitXY"
+            android:background="@drawable/hat"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:layout_weight="0.25"
+      />
+
+        <ImageButton
+            android:id="@+id/answer3"
+            android:scaleType="fitXY"
+            android:background="@drawable/bat"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />-->
+
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Rapp</string>
-
+    <string name="testText">test!</string>
+    <string name="userName">blank</string>
+    <string name="passWord">blank</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
