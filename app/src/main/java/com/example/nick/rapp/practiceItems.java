@@ -12,12 +12,17 @@ import android.widget.Toast;
 public class practiceItems extends AppCompatActivity {
     Intent proceedIntent;
     Button answerButton;
+    TextView welcomeNotice;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.practiceitems_layout);
         proceedIntent = new Intent(this, doneScreen.class);
+        welcomeNotice = (TextView) findViewById(R.id.welcomeNotice);
+        welcomeNotice.setText(currentUserData.getInstance().getUserType());
+
 
     }
 

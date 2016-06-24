@@ -8,24 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.os.Bundle;
-
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 
 public class loginScreen extends AppCompatActivity {
     EditText userName;
@@ -33,6 +16,7 @@ public class loginScreen extends AppCompatActivity {
     TextView testText;
     Button loginButton;
     Intent loginIntent;
+    currentUserData currentUserData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +29,8 @@ public class loginScreen extends AppCompatActivity {
         testText.setVisibility(View.GONE);
         loginIntent = new Intent(this, practiceItems.class);
 
+
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +39,9 @@ public class loginScreen extends AppCompatActivity {
                         password.getText().toString().equals("admin")) {
 
                     Toast.makeText(getApplicationContext(), "Redirecting...",Toast.LENGTH_SHORT).show();
+                    currentUserData.getInstance().setUserName(userName.getText().toString());
+                    currentUserData.getInstance().setPassword(password.getText().toString());
+                    currentUserData.getInstance().setUserType("Platypus!!");
                     startActivity(loginIntent);
                 }
                 else{
