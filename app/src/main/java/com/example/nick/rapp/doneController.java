@@ -1,5 +1,6 @@
 package com.example.nick.rapp;
 
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -13,11 +14,15 @@ import android.widget.TextView;
 public class doneController extends AppCompatActivity {
     TextView testNotice;
     currentQuestionData question;
+    MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.done_screen);
+
+        mp = MediaPlayer.create(this, R.raw.receptiveending);
+        mp.start();
 
 
 

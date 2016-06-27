@@ -41,7 +41,7 @@ public class loginController extends AppCompatActivity {
         loginButton=(Button)findViewById(R.id.loginButton);
 
         //Login class prepares an intent to change activity to the practice screens.
-        loginIntent = new Intent(this, questionsController.class);
+        loginIntent = new Intent(this, proceedController.class);
 
 
         //Following method class detects when user has clicked the login button and validates

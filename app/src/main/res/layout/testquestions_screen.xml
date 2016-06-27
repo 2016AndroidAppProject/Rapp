@@ -6,7 +6,7 @@
     android:paddingBottom="25dp"
     tools:context=".questionsController"
     android:background="#90CAF9"
-    android:weightSum="6"
+    android:weightSum="9"
     >
 
 
@@ -17,7 +17,8 @@
         android:layout_height="wrap_content"
         android:textColor="#000000"
         android:text="test"
-        android:id="@+id/testNotice"/>
+        android:id="@+id/testNotice"
+        android:visibility = "invisible"/>
 
         <RadioGroup
             android:orientation="horizontal"
@@ -30,35 +31,42 @@
         <RadioButton
             android:id="@+id/opt1"
 
-            android:layout_margin="50dp"
+            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.25"
-            android:text="1"
+            android:layout_weight="0.45"
             android:onClick="answer"
+            android:button="@null"
+            android:scaleY="0.75"
             />
 
         <RadioButton
             android:id="@+id/opt2"
             android:scaleType="fitXY"
 
-            android:layout_margin="50dp"
+            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="2"
-            android:layout_weight="0.25"
+
+            android:layout_weight="0.45"
             android:onClick="answer"
+            android:button="@null"
+
+            android:scaleY="0.75"
       />
 
         <RadioButton
             android:id="@+id/opt3"
             android:scaleType="fitXY"
-            android:layout_margin="50dp"
+            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="3"
-            android:layout_weight="0.25"
+
+            android:layout_weight="0.45"
             android:onClick="answer"
+            android:button="@null"
+
+            android:scaleY="0.75"
             />
         </RadioGroup>
 

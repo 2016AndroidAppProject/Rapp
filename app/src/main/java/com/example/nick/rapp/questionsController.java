@@ -3,6 +3,7 @@ package com.example.nick.rapp;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,7 +45,16 @@ public class questionsController extends AppCompatActivity {
     RadioButton opt2;
     RadioButton opt3;
     int currentQNum = question.getInstance().getQuestionNum();
+
+    //integer n is used as a random number to shuffle the answers
     int n;
+
+    //integer audID is used as an identifier for our audio files
+    int audID;
+
+    MediaPlayer mp;
+
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -81,6 +91,7 @@ public class questionsController extends AppCompatActivity {
         loadQuestion();
 
 
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -92,10 +103,29 @@ public class questionsController extends AppCompatActivity {
     //it users the random number n to make sure we don't place the correct answer in the same location twice
     //and it also sets the correct answer to the proper option.
     public void loadQuestion() {
+        question.getInstance().nextQuestion();
+        currentQNum = question.getInstance().getQuestionNum();
+        Log.d("currentQuestion", "The current question is " + currentQNum);
+
+
+
+        //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
+        if ((currentQNum == 1) || (currentQNum == 2)){
+            question.getInstance().setCurrentQtype("Practice");
+        } else  {
+            question.getInstance().setCurrentQtype("Test");
+        }
+
+
 
         int pic1id = this.getResources().getIdentifier("p" + currentQNum + "a", "drawable", this.getPackageName());
         int pic2id = this.getResources().getIdentifier("p" + currentQNum + "b", "drawable", this.getPackageName());
         int pic3id = this.getResources().getIdentifier("p" + currentQNum + "c", "drawable", this.getPackageName());
+
+        audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
+        mp = MediaPlayer.create(this, audID);
+
+
 
         Random rand = new Random();
 
@@ -106,24 +136,30 @@ public class questionsController extends AppCompatActivity {
         Log.d("random", "current random number is " + n);
 
         switch (n) {
-            case 1:
+            case 1 :
                 opt1.setBackground(getResources().getDrawable(pic1id));
                 opt2.setBackground(getResources().getDrawable(pic2id));
                 opt3.setBackground(getResources().getDrawable(pic3id));
                 question.getInstance().setCorrectAnswer(2);
                 Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                mp.start();
+                break;
             case 2:
                 opt1.setBackground(getResources().getDrawable(pic3id));
                 opt2.setBackground(getResources().getDrawable(pic1id));
                 opt3.setBackground(getResources().getDrawable(pic2id));
                 question.getInstance().setCorrectAnswer(3);
                 Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                mp.start();
+                break;
             case 3:
                 opt1.setBackground(getResources().getDrawable(pic2id));
                 opt2.setBackground(getResources().getDrawable(pic3id));
                 opt3.setBackground(getResources().getDrawable(pic1id));
                 question.getInstance().setCorrectAnswer(1);
                 Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                mp.start();
+                break;
         }
 
 
@@ -143,30 +179,88 @@ public class questionsController extends AppCompatActivity {
     //and displaying new items on the screen. The answer is responsible for detecting when the user
     //has answered all the items in the test, and forward them to the doneController accordingly.
 
-    //The answer method is also responsible for controllign the storing of results, depending on the kind
+    //The answer method is also responsible for controlling the storing of results, depending on the kind
     //of question answered.
     public void answer(View view) {
-        boolean checked = ((RadioButton) view).isChecked();
-
-        switch (view.getId()) {
-            case R.id.opt1:
-                question.getInstance().nextQuestion();
-                currentQNum = question.getInstance().getQuestionNum();
-                Log.d("currentQuestion","The current question is " + currentQNum);
 
 
-                loadQuestion();
-                break;
-            case R.id.opt2:
-                Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.opt3:
-                Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
-                break;
+            boolean checked = ((RadioButton) view).isChecked();
+
+            switch (view.getId()) {
+                case R.id.opt1:
+
+                    if ((question.getInstance().getCorrectAnswer() == 1) ||
+                     (question.getInstance().getCurrentQtype() != "Practice")) {
+
+                        if (currentQNum == question.getInstance().getTestSize()) {
+                            //go to last activity
+                            //RECORD RESULTS HERE
+                            startActivity(proceedIntent);
+                        } else {
 
 
+                            //                processes that occur when correct answer is chosen
+                            loadQuestion();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+
+                        mp = MediaPlayer.create(this, R.raw.tryagain);
+                        mp.start();
+                    }
+                    break;
+
+                case R.id.opt2:
+                    if ((question.getInstance().getCorrectAnswer() == 2) ||
+                            (question.getInstance().getCurrentQtype() != "Practice")) {
+
+                        if (currentQNum == question.getInstance().getTestSize()) {
+                            //go to last activity
+                            //RECORD RESULTS HERE
+                            startActivity(proceedIntent);
+                        } else {
+
+
+                            //                processes that occur when correct answer is chosen
+                            loadQuestion();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+
+                        mp = MediaPlayer.create(this, R.raw.tryagain);
+                        mp.start();
+                    }
+                    break;
+
+
+                case R.id.opt3:
+
+
+                    if ((question.getInstance().getCorrectAnswer() == 3) ||
+                            (question.getInstance().getCurrentQtype() != "Practice")) {
+
+
+                        if (currentQNum == question.getInstance().getTestSize()) {
+                            //go to last activity
+                            //RECORD RESULTS HERE
+                            startActivity(proceedIntent);
+                        } else {
+
+
+                            //                processes that occur when correct answer is chosen
+
+                            loadQuestion();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                        mp = MediaPlayer.create(this, R.raw.tryagain);
+                        mp.start();
+                    }
+                    break;
+
+            }
         }
-    }
+
 
     @Override
     public void onStart() {
