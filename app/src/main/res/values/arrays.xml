@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer-array name="question_audio">
+        <!--<item>@raw/Baby</item>
+        <item>@raw/Banana</item>
+        <item>@raw/Cake</item>-->
+    </integer-array>
+</resources>

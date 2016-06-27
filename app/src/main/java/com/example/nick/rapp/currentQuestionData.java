@@ -1,5 +1,10 @@
 package com.example.nick.rapp;
 
+import android.content.Context;
+import android.os.Environment;
+
+import java.io.File;
+
 /**
  * Created by Nick on 6/23/2016.
  */
@@ -15,21 +20,34 @@ package com.example.nick.rapp;
 
 
 public class currentQuestionData {
-    private int correctAnswer;
+    Context context;
+    int correctAnswer;
     int currentSelection;
     int numPosAnswer;
     String currentQtype;
-    int totalQuestions;
-    String currentQuestion;
+    int currentQuestion;
+
+
+
+
+    //THE FOLLOWING VALUE IS HARDCODED BELOW TO REFLECT THE NUMBER OF EXAMPLE QUESTIONS
+    //IN FINAL APP IT WILL REFLECT THE NUMBER OF QUESTIONS IN A POSSIBLE TEST
+    //AND WILL BE OBTAINED VIA QUERY FROM THE DATABASE
+    int testSize;
+
+    //WILL NEED TO BE CHANGED TO ALLOW FOR DIFFERENT TESTS TO BE PUT IN
+
 
     public currentQuestionData(int correctAnswer, int currentSelection,
-                               int numPosAnswer, String currentQtype, int totalQuestions, String currentQuestion) {
+                               int numPosAnswer, String currentQtype, int currentQuestion
+                                , int testSize) {
         this.correctAnswer = correctAnswer;
         this.currentSelection = currentSelection;
         this.numPosAnswer = numPosAnswer;
         this.currentQtype = currentQtype;
-        this.totalQuestions = totalQuestions;
         this.currentQuestion = currentQuestion;
+        this.testSize = testSize;
+
     }
 
 
@@ -37,7 +55,21 @@ public class currentQuestionData {
     // that it is ready to hold data when we initialize it in another class.
     // It is first initialized in the login screen.java class.
     private static final currentQuestionData CURRENT_QUESTION_DATA =
-            new currentQuestionData(0, 0, 0, "practice", 0, "blank");
+            new currentQuestionData(0, 0, 0, "practice", 1, 22);
+
+    public static currentQuestionData getInstance() {return CURRENT_QUESTION_DATA;}
+
+    public int getTestSize() {
+        return testSize;
+    }
+
+    public void setTestSize(int testSize) {
+        this.testSize = testSize;
+    }
+
+    public int getQuestionNum(){
+        return this.currentQuestion;
+    }
 
     public int getCorrectAnswer() {
         return correctAnswer;
@@ -71,12 +103,16 @@ public class currentQuestionData {
         this.currentQtype = currentQtype;
     }
 
-    public int getTotalQuestions() {
-        return totalQuestions;
+
+
+
+    public int getCurrentQuestion() {
+        return currentQuestion;
     }
 
-    public void setTotalQuestions(int totalQuestions) {
-        this.totalQuestions = totalQuestions;
+    public void nextQuestion() {
+
+        this.currentQuestion++;
     }
 
     // boolean nextQEmpty?

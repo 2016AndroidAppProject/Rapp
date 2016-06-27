@@ -10,6 +10,8 @@ import android.widget.Toast;
 import android.widget.Button;
 
 
+
+
 //This class is part of the controller component of the model-view-controller design.
 
 
@@ -39,7 +41,7 @@ public class loginController extends AppCompatActivity {
         loginButton=(Button)findViewById(R.id.loginButton);
 
         //Login class prepares an intent to change activity to the practice screens.
-        loginIntent = new Intent(this, testQuestionsController.class);
+        loginIntent = new Intent(this, questionsController.class);
 
 
         //Following method class detects when user has clicked the login button and validates
@@ -60,7 +62,7 @@ public class loginController extends AppCompatActivity {
                     startActivity(loginIntent);
                 }
                 else{
-                    Toast.makeText(getApplicationContext(), "Wrong Credentials",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Wrong Credentials, please try again or contact testing administrators for help logging in.",Toast.LENGTH_SHORT).show();
 
                 }
             }

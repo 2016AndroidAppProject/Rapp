@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="25dp"
-    tools:context=".testQuestionsController"
+    tools:context=".questionsController"
     android:background="#90CAF9"
     android:weightSum="6"
     >
@@ -16,8 +16,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#000000"
-        android:text="Welcome to the Rapp blank"
-        android:id="@+id/welcomeNotice"/>
+        android:text="test"
+        android:id="@+id/testNotice"/>
 
         <RadioGroup
             android:orientation="horizontal"
@@ -28,8 +28,8 @@
 
 
         <RadioButton
-            android:id="@+id/answer1"
-            android:background="@drawable/cat"
+            android:id="@+id/opt1"
+
             android:layout_margin="50dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -39,9 +39,9 @@
             />
 
         <RadioButton
-            android:id="@+id/answer2"
+            android:id="@+id/opt2"
             android:scaleType="fitXY"
-            android:background="@drawable/hat"
+
             android:layout_margin="50dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -51,9 +51,8 @@
       />
 
         <RadioButton
-            android:id="@+id/answer3"
+            android:id="@+id/opt3"
             android:scaleType="fitXY"
-            android:background="@drawable/bat"
             android:layout_margin="50dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

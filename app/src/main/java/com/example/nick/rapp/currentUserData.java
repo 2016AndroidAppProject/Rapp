@@ -43,7 +43,6 @@ public class currentUserData {
         this.password = password;
     }
 
-
     public String getUserType() {
         return userType;
     }
