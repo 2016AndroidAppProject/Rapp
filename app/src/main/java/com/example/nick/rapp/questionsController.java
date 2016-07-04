@@ -88,6 +88,9 @@ public class questionsController extends AppCompatActivity {
         String notice = String.valueOf(testSize);
         testNotice.setText(notice);
 
+
+
+
         loadQuestion();
 
 
@@ -97,17 +100,38 @@ public class questionsController extends AppCompatActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+    public void performOnEnd(){
+        audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
+        mp = MediaPlayer.create(this, audID);
+        mp.start();
+    }
+
+    public void proceedOnEnd(){
+        loadQuestion();
+    }
+
 
 
     //This method loads new assets into screen based on the current question number.
     //it users the random number n to make sure we don't place the correct answer in the same location twice
     //and it also sets the correct answer to the proper option.
     public void loadQuestion() {
+
+
+        //determines rather we need to play third set of instructions here.
+        String audio;
+//        if (question.getInstance().getCurrentQtype() == "Practice"){
+//            audio = "play";
+//        } else {
+//            audio = "stop";
+//        }
+
+
+
+
         question.getInstance().nextQuestion();
         currentQNum = question.getInstance().getQuestionNum();
         Log.d("currentQuestion", "The current question is " + currentQNum);
-
-
 
         //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
         if ((currentQNum == 1) || (currentQNum == 2)){
@@ -116,14 +140,39 @@ public class questionsController extends AppCompatActivity {
             question.getInstance().setCurrentQtype("Test");
         }
 
+        audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
+        if (currentQNum == 1){
+            mp = MediaPlayer.create(this, R.raw.practiceiteminstructions);
+            mp.start();
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    performOnEnd();
+                }
+            });
+        }  else {
+            mp = MediaPlayer.create(this, audID);
+            mp.start();
+        }
+
+
+
+
+
+
+
+
+
+
+
 
 
         int pic1id = this.getResources().getIdentifier("p" + currentQNum + "a", "drawable", this.getPackageName());
         int pic2id = this.getResources().getIdentifier("p" + currentQNum + "b", "drawable", this.getPackageName());
         int pic3id = this.getResources().getIdentifier("p" + currentQNum + "c", "drawable", this.getPackageName());
 
-        audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
-        mp = MediaPlayer.create(this, audID);
+
 
 
 
@@ -158,7 +207,6 @@ public class questionsController extends AppCompatActivity {
                 opt3.setBackground(getResources().getDrawable(pic1id));
                 question.getInstance().setCorrectAnswer(1);
                 Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
-                mp.start();
                 break;
         }
 
@@ -196,12 +244,26 @@ public class questionsController extends AppCompatActivity {
                             //go to last activity
                             //RECORD RESULTS HERE
                             startActivity(proceedIntent);
-                        } else {
+                        } else if (currentQNum == 2){
+
+
+                                    mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                                    mp.start();
+                                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                                        @Override
+                                        public void onCompletion(MediaPlayer mp) {
+                                            proceedOnEnd();
+                                        }
+                                    });
+
+                                } else {
+                            loadQuestion();
+                        }
 
 
                             //                processes that occur when correct answer is chosen
-                            loadQuestion();
-                        }
+
                     } else {
                         Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
 
@@ -218,6 +280,19 @@ public class questionsController extends AppCompatActivity {
                             //go to last activity
                             //RECORD RESULTS HERE
                             startActivity(proceedIntent);
+                        } else if (currentQNum == 2){
+
+
+                            mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    proceedOnEnd();
+                                }
+                            });
+
                         } else {
 
 
@@ -244,6 +319,19 @@ public class questionsController extends AppCompatActivity {
                             //go to last activity
                             //RECORD RESULTS HERE
                             startActivity(proceedIntent);
+                        } else if (currentQNum == 2){
+
+
+                            mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    proceedOnEnd();
+                                }
+                            });
+
                         } else {
 
 

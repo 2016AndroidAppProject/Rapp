@@ -28,9 +28,8 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="PRESS BUTTON TO PROCEED"
         android:id="@+id/textView"
-        android:layout_above="@+id/proceed"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="49dp"
-        android:textSize="72dp" />
+        android:textSize="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

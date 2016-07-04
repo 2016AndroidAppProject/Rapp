@@ -55,7 +55,7 @@ public class currentQuestionData {
     // that it is ready to hold data when we initialize it in another class.
     // It is first initialized in the login screen.java class.
     private static final currentQuestionData CURRENT_QUESTION_DATA =
-            new currentQuestionData(0, 0, 0, "practice", 0, 22);
+            new currentQuestionData(0, 0, 0, "Practice", 0, 22);
 
     public static currentQuestionData getInstance() {return CURRENT_QUESTION_DATA;}
 
