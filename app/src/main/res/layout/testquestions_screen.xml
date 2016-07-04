@@ -24,50 +24,64 @@
             android:orientation="horizontal"
             android:layout_margin="50dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             >
 
 
-        <RadioButton
-            android:id="@+id/opt1"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
 
-            android:layout_margin="15dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.45"
-            android:onClick="answer"
-            android:button="@null"
-            android:scaleY="0.75"
-            />
+                <RadioButton
+                android:id="@+id/opt3"
+                android:scaleType="fitXY"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
 
-        <RadioButton
-            android:id="@+id/opt2"
-            android:scaleType="fitXY"
+                android:layout_weight="0.45"
+                android:onClick="answer"
+                android:button="@null"
+                android:scaleY="0.75"
+                />
+            </LinearLayout>
 
-            android:layout_margin="15dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
 
-            android:layout_weight="0.45"
-            android:onClick="answer"
-            android:button="@null"
+                <RadioButton
+                android:id="@+id/opt1"
 
-            android:scaleY="0.75"
-      />
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.45"
+                android:onClick="answer"
+                android:button="@null"
+                android:scaleY="0.75"
+                />
 
-        <RadioButton
-            android:id="@+id/opt3"
-            android:scaleType="fitXY"
-            android:layout_margin="15dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+                <RadioButton
+                android:id="@+id/opt2"
+                android:scaleType="fitXY"
 
-            android:layout_weight="0.45"
-            android:onClick="answer"
-            android:button="@null"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/opt1"
+                android:layout_weight="0.45"
+                android:onClick="answer"
+                android:button="@null"
+                android:scaleY="0.75"
+                />
+            </LinearLayout>
 
-            android:scaleY="0.75"
-            />
+
         </RadioGroup>
 
 
