@@ -12,77 +12,138 @@
 
     <!--This layout is part of the view component of the model-view-controller design.-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:text="test"
-        android:id="@+id/testNotice"
-        android:visibility = "invisible"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <RadioGroup
             android:orientation="horizontal"
             android:layout_margin="50dp"
             android:layout_width="match_parent"
+            android:layout_height="fill_parent">
+
+
+        <RadioButton
+            android:id="@+id/opt1pic"
+            android:orientation="vertical"
+            android:layout_margin="15dp"
+            android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            >
+            android:layout_weight="0.45"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:onClick="doNothing"
+            android:button="@null"
 
+            android:background="@drawable/p1a"></RadioButton>
 
-            <LinearLayout
+            <RadioButton
+                android:id="@+id/opt2pic"
+                android:layout_margin="15dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5">
-
-                <RadioButton
-                android:id="@+id/opt3"
-                android:scaleType="fitXY"
-                android:layout_margin="15dp"
-                android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-
                 android:layout_weight="0.45"
-                android:onClick="answer"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:onClick="doNothing"
                 android:button="@null"
-                android:scaleY="0.75"
-                />
-            </LinearLayout>
 
-            <LinearLayout
+                android:background="@drawable/p1a"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/opt3pic"
                 android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5">
-
-                <RadioButton
-                android:id="@+id/opt1"
-
                 android:layout_margin="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="0.45"
-                android:onClick="answer"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:onClick="doNothing"
                 android:button="@null"
-                android:scaleY="0.75"
-                />
 
-                <RadioButton
-                android:id="@+id/opt2"
-                android:scaleType="fitXY"
+                android:background="@drawable/p1a">
+        </RadioButton>
 
-                android:layout_margin="15dp"
+            </RadioGroup>
+
+        <RadioGroup
+                android:orientation="horizontal"
+                android:layout_margin="50dp"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-                android:layout_below="@+id/opt1"
-                android:layout_weight="0.45"
-                android:onClick="answer"
-                android:button="@null"
-                android:scaleY="0.75"
-                />
-            </LinearLayout>
+                >
 
+
+            <RadioButton
+            android:id="@+id/opt1"
+            android:scaleType="fitXY"
+            android:layout_margin="35dp"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.45"
+            android:onClick="answer"
+            android:button="@null"
+            android:scaleY="0.65"
+            />
+
+            <RadioButton
+            android:id="@+id/opt2"
+            android:scaleType="fitXY"
+            android:layout_margin="35dp"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:layout_weight="0.45"
+            android:onClick="answer"
+            android:button="@null"
+            android:scaleY="0.65"
+            />
+
+            <RadioButton
+            android:id="@+id/opt3"
+
+            android:layout_margin="35dp"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.45"
+            android:onClick="answer"
+            android:button="@null"
+            android:scaleY="0.65"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+
+            <!--<LinearLayout-->
+                <!--android:id="@+id/opt2pic"-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_margin="15dp"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:layout_below="@+id/opt1"-->
+                <!--android:layout_weight="0.45"-->
+                <!--android:minHeight="0dp"-->
+                <!--android:minWidth="0dp"-->
+                <!--android:onClick="answer"-->
+                <!--android:button="@null"-->
+
+                <!--android:background="@drawable/p1a">-->
 
         </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:text="test"
+            android:id="@+id/testNotice"
+            android:visibility = "invisible"/>
+
+
+    </FrameLayout>
 
 
 </LinearLayout>

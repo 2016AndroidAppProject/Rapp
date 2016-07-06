@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -41,9 +42,9 @@ public class questionsController extends AppCompatActivity {
     Button answerButton;
     TextView testNotice;
     currentQuestionData question;
-    RadioButton opt1;
-    RadioButton opt2;
-    RadioButton opt3;
+    View opt1;
+    View opt2;
+    View opt3;
     int currentQNum = question.getInstance().getQuestionNum();
 
     //integer n is used as a random number to shuffle the answers
@@ -68,9 +69,9 @@ public class questionsController extends AppCompatActivity {
         setContentView(R.layout.testquestions_screen);
 
 
-        opt1 = (RadioButton) findViewById(R.id.opt1);
-        opt2 = (RadioButton) findViewById(R.id.opt2);
-        opt3 = (RadioButton) findViewById(R.id.opt3);
+        opt1 = (View) findViewById(R.id.opt1pic);
+        opt2 = (View) findViewById(R.id.opt2pic);
+        opt3 = (View) findViewById(R.id.opt3pic);
 
 
 
@@ -348,6 +349,10 @@ public class questionsController extends AppCompatActivity {
 
             }
         }
+
+    public void doNothing(View view){
+
+    }
 
 
     @Override
