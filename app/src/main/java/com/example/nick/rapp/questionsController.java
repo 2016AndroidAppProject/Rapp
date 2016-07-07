@@ -40,7 +40,6 @@ import java.util.Random;
 public class questionsController extends AppCompatActivity {
     Intent proceedIntent;
     Button answerButton;
-    TextView testNotice;
     currentQuestionData question;
     View opt1;
     View opt2;
@@ -84,10 +83,6 @@ public class questionsController extends AppCompatActivity {
         proceedIntent = new Intent(this, doneController.class);
 
 
-        testNotice = (TextView) findViewById(R.id.testNotice);
-        int testSize = question.getInstance().getTestSize();
-        String notice = String.valueOf(testSize);
-        testNotice.setText(notice);
 
 
 
