@@ -20,23 +20,23 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:weightSum="1">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentTop="false"
-                android:layout_alignParentBottom="false">
+                android:layout_alignParentBottom="false"
+                android:layout_weight="0.5">
 
                 <RadioButton
                     android:id="@+id/opt3pic"
                     android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.45"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
                     android:onClick="doNothing"
                     android:button="@null"
                     android:background="@drawable/p1a"
@@ -44,30 +44,16 @@
                     android:layout_centerHorizontal="true"
                     android:layout_margin="15dp">
 
-
-                    <!--android:id="@+id/opt1pic"-->
-                    <!--android:orientation="vertical"-->
-                    <!--android:layout_margin="15dp"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_weight="0.45"-->
-                    <!--android:minHeight="0dp"-->
-                    <!--android:minWidth="0dp"-->
-                    <!--android:onClick="doNothing"-->
-                    <!--android:button="@null"-->
-
-                    <!--android:background="@drawable/p1a">-->
             </RadioButton>
 
                 <RadioButton
                 android:id="@+id/opt3"
-                android:scaleType="fitXY"
-                    android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.45"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:onClick="answer"
                 android:button="@null"
-                android:scaleY="0.65"
+
                 android:checked="false"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
@@ -75,7 +61,7 @@
                     android:layout_alignBottom="@+id/opt3pic"
                     android:layout_alignLeft="@+id/opt3pic"
                     android:layout_alignRight="@+id/opt3pic"
-                    android:layout_margin="5dp" />
+                    android:layout_margin="7dp" />
 
             </RelativeLayout>
         </RelativeLayout>
@@ -94,16 +80,14 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_weight="4.5">
+            android:layout_weight="4.5"
+            android:layout_margin="5dp">
 
             <RadioButton
                 android:id="@+id/opt1pic"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.45"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
                 android:onClick="doNothing"
                 android:button="@null"
 
@@ -113,13 +97,11 @@
 
             <RadioButton
             android:id="@+id/opt1"
-            android:scaleType="fitXY"
-                android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.45"
+                android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:onClick="answer"
             android:button="@null"
-            android:scaleY="0.65"
+
             android:checked="false"
                 android:layout_alignRight="@+id/opt1pic"
                 android:layout_alignEnd="@+id/opt1pic"
@@ -127,47 +109,42 @@
                 android:layout_alignStart="@+id/opt1pic"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentBottom="true"
-                android:layout_margin="5dp" />
+                android:layout_margin="7dp" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="4.5">
+            android:layout_weight="4.5"
+            android:layout_margin="5dp">
 
             <RadioButton
                 android:id="@+id/opt2pic"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.45"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
                 android:onClick="doNothing"
                 android:button="@null"
 
                 android:background="@drawable/p1a"
                 android:checked="false"
-                android:layout_alignBottom="@+id/opt2"
                 android:layout_centerHorizontal="true"></RadioButton>
 
             <RadioButton
             android:id="@+id/opt2"
-            android:scaleType="fitXY"
-                android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:layout_weight="0.45"
+                android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:onClick="answer"
             android:button="@null"
-            android:scaleY="0.65"
+
                 android:layout_alignLeft="@+id/opt2pic"
                 android:layout_alignStart="@+id/opt2pic"
                 android:layout_alignRight="@+id/opt2pic"
                 android:layout_alignEnd="@+id/opt2pic"
-                android:layout_margin="5dp" />
+                android:layout_margin="7dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true" />
         </RelativeLayout>
 
     </LinearLayout>

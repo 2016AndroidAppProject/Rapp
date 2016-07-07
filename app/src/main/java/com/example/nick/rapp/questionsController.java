@@ -73,6 +73,11 @@ public class questionsController extends AppCompatActivity {
         opt3 = (View) findViewById(R.id.opt3pic);
 
 
+        opt1.setSoundEffectsEnabled(false);
+        opt2.setSoundEffectsEnabled(false);
+        opt3.setSoundEffectsEnabled(false);
+
+
 
 
         //Create intent to forward user to the real test items
