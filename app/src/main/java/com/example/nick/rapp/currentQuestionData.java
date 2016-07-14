@@ -1,9 +1,6 @@
 package com.example.nick.rapp;
 
 import android.content.Context;
-import android.os.Environment;
-
-import java.io.File;
 
 /**
  * Created by Nick on 6/23/2016.
@@ -25,8 +22,12 @@ public class currentQuestionData {
     int currentSelection;
     int numPosAnswer;
     String currentQtype;
-    int currentQuestion;
+    int currentIndex;
 
+
+    //these two arrays hold the randomized integer arrays that determine the question order.
+    int[] practiceList;
+    int[] questionList;
 
 
 
@@ -35,19 +36,48 @@ public class currentQuestionData {
     //AND WILL BE OBTAINED VIA QUERY FROM THE DATABASE
     int testSize;
 
+    //This value indicates how many practice items are in the test
+    int numPractice;
+
+    public int getNumPractice() {
+        return numPractice;
+    }
+
+    public void setNumPractice(int numPractice) {
+        this.numPractice = numPractice;
+    }
     //WILL NEED TO BE CHANGED TO ALLOW FOR DIFFERENT TESTS TO BE PUT IN
 
 
     public currentQuestionData(int correctAnswer, int currentSelection,
-                               int numPosAnswer, String currentQtype, int currentQuestion
-                                , int testSize) {
+                               int numPosAnswer, String currentQtype, int currentIndex
+                                , int testSize, int numPractice, int[] practiceList, int[] questionList) {
         this.correctAnswer = correctAnswer;
         this.currentSelection = currentSelection;
         this.numPosAnswer = numPosAnswer;
         this.currentQtype = currentQtype;
-        this.currentQuestion = currentQuestion;
+        this.currentIndex = currentIndex;
         this.testSize = testSize;
+        this.numPractice = numPractice;
+        this.practiceList = practiceList;
+        this.questionList = questionList;
 
+    }
+
+    public int[] getPracticeList() {
+        return practiceList;
+    }
+
+    public void setPracticeList(int[] practiceList) {
+        this.practiceList = practiceList;
+    }
+
+    public int[] getQuestionList() {
+        return questionList;
+    }
+
+    public void setQuestionList(int[] questionList) {
+        this.questionList = questionList;
     }
 
 
@@ -55,7 +85,7 @@ public class currentQuestionData {
     // that it is ready to hold data when we initialize it in another class.
     // It is first initialized in the login screen.java class.
     private static final currentQuestionData CURRENT_QUESTION_DATA =
-            new currentQuestionData(0, 0, 0, "Practice", 0, 22);
+            new currentQuestionData(0, 0, 4, "Practice", 0, 24, 2, null, null);
 
     public static currentQuestionData getInstance() {return CURRENT_QUESTION_DATA;}
 
@@ -68,7 +98,7 @@ public class currentQuestionData {
     }
 
     public int getQuestionNum(){
-        return this.currentQuestion;
+        return this.currentIndex;
     }
 
     public int getCorrectAnswer() {
@@ -106,13 +136,17 @@ public class currentQuestionData {
 
 
 
-    public int getCurrentQuestion() {
-        return currentQuestion;
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
     }
 
     public void nextQuestion() {
 
-        this.currentQuestion++;
+        this.currentIndex++;
     }
 
     // boolean nextQEmpty?

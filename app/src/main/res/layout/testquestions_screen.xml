@@ -13,57 +13,94 @@
     <!--This layout is part of the view component of the model-view-controller design.-->
 
     <LinearLayout
+        android:id="@+id/top"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="4.5">
+        android:layout_weight="4.5"
+        >
 
         <RelativeLayout
+            android:id="@+id/opt3layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:weightSum="1">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerHorizontal="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="false">
+
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_alignParentTop="false"-->
+            <!--android:layout_alignParentBottom="false"-->
+
+            <RadioButton
+                android:id="@+id/opt3pic"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="doNothing"
+                android:button="@null"
+                android:background="@drawable/p1a"
                 android:layout_alignParentTop="false"
-                android:layout_alignParentBottom="false"
-                android:layout_weight="0.5">
+                android:layout_centerHorizontal="true"
+                android:layout_margin="15dp">
 
-                <RadioButton
-                    android:id="@+id/opt3pic"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="doNothing"
-                    android:button="@null"
-                    android:background="@drawable/p1a"
-                    android:layout_alignParentTop="false"
-                    android:layout_centerHorizontal="true"
-                    android:layout_margin="15dp">
+        </RadioButton>
 
-            </RadioButton>
+            <RadioButton
+            android:id="@+id/opt3"
 
-                <RadioButton
-                android:id="@+id/opt3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="answer"
+            android:button="@null"
 
+            android:checked="false"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:layout_alignTop="@+id/opt3pic"
+                android:layout_alignBottom="@+id/opt3pic"
+                android:layout_alignLeft="@+id/opt3pic"
+                android:layout_alignRight="@+id/opt3pic"
+                android:layout_margin="7dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/opt4layout"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <RadioButton
+                android:id="@+id/opt4pic"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="doNothing"
+                android:button="@null"
+                android:background="@drawable/p1a"
+                android:layout_alignParentTop="false"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="15dp" />
+
+            <RadioButton
+                android:id="@+id/opt4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="answer"
                 android:button="@null"
-
                 android:checked="false"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignTop="@+id/opt3pic"
-                    android:layout_alignBottom="@+id/opt3pic"
-                    android:layout_alignLeft="@+id/opt3pic"
-                    android:layout_alignRight="@+id/opt3pic"
-                    android:layout_margin="7dp" />
-
-            </RelativeLayout>
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:layout_alignTop="@+id/opt4pic"
+                android:layout_alignBottom="@+id/opt4pic"
+                android:layout_alignLeft="@+id/opt4pic"
+                android:layout_alignRight="@+id/opt4pic"
+                android:layout_margin="7dp" />
         </RelativeLayout>
 
     </LinearLayout>

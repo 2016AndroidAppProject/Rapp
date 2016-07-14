@@ -1,25 +1,24 @@
 package com.example.nick.rapp;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.io.File;
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -41,18 +40,43 @@ public class questionsController extends AppCompatActivity {
     Intent proceedIntent;
     Button answerButton;
     currentQuestionData question;
+
+    //the values for the button visuals and the buttons themselves in the test layout.
     View opt1;
     View opt2;
     View opt3;
-    int currentQNum = question.getInstance().getQuestionNum();
+    View opt4;
+    RadioButton opt1but;
+    RadioButton opt2but;
+    RadioButton opt3but;
+    RadioButton opt4but;
 
-    //integer n is used as a random number to shuffle the answers
+
+    //values that describe which question we are on, how many possible answers the questions have, and
+    //an array of integers that determines that order of questions.
+    int currentQIndex;
+
+    int currentQNum;
+
+    int numPosAnswers;
+    int[] practiceList;
+    int[] questionList;
+
+    //integer n is used as a random number to shuffle the position of the buttons on the screen
     int n;
+
+    //integer testSize is used to say how big the test should be. It is obtained from the testsize
+    //quality of the question data in the oncreate method.
+    int testSize;
 
     //integer audID is used as an identifier for our audio files
     int audID;
 
     MediaPlayer mp;
+
+
+    //this simple boolean prevents the index of the question from incrementing when we first load the questions
+    boolean firstQuestion;
 
 
     /**
@@ -62,15 +86,140 @@ public class questionsController extends AppCompatActivity {
     private GoogleApiClient client;
 
 
+    //A helper method to produce the random list of practice questions and questions.
+    //the length of the array is dictated by the test length feature of the question data singleton.
+    //the array consists of every integer from 1 to test length, randomly organized.
+
+    //must include special functionality for practice questions
+
+    private void getQuestionList(){
+        questionList = new int[testSize];
+        int j = 1;
+        for (int i = 0; i < testSize; i++){
+            questionList[i] = j;
+            j++;
+        }
+        getPracticeArray();
+        question.getInstance().setPracticeList(practiceList);
+        System.out.println("Practice list copied: " + Arrays.toString(question.getInstance().getPracticeList()));
+
+        shuffleArray(questionList);
+        System.out.println("Test list after shuffle: " + Arrays.toString(questionList));
+
+        int[] finalQuestionList = new int[testSize];
+
+        int numPracticeItems = this.question.getInstance().getNumPractice();
+        System.arraycopy(practiceList, 0, finalQuestionList, 0, numPracticeItems);
+        System.arraycopy(questionList, 0, finalQuestionList, numPracticeItems, questionList.length);
+
+
+        questionList = finalQuestionList;
+
+        question.getInstance().setQuestionList(questionList);
+        System.out.println("Final: " + Arrays.toString(question.getInstance().getQuestionList()));
+
+
+
+
+
+    }
+
+
+    private void getPracticeArray(){
+
+        //copies the proper number of question numbers from the question List
+        //to the practice list depending on the amount of practice items.
+        int numPracticeItems = this.question.getInstance().getNumPractice();
+
+        practiceList = new int[numPracticeItems];
+        System.out.println("The number of practice items is " + numPracticeItems);
+        System.arraycopy(questionList, 0, practiceList,
+                0, numPracticeItems);
+
+        System.out.println("Practice list: " + Arrays.toString(question.getInstance().getPracticeList()));
+
+        int[] newQuestionList = new int[questionList.length - numPracticeItems];
+        System.arraycopy(questionList, numPracticeItems, // from array[removeEnd]
+                newQuestionList, 0,            // to array[removeStart]
+                questionList.length - numPracticeItems);
+
+        questionList = newQuestionList;
+
+        System.out.println("Test list before shuffle: " + Arrays.toString(questionList));
+
+
+    }
+
+    static void shuffleArray(int[] ar)
+    {
+
+
+
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        Random rnd = new Random();
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            int a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
+    }
+
+    public void findCurrentQNum(){
+        currentQNum = this.questionList[currentQIndex];
+    }
+
+
+
+
+
+
+    //On create, the activity needs to get the number of possible answers and either keep the default layout (3)
+    //or add a 4th layout if needed if the numPosAnswers is 4.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testquestions_screen);
 
 
+        testSize = question.getInstance().getTestSize();
+        getQuestionList();
+        question.getInstance().setCurrentIndex(0);
+
+        firstQuestion = true;
+
         opt1 = (View) findViewById(R.id.opt1pic);
         opt2 = (View) findViewById(R.id.opt2pic);
         opt3 = (View) findViewById(R.id.opt3pic);
+
+        opt1but = (RadioButton) findViewById(R.id.opt1);
+        opt2but = (RadioButton) findViewById(R.id.opt2);
+        opt3but = (RadioButton) findViewById(R.id.opt3);
+
+        numPosAnswers = question.getInstance().getNumPosAnswer();
+
+        if (numPosAnswers == 4){
+
+            LinearLayout top = (LinearLayout) findViewById(R.id.top);
+            RelativeLayout opt3Layout = (RelativeLayout) findViewById(R.id.opt3layout);
+            RelativeLayout opt4Layout = (RelativeLayout) findViewById(R.id.opt4layout);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 0.5f);
+            top.removeView(opt3Layout);
+            top.removeView(opt4Layout);
+            top.addView(opt3Layout, params);
+            top.addView(opt4Layout, params);
+
+
+
+
+            opt4 = (View) findViewById(R.id.opt4pic);
+            opt4but = (RadioButton) findViewById(R.id.opt4);
+            opt4.setSoundEffectsEnabled(false);
+
+
+        }
 
 
         opt1.setSoundEffectsEnabled(false);
@@ -101,14 +250,64 @@ public class questionsController extends AppCompatActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public void performOnEnd(){
         audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
         mp = MediaPlayer.create(this, audID);
         mp.start();
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                enableButtons();
+            }
+        });
+
     }
 
     public void proceedOnEnd(){
+
+        enableButtons();
         loadQuestion();
+    }
+
+    public void disableButtons(){
+        opt1but.setEnabled(false);
+        opt2but.setEnabled(false);
+        opt3but.setEnabled(false);
+
+        if (numPosAnswers == 4){
+            opt4but.setEnabled(false);
+        }
+    }
+
+    public void enableButtons(){
+        opt1but.setEnabled(true);
+        opt2but.setEnabled(true);
+        opt3but.setEnabled(true);
+
+        if (numPosAnswers == 4){
+            opt4but.setEnabled(true);
+        }
     }
 
 
@@ -129,20 +328,27 @@ public class questionsController extends AppCompatActivity {
 
 
 
+        if (firstQuestion == false) {
+            question.getInstance().nextQuestion();
+        } else {
+            firstQuestion = false;
+        }
 
-        question.getInstance().nextQuestion();
-        currentQNum = question.getInstance().getQuestionNum();
-        Log.d("currentQuestion", "The current question is " + currentQNum);
+
+        currentQIndex = question.getInstance().getQuestionNum();
+        findCurrentQNum();
+        Log.d("currentIndex", "The current question is " + currentQNum + " located at " + currentQIndex);
 
         //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
-        if ((currentQNum == 1) || (currentQNum == 2)){
+        if ((currentQIndex == 0) || (currentQIndex == 1)){
             question.getInstance().setCurrentQtype("Practice");
         } else  {
             question.getInstance().setCurrentQtype("Test");
         }
 
         audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
-        if (currentQNum == 1){
+        if (currentQIndex == 0){
+            disableButtons();
             mp = MediaPlayer.create(this, R.raw.practiceiteminstructions);
             mp.start();
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -152,9 +358,21 @@ public class questionsController extends AppCompatActivity {
                     performOnEnd();
                 }
             });
-        }  else {
+        }
+
+
+
+        else {
+            disableButtons();
             mp = MediaPlayer.create(this, audID);
             mp.start();
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    enableButtons();
+                }
+            });
         }
 
 
@@ -176,39 +394,89 @@ public class questionsController extends AppCompatActivity {
 
 
 
+        if (numPosAnswers == 4){
+            int pic4id = this.getResources().getIdentifier("p" + currentQNum + "d", "drawable", this.getPackageName());
+            Random rand = new Random();
+            int prevn = n;
+            while (n == prevn){
+                n = rand.nextInt(3) + 1;
+            }
 
-        Random rand = new Random();
+            switch (n){
+                case 1 :
+                    opt1.setBackground(getResources().getDrawable(pic1id));
+                    opt2.setBackground(getResources().getDrawable(pic2id));
+                    opt3.setBackground(getResources().getDrawable(pic3id));
+                    opt4.setBackground(getResources().getDrawable(pic4id));
+                    question.getInstance().setCorrectAnswer(2);
 
-        int prevn = n;
-        while (n == prevn){
-            n = rand.nextInt(3) + 1;
-        }
-        Log.d("random", "current random number is " + n);
+                    mp.start();
+                    break;
+                case 2:
+                    opt1.setBackground(getResources().getDrawable(pic4id));
+                    opt2.setBackground(getResources().getDrawable(pic3id));
+                    opt3.setBackground(getResources().getDrawable(pic1id));
+                    opt4.setBackground(getResources().getDrawable(pic2id));
+                    question.getInstance().setCorrectAnswer(4);
 
-        switch (n) {
-            case 1 :
-                opt1.setBackground(getResources().getDrawable(pic1id));
-                opt2.setBackground(getResources().getDrawable(pic2id));
-                opt3.setBackground(getResources().getDrawable(pic3id));
-                question.getInstance().setCorrectAnswer(2);
-                Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
-                mp.start();
-                break;
-            case 2:
-                opt1.setBackground(getResources().getDrawable(pic3id));
-                opt2.setBackground(getResources().getDrawable(pic1id));
-                opt3.setBackground(getResources().getDrawable(pic2id));
-                question.getInstance().setCorrectAnswer(3);
-                Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
-                mp.start();
-                break;
-            case 3:
-                opt1.setBackground(getResources().getDrawable(pic2id));
-                opt2.setBackground(getResources().getDrawable(pic3id));
-                opt3.setBackground(getResources().getDrawable(pic1id));
-                question.getInstance().setCorrectAnswer(1);
-                Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
-                break;
+                    mp.start();
+                    break;
+                case 3:
+                    opt1.setBackground(getResources().getDrawable(pic2id));
+                    opt2.setBackground(getResources().getDrawable(pic1id));
+                    opt3.setBackground(getResources().getDrawable(pic4id));
+                    opt4.setBackground(getResources().getDrawable(pic3id));
+                    question.getInstance().setCorrectAnswer(1);
+
+                    mp.start();
+                    break;
+                case 4:
+                    opt1.setBackground(getResources().getDrawable(pic3id));
+                    opt2.setBackground(getResources().getDrawable(pic4id));
+                    opt3.setBackground(getResources().getDrawable(pic2id));
+                    opt4.setBackground(getResources().getDrawable(pic1id));
+                    question.getInstance().setCorrectAnswer(3);
+
+                    mp.start();
+                    break;
+            }
+
+        } else if (numPosAnswers == 3) {
+
+
+            Random rand = new Random();
+
+            int prevn = n;
+            while (n == prevn) {
+                n = rand.nextInt(3) + 1;
+            }
+
+
+            switch (n) {
+                case 1:
+                    opt1.setBackground(getResources().getDrawable(pic1id));
+                    opt2.setBackground(getResources().getDrawable(pic2id));
+                    opt3.setBackground(getResources().getDrawable(pic3id));
+                    question.getInstance().setCorrectAnswer(2);
+                    Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                    mp.start();
+                    break;
+                case 2:
+                    opt1.setBackground(getResources().getDrawable(pic3id));
+                    opt2.setBackground(getResources().getDrawable(pic1id));
+                    opt3.setBackground(getResources().getDrawable(pic2id));
+                    question.getInstance().setCorrectAnswer(3);
+                    Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                    mp.start();
+                    break;
+                case 3:
+                    opt1.setBackground(getResources().getDrawable(pic2id));
+                    opt2.setBackground(getResources().getDrawable(pic3id));
+                    opt3.setBackground(getResources().getDrawable(pic1id));
+                    question.getInstance().setCorrectAnswer(1);
+                    Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                    break;
+            }
         }
 
 
@@ -241,13 +509,13 @@ public class questionsController extends AppCompatActivity {
                     if ((question.getInstance().getCorrectAnswer() == 1) ||
                      (question.getInstance().getCurrentQtype() != "Practice")) {
 
-                        if (currentQNum == question.getInstance().getTestSize()) {
+                        if (currentQIndex == (testSize - 1)) {
                             //go to last activity
                             //RECORD RESULTS HERE
                             startActivity(proceedIntent);
-                        } else if (currentQNum == 2){
+                        } else if (currentQIndex == 1){
 
-
+                                    disableButtons();
                                     mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
                                     mp.start();
                                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -277,13 +545,13 @@ public class questionsController extends AppCompatActivity {
                     if ((question.getInstance().getCorrectAnswer() == 2) ||
                             (question.getInstance().getCurrentQtype() != "Practice")) {
 
-                        if (currentQNum == question.getInstance().getTestSize()) {
+                        if (currentQIndex == (testSize - 1)) {
                             //go to last activity
                             //RECORD RESULTS HERE
                             startActivity(proceedIntent);
-                        } else if (currentQNum == 2){
+                        } else if (currentQIndex == 1){
 
-
+                            disableButtons();
                             mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
                             mp.start();
                             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -316,13 +584,13 @@ public class questionsController extends AppCompatActivity {
                             (question.getInstance().getCurrentQtype() != "Practice")) {
 
 
-                        if (currentQNum == question.getInstance().getTestSize()) {
+                        if (currentQIndex == (testSize - 1)) {
                             //go to last activity
                             //RECORD RESULTS HERE
                             startActivity(proceedIntent);
-                        } else if (currentQNum == 2){
+                        } else if (currentQIndex == 1){
 
-
+                            disableButtons();
                             mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
                             mp.start();
                             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -337,6 +605,41 @@ public class questionsController extends AppCompatActivity {
 
 
                             //                processes that occur when correct answer is chosen
+
+                            loadQuestion();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                        mp = MediaPlayer.create(this, R.raw.tryagain);
+                        mp.start();
+                    }
+                    break;
+                case R.id.opt4:
+                    if ((question.getInstance().getCorrectAnswer() == 4) ||
+                            (question.getInstance().getCurrentQtype() != "Practice")) {
+
+
+                        if (currentQIndex == (testSize - 1)) {
+                            //go to last activity
+                            //RECORD RESULTS HERE
+                            startActivity(proceedIntent);
+                        } else if (currentQIndex == 1){
+
+                            disableButtons();
+                            mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    proceedOnEnd();
+                                }
+                            });
+
+                        } else {
+
+
+                            //                processes that occur when correct answer is chosen on a normal question
 
                             loadQuestion();
                         }
