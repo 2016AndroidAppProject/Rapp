@@ -62,6 +62,10 @@ public class questionsController extends AppCompatActivity {
     int[] practiceList;
     int[] questionList;
 
+    //integer attempts describes how many times a user has incorrectly answer so we know when to play
+    //the word audio again (on the 3rd attempt)
+    int attempts;
+
     //integer n is used as a random number to shuffle the position of the buttons on the screen
     int n;
 
@@ -109,6 +113,7 @@ public class questionsController extends AppCompatActivity {
         int[] finalQuestionList = new int[testSize];
 
         int numPracticeItems = this.question.getInstance().getNumPractice();
+        int attempts = 0;
         System.arraycopy(practiceList, 0, finalQuestionList, 0, numPracticeItems);
         System.arraycopy(questionList, 0, finalQuestionList, numPracticeItems, questionList.length);
 
@@ -189,6 +194,7 @@ public class questionsController extends AppCompatActivity {
         question.getInstance().setCurrentIndex(0);
 
         firstQuestion = true;
+        attempts = 0;
 
         opt1 = (View) findViewById(R.id.opt1pic);
         opt2 = (View) findViewById(R.id.opt2pic);
@@ -286,6 +292,13 @@ public class questionsController extends AppCompatActivity {
 
     public void proceedOnEnd(){
 
+
+        opt1.setVisibility(View.VISIBLE);
+        opt2.setVisibility(View.VISIBLE);
+        opt3.setVisibility(View.VISIBLE);
+        if (numPosAnswers == 4){
+            opt4.setVisibility(View.VISIBLE);
+        }
         enableButtons();
         loadQuestion();
     }
@@ -308,6 +321,20 @@ public class questionsController extends AppCompatActivity {
         if (numPosAnswers == 4){
             opt4but.setEnabled(true);
         }
+    }
+
+    public void setButVisible(){
+
+    }
+
+    public void setButInvisible(){
+        opt1.setVisibility(View.GONE);
+        opt2.setVisibility(View.GONE);
+        opt3.setVisibility(View.GONE);
+        if (numPosAnswers == 4){
+            opt4.setVisibility(View.GONE);
+        }
+
     }
 
 
@@ -338,10 +365,11 @@ public class questionsController extends AppCompatActivity {
         currentQIndex = question.getInstance().getQuestionNum();
         findCurrentQNum();
         Log.d("currentIndex", "The current question is " + currentQNum + " located at " + currentQIndex);
-
+        attempts = 0;
         //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
         if ((currentQIndex == 0) || (currentQIndex == 1)){
             question.getInstance().setCurrentQtype("Practice");
+
         } else  {
             question.getInstance().setCurrentQtype("Test");
         }
@@ -475,6 +503,7 @@ public class questionsController extends AppCompatActivity {
                     opt3.setBackground(getResources().getDrawable(pic1id));
                     question.getInstance().setCorrectAnswer(1);
                     Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
+                    mp.start();
                     break;
             }
         }
@@ -482,6 +511,12 @@ public class questionsController extends AppCompatActivity {
 
 
 
+    }
+
+    public void tryAgainMessage() {
+        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+        mp = MediaPlayer.create(this, R.raw.tryagain);
+        mp.start();
     }
 
 
@@ -518,6 +553,12 @@ public class questionsController extends AppCompatActivity {
                                     disableButtons();
                                     mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
                                     mp.start();
+                                    opt1.setVisibility(View.GONE);
+                                    opt2.setVisibility(View.GONE);
+                                    opt3.setVisibility(View.GONE);
+                                    if (numPosAnswers == 4){
+                                        opt4.setVisibility(View.GONE);
+                                    }
                                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                                         @Override
@@ -534,10 +575,22 @@ public class questionsController extends AppCompatActivity {
                             //                processes that occur when correct answer is chosen
 
                     } else {
-                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                        attempts++;
+                        if (attempts >= 2){
+                            mp = MediaPlayer.create(this, audID);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-                        mp = MediaPlayer.create(this, R.raw.tryagain);
-                        mp.start();
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    tryAgainMessage();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                            mp = MediaPlayer.create(this, R.raw.tryagain);
+                            mp.start();
+                        }
                     }
                     break;
 
@@ -553,6 +606,12 @@ public class questionsController extends AppCompatActivity {
 
                             disableButtons();
                             mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                            opt1.setVisibility(View.GONE);
+                            opt2.setVisibility(View.GONE);
+                            opt3.setVisibility(View.GONE);
+                            if (numPosAnswers == 4){
+                                opt4.setVisibility(View.GONE);
+                            }
                             mp.start();
                             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
@@ -569,10 +628,23 @@ public class questionsController extends AppCompatActivity {
                             loadQuestion();
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                        attempts++;
+                        if (attempts >= 2){
+                            mp = MediaPlayer.create(this, audID);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-                        mp = MediaPlayer.create(this, R.raw.tryagain);
-                        mp.start();
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    tryAgainMessage();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                            mp = MediaPlayer.create(this, R.raw.tryagain);
+                            mp.start();
+                        }
+
                     }
                     break;
 
@@ -592,6 +664,12 @@ public class questionsController extends AppCompatActivity {
 
                             disableButtons();
                             mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                            opt1.setVisibility(View.GONE);
+                            opt2.setVisibility(View.GONE);
+                            opt3.setVisibility(View.GONE);
+                            if (numPosAnswers == 4){
+                                opt4.setVisibility(View.GONE);
+                            }
                             mp.start();
                             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
@@ -609,9 +687,23 @@ public class questionsController extends AppCompatActivity {
                             loadQuestion();
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
-                        mp = MediaPlayer.create(this, R.raw.tryagain);
-                        mp.start();
+                        attempts++;
+                        if (attempts >= 2){
+                            mp = MediaPlayer.create(this, audID);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    tryAgainMessage();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                            mp = MediaPlayer.create(this, R.raw.tryagain);
+                            mp.start();
+                        }
+
                     }
                     break;
                 case R.id.opt4:
@@ -627,6 +719,12 @@ public class questionsController extends AppCompatActivity {
 
                             disableButtons();
                             mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
+                            opt1.setVisibility(View.GONE);
+                            opt2.setVisibility(View.GONE);
+                            opt3.setVisibility(View.GONE);
+                            if (numPosAnswers == 4){
+                                opt4.setVisibility(View.GONE);
+                            }
                             mp.start();
                             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
@@ -644,9 +742,23 @@ public class questionsController extends AppCompatActivity {
                             loadQuestion();
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
-                        mp = MediaPlayer.create(this, R.raw.tryagain);
-                        mp.start();
+                        attempts++;
+                        if (attempts >= 2){
+                            mp = MediaPlayer.create(this, audID);
+                            mp.start();
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    tryAgainMessage();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
+                            mp = MediaPlayer.create(this, R.raw.tryagain);
+                            mp.start();
+                        }
+
                     }
                     break;
 
