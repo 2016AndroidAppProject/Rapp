@@ -12,9 +12,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:largeHeap="true">
+        android:theme="@style/AppTheme">
         android:debuggable="true"
         <activity
             android:name=".loginController"
@@ -36,7 +36,8 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".proceedController" />
-        <activity android:name=".instructionController"></activity>
+        <activity android:name=".instructionController" />
+        <activity android:name=".selectionController"></activity>
     </application>
 
 </manifest>

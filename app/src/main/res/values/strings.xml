@@ -15,4 +15,24 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+
+
+    <string-array name="header_titles">
+        <item>Select a Test</item>
+        <item>Select a Student</item>
+    </string-array>
+
+
+    <string-array name="tests">
+        <item>Test1</item>
+        <item>Test2</item>
+    </string-array>
+
+    <string-array name="students">
+        <item>Riley</item>
+        <item>Indigo</item>
+        <item>Oliver</item>
+        <item>Daniel</item>
+    </string-array>
 </resources>
