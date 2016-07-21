@@ -65,7 +65,8 @@ public class questionsController extends AppCompatActivity {
     int[] questionList;
 
     //integer attempts describes how many times a user has incorrectly answer so we know when to play
-    //the word audio again (on the 3rd attempt)
+    //the word audio again (on the 3rd attempt)and we know when a user has gotten a question
+    //correct on the first attempt.
     int attempts;
 
     //integer n is used as a random number to shuffle the position of the buttons on the screen
@@ -78,6 +79,11 @@ public class questionsController extends AppCompatActivity {
     //integer audID is used as an identifier for our audio files
     int audID;
 
+    //integer pracCorrect describes how many times the user has gotten a practice question correct
+    //on the first time. pracCorrect only increases when attempts = 0.
+    int pracCorrect;
+
+    //A media player to allow us to play audio.
     MediaPlayer mp;
 
 
@@ -180,7 +186,7 @@ public class questionsController extends AppCompatActivity {
 
         testSize = question.getInstance().getTestSize();
         getQuestionList();
-        question.getInstance().setCurrentIndex(0);
+        question.getInstance().setCurrentQIndex(0);
 
         firstQuestion = true;
         attempts = 0;
@@ -279,6 +285,7 @@ public class questionsController extends AppCompatActivity {
     }
 
     public void enableButtons(){
+        setButVisible();
         opt1but.setEnabled(true);
         opt2but.setEnabled(true);
         opt3but.setEnabled(true);
@@ -321,25 +328,46 @@ public class questionsController extends AppCompatActivity {
 //        } else {
 //            audio = "stop";
 //        }
+
+
+        //The following if statement sets the question to the next question IF and only IF
+        //we are not on the first question. If we are loading the questions for the first time, we want
+        //it to load the first question.
         if (firstQuestion == false) {
-            question.getInstance().nextQuestion();
+
+            //code to set the current question to the next question OR
+            //forward them to the first practice item if they just successfully
+            //completed the second practice question.
+            if (pracCorrect == 2){
+                pracCorrect = 0;
+                question.getInstance().setQuestionNum(numPracticeItems);
+            } else {
+                question.getInstance().nextQuestion();
+            }
         } else {
             firstQuestion = false;
         }
+
+
+        //currentQIndex describes the position in the questionList array that
+        //the question is located at.
+
+
+
         currentQIndex = question.getInstance().getQuestionNum();
         findCurrentQNum();
-        Log.d("currentIndex", "The current question is " + currentQNum + " located at " + currentQIndex);
+        Log.d("currentQIndex", "The current question is " + currentQNum + " located at " + currentQIndex);
         attempts = 0;
         //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
-        if ((currentQIndex == 0) || (currentQIndex == 1)){
+        if (currentQIndex < numPracticeItems){
             question.getInstance().setCurrentQtype("Practice");
-
         } else  {
             question.getInstance().setCurrentQtype("Test");
         }
         audID = this.getResources().getIdentifier("a" + currentQNum, "raw", this.getPackageName());
         if (currentQIndex == 0){
             disableButtons();
+            setButInvisible();
             mp = MediaPlayer.create(this, R.raw.practiceiteminstructions);
             mp.start();
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -352,6 +380,7 @@ public class questionsController extends AppCompatActivity {
         }
         else {
             disableButtons();
+            setButInvisible();
             mp = MediaPlayer.create(this, audID);
             mp.start();
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -489,12 +518,20 @@ public class questionsController extends AppCompatActivity {
     //Behavior that is triggered when the user chooses the correct button. Either
     //the user will continue to the next question, they will have finished the test,
     //or they will have finished the practice questions.
-    public void processCorrectAnswer(){
+    public void processAnswer(){
+        //Code to add +1 to pracCorrect if attempts = 0
+        //so that when user gets two practice questions right on their first attempt
+        //they are forwarded to the first real practice item regardless of rather
+        //they finished all the practice questions.
+        if ((attempts == 0) && (question.getInstance().getCurrentQtype() == "Practice")){
+            pracCorrect++;
+        }
+
         if (currentQIndex == (testSize - 1)) {
             //go to last activity
             //RECORD RESULTS HERE
             startActivity(proceedIntent);
-        } else if (currentQIndex == 1){
+        } else if ((currentQIndex == (numPracticeItems - 1) || pracCorrect == 2)){
             transitionToTestItems();
         } else {
             loadQuestion();
@@ -526,7 +563,7 @@ public class questionsController extends AppCompatActivity {
                 case R.id.opt1:
                     if ((question.getInstance().getCorrectAnswer() == 1) ||
                      (question.getInstance().getCurrentQtype() != "Practice")) {
-                        processCorrectAnswer();
+                        processAnswer();
                     } else {
                         incorrectAnswer();
                     }
@@ -534,7 +571,7 @@ public class questionsController extends AppCompatActivity {
                 case R.id.opt2:
                     if ((question.getInstance().getCorrectAnswer() == 2) ||
                             (question.getInstance().getCurrentQtype() != "Practice")) {
-                        processCorrectAnswer();
+                        processAnswer();
                     } else {
                         incorrectAnswer();
                     }
@@ -542,7 +579,7 @@ public class questionsController extends AppCompatActivity {
                 case R.id.opt3:
                     if ((question.getInstance().getCorrectAnswer() == 3) ||
                             (question.getInstance().getCurrentQtype() != "Practice")) {
-                        processCorrectAnswer();
+                        processAnswer();
                     } else {
                         incorrectAnswer();
                     }
@@ -550,7 +587,7 @@ public class questionsController extends AppCompatActivity {
                 case R.id.opt4:
                     if ((question.getInstance().getCorrectAnswer() == 4) ||
                             (question.getInstance().getCurrentQtype() != "Practice")) {
-                        processCorrectAnswer();
+                        processAnswer();
                     } else {
                       incorrectAnswer(); //user answers incorrectly
                     }

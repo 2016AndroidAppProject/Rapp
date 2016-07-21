@@ -26,7 +26,9 @@ public class loginController extends AppCompatActivity {
     EditText userName;
     EditText password;
     Button loginButton;
-    Intent loginIntent;
+    Intent teacherLoginIntent;
+    Intent adminLoginIntent;
+
     currentUserData currentUserData;
     currentQuestionData currentQuestionData;
 
@@ -36,12 +38,13 @@ public class loginController extends AppCompatActivity {
         setContentView(R.layout.login_screen);
 
         //The class links up with the fields in the login_screen.
-        userName = (EditText) findViewById(R.id.userNameField);
-        password = (EditText)findViewById(R.id.passwordField);
+        userName = (EditText) findViewById(R.id.newUserNameField);
+        password = (EditText)findViewById(R.id.newPasswordField);
         loginButton=(Button)findViewById(R.id.loginButton);
 
         //Login class prepares an intent to change activity to the practice screens.
-        loginIntent = new Intent(this, proceedController.class);
+        teacherLoginIntent = new Intent(this, selectionController.class);
+        adminLoginIntent = new Intent(this, adminViewController.class);
 
 
         //Following method class detects when user has clicked the login button and validates
@@ -58,10 +61,18 @@ public class loginController extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Redirecting...",Toast.LENGTH_SHORT).show();
                     currentUserData.getInstance().setUserName(userName.getText().toString());
                     currentUserData.getInstance().setPassword(password.getText().toString());
-                    currentUserData.getInstance().setUserType("Platypus!!");
-                    startActivity(loginIntent);
-                }
-                else{
+                    currentUserData.getInstance().setUserType("admin");
+                    startActivity(adminLoginIntent);
+                } else if(userName.getText().toString().equals("teacher") &&
+
+                        password.getText().toString().equals("teacher")) {
+
+                    Toast.makeText(getApplicationContext(), "Redirecting...",Toast.LENGTH_SHORT).show();
+                    currentUserData.getInstance().setUserName(userName.getText().toString());
+                    currentUserData.getInstance().setPassword(password.getText().toString());
+                    currentUserData.getInstance().setUserType("teacher");
+                    startActivity(teacherLoginIntent);
+                } else{
                     Toast.makeText(getApplicationContext(), "Wrong Credentials, please try again or contact testing administrators for help logging in.",Toast.LENGTH_SHORT).show();
 
                 }

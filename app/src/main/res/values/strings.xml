@@ -17,7 +17,6 @@
     </string>
 
 
-
     <string-array name="header_titles">
         <item>Select a Test</item>
         <item>Select a Student</item>
@@ -30,9 +29,20 @@
     </string-array>
 
     <string-array name="students">
-        <item>Riley</item>
-        <item>Indigo</item>
-        <item>Oliver</item>
-        <item>Daniel</item>
+        <item>Morgan</item>
+        <item>Yaritza</item>
+        <item>Seamus</item>
+        <item>Ashlynn</item>
+        <item>Josie</item>
+        <item>Justus</item>
+        <item>Macy</item>
+        <item>Lee</item>
+        <item>Tanner</item>
+        <item>Andreas</item>
+        <item>Reese</item>
+        <item>Mckinley</item>
+        <item>Lorena</item>
+        <item>Myah</item>
+        <item>Destiny</item>
     </string-array>
 </resources>

@@ -1,5 +1,7 @@
 package com.example.nick.rapp;
 
+import android.app.Activity;
+
 /**
  * Created by Nick on 6/23/2016.
  */
@@ -16,18 +18,38 @@ public class currentUserData {
     private String userName;
     private String password;
     private String userType;
+//    private Activity prevAct;
+//    private Activity currentAct;
 
-    public currentUserData(String userName, String password, String userType, int selection) {
+    public currentUserData(String userName, String password, String userType
+    ) {
         this.userName = userName;
         this.password = password;
         this.userType = userType;
+//        this.prevAct = prevAct;
+//        this.currentAct = currentAct;
     }
 
 
     //SINGLETON PATTERN: The user is instantiated here so that the user is ready to hold data when initialized in
     //the other class. The userData is initialized in the loginController.java class.
-    private static final currentUserData CURRENT_USER_DATA = new currentUserData("blank", "blank", "Teacher", 0);
-
+    private static final currentUserData CURRENT_USER_DATA = new currentUserData("blank", "blank", "blank");
+//
+//    public Activity getPrevAct() {
+//        return prevAct;
+//    }
+//
+//    public void setPrevAct(Activity prevAct) {
+//        this.prevAct = prevAct;
+//    }
+//
+//    public Activity getCurrentAct() {
+//        return currentAct;
+//    }
+//
+//    public void setCurrentAct(Activity currentAct) {
+//        this.currentAct = currentAct;
+//    }
 
     public static currentUserData getInstance() {return CURRENT_USER_DATA;}
 

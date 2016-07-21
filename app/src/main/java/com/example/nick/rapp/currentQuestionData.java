@@ -22,7 +22,7 @@ public class currentQuestionData {
     int currentSelection;
     int numPosAnswer;
     String currentQtype;
-    int currentIndex;
+    int currentQIndex;
 
 
     //these two arrays hold the randomized integer arrays that determine the question order.
@@ -56,7 +56,7 @@ public class currentQuestionData {
         this.currentSelection = currentSelection;
         this.numPosAnswer = numPosAnswer;
         this.currentQtype = currentQtype;
-        this.currentIndex = currentIndex;
+        this.currentQIndex = currentIndex;
         this.testSize = testSize;
         this.numPractice = numPractice;
         this.practiceList = practiceList;
@@ -85,7 +85,7 @@ public class currentQuestionData {
     // that it is ready to hold data when we initialize it in another class.
     // It is first initialized in the login screen.java class.
     private static final currentQuestionData CURRENT_QUESTION_DATA =
-            new currentQuestionData(0, 0, 4, "Practice", 0, 24, 2, null, null);
+            new currentQuestionData(0, 0, 4, "Practice", 0, 24, 4, null, null);
 
     public static currentQuestionData getInstance() {return CURRENT_QUESTION_DATA;}
 
@@ -98,8 +98,12 @@ public class currentQuestionData {
     }
 
     public int getQuestionNum(){
-        return this.currentIndex;
+        return this.currentQIndex;
     }
+
+    public void setQuestionNum(int index) {this.currentQIndex = index; }
+
+
 
     public int getCorrectAnswer() {
         return correctAnswer;
@@ -136,17 +140,17 @@ public class currentQuestionData {
 
 
 
-    public int getCurrentIndex() {
-        return currentIndex;
+    public int getCurrentQIndex() {
+        return currentQIndex;
     }
 
-    public void setCurrentIndex(int currentIndex) {
-        this.currentIndex = currentIndex;
+    public void setCurrentQIndex(int currentQIndex) {
+        this.currentQIndex = currentQIndex;
     }
 
     public void nextQuestion() {
 
-        this.currentIndex++;
+        this.currentQIndex++;
     }
 
     // boolean nextQEmpty?

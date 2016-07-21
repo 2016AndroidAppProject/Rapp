@@ -37,7 +37,8 @@
 
         <activity android:name=".proceedController" />
         <activity android:name=".instructionController" />
-        <activity android:name=".selectionController"></activity>
+        <activity android:name=".selectionController" />
+        <activity android:name=".adminViewController"></activity>
     </application>
 
 </manifest>
