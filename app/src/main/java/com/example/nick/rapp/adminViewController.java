@@ -46,7 +46,7 @@ public class adminViewController extends AppCompatActivity {
 
                 } else {
                     DatabaseOperations db = new DatabaseOperations(ctx);
-                    db.addNewUser(db, newUserName, newPassword);
+                    db.addNewUser(db, newUserName, newPassword, "teacher");
                     Toast.makeText(getBaseContext(),
                             newUserName + " has been successfully registered!", Toast.LENGTH_LONG).show();
                 }

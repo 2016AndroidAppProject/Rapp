@@ -16,9 +16,11 @@ public class tableData {
     {
         public static final String USER_NAME = "user_name";
         public static final String USER_PASSWORD = "user_password";
+        public static final String USER_TYPE = "user_type";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
         public static final String TABLE_NAME = "account_info";
+
     }
 }
