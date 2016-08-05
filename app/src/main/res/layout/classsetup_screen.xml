@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.nick.rapp.classSetupController"
+    android:background="#90CAF9">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/relativeLayout2">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap to add new student"
+            android:id="@+id/addNewStudentButton"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:id="@+id/addStudentFNameField"
+            android:hint="Enter Childs First Name"
+            android:focusable="true"
+            android:textColor="#000000"
+            android:ems="10"
+            android:layout_above="@+id/addNewStudentButton"
+            android:layout_alignLeft="@+id/addNewStudentButton"
+            android:layout_marginBottom="75dp" />
+
+        <Spinner
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/teacherSpinner"
+            android:background="#FFFFFF"
+            android:layout_above="@+id/addStudentFNameField"
+            android:layout_alignRight="@+id/addNewStudentButton"
+            android:layout_alignEnd="@+id/addNewStudentButton" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose teacher and enter name to add child to that teacher&apos;s class:"
+        android:id="@+id/textView6"
+        android:layout_marginTop="111dp"
+        android:textSize="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/relativeLayout2"
+        android:layout_toStartOf="@+id/relativeLayout2" />
+</RelativeLayout>

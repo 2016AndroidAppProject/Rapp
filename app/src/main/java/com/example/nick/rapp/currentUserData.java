@@ -18,11 +18,11 @@ public class currentUserData {
     private String userName;
     private String password;
     private String userType;
+    private String userRealName;
 //    private Activity prevAct;
 //    private Activity currentAct;
 
-    public currentUserData(String userName, String password, String userType
-    ) {
+    public currentUserData(String userName, String password, String userType, String userRealName) {
         this.userName = userName;
         this.password = password;
         this.userType = userType;
@@ -33,7 +33,7 @@ public class currentUserData {
 
     //SINGLETON PATTERN: The user is instantiated here so that the user is ready to hold data when initialized in
     //the other class. The userData is initialized in the loginController.java class.
-    private static final currentUserData CURRENT_USER_DATA = new currentUserData("blank", "blank", "blank");
+    private static final currentUserData CURRENT_USER_DATA = new currentUserData("blank", "blank", "blank", "blank");
 //
 //    public Activity getPrevAct() {
 //        return prevAct;
@@ -50,6 +50,15 @@ public class currentUserData {
 //    public void setCurrentAct(Activity currentAct) {
 //        this.currentAct = currentAct;
 //    }
+
+
+    public String getUserRealName() {
+        return userRealName;
+    }
+
+    public void setUserRealName(String userRealName) {
+        this.userRealName = userRealName;
+    }
 
     public static currentUserData getInstance() {return CURRENT_USER_DATA;}
 

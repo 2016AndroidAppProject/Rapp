@@ -22,4 +22,9 @@ public class proceedController extends AppCompatActivity {
         startActivity(proceedIntent);
     }
 
+    //This method is used to ensure that the user cannot press the back button while in a test
+    @Override
+    public void onBackPressed() {
+    }
+
 }

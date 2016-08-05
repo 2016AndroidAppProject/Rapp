@@ -38,7 +38,18 @@
         <activity android:name=".proceedController" />
         <activity android:name=".instructionController" />
         <activity android:name=".selectionController" />
-        <activity android:name=".adminViewController"></activity>
+        <activity android:name=".adminViewController" />
+        <activity android:name=".userSetupController" />
+        <activity android:name=".classSetupController" />
+        <activity android:name=".settingsController" />
+        <activity android:name=".testSetupController" />
+        <activity android:name=".resultsSetupController" />
+        <activity android:name=".testsController" />
+        <activity android:name=".addTestController" />
+        <activity android:name=".editTestsController" />
+        <activity android:name=".editPracticeItemsController" />
+        <activity android:name=".exportResultsController" />
+        <activity android:name=".viewResultsController"></activity>
     </application>
 
 </manifest>

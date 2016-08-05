@@ -7,53 +7,40 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.nick.rapp.adminViewController"
+    tools:context="com.example.nick.rapp.settingsController"
     android:background="#90CAF9">
-
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="1">
+        android:weightSum="1" >
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.33"
-            android:weightSum="1">
+            android:weightSum="1" >
 
             <Button
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="Administer Receptive Test"
-                android:id="@+id/administerReceptiveTest"
+                android:text="RESULTS SETUP"
+                android:id="@+id/button"
                 android:textSize="35dp"
                 android:padding="20dp"
-                android:layout_alignTop="@+id/settingsButton"
+                android:layout_alignTop="@+id/button5"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_weight=".50" />
+                android:layout_alignParentEnd="true" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="STUDENT LIVE VIEW"
-                android:id="@+id/button2"
-                android:textSize="35dp"
-                android:padding="20dp"
-                android:layout_alignTop="@+id/settingsButton"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_weight=".50" />
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.33"></LinearLayout>
+            android:layout_weight="0.33" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -63,16 +50,16 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_weight="0.33"
-            android:weightSum="1">
+            android:weightSum="1" >
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="ADD/EDIT TESTS"
-                android:id="@+id/tests"
+                android:text="TEST SETUP"
+                android:id="@+id/button4"
                 android:textSize="35dp"
                 android:padding="20dp"
-                android:layout_alignTop="@+id/settingsButton"
+                android:layout_alignTop="@+id/button5"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_weight=".33" />
@@ -80,19 +67,19 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="SETTINGS"
-                android:id="@+id/settingsButton"
+                android:text="Classroom Setup"
+                android:id="@+id/button5"
                 android:textSize="35dp"
                 android:padding="20dp"
-                android:layout_alignTop="@+id/exportResultsButton"
+                android:layout_alignTop="@+id/button6"
                 android:layout_centerHorizontal="true"
                 android:layout_weight="0.33" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="EXPORT RESULTS"
-                android:id="@+id/exportResultsButton"
+                android:text="Add/Edit Users"
+                android:id="@+id/button6"
                 android:textSize="35dp"
                 android:padding="20dp"
                 android:layout_centerVertical="true"
@@ -101,5 +88,4 @@
                 android:layout_weight="0.33" />
         </LinearLayout>
     </LinearLayout>
-
 </RelativeLayout>

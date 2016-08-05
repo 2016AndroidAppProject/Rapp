@@ -286,6 +286,8 @@ public class questionsController extends AppCompatActivity {
 
     public void enableButtons(){
         setButVisible();
+        mp = MediaPlayer.create(this, audID);
+        mp.start();
         opt1but.setEnabled(true);
         opt2but.setEnabled(true);
         opt3but.setEnabled(true);
@@ -468,11 +470,11 @@ public class questionsController extends AppCompatActivity {
                     break;
             }
         }
+
     }
 
     //Message that appears when user answers incorrectly.
     public void tryAgainMessage() {
-        Toast.makeText(getApplicationContext(), "Incorrect, please try again", Toast.LENGTH_SHORT).show();
         mp = MediaPlayer.create(this, R.raw.tryagain);
         mp.start();
     }
@@ -525,6 +527,8 @@ public class questionsController extends AppCompatActivity {
         //they finished all the practice questions.
         if ((attempts == 0) && (question.getInstance().getCurrentQtype() == "Practice")){
             pracCorrect++;
+        } else {
+            pracCorrect = 0;
         }
 
         if (currentQIndex == (testSize - 1)) {
@@ -599,6 +603,14 @@ public class questionsController extends AppCompatActivity {
 
     //This method is used as a placeholder on the button
     public void doNothing(View view){
+    }
+
+
+
+
+    //This method is used to ensure that the user cannot press the back button while in a test
+    @Override
+    public void onBackPressed() {
     }
 
 
