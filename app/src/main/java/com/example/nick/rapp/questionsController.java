@@ -1,6 +1,10 @@
 package com.example.nick.rapp;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +22,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -50,6 +55,8 @@ public class questionsController extends AppCompatActivity {
     RadioButton opt2but;
     RadioButton opt3but;
     RadioButton opt4but;
+
+    DatabaseOperations dop;
 
 
     //values that describe which question we are on, how many possible answers the questions have, and
@@ -183,7 +190,7 @@ public class questionsController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testquestions_screen);
 
-
+        dop = new DatabaseOperations(this);
         testSize = question.getInstance().getTestSize();
         getQuestionList();
         question.getInstance().setCurrentQIndex(0);
@@ -317,12 +324,38 @@ public class questionsController extends AppCompatActivity {
 
     }
 
+    public Bitmap byteArrayToBitmap(byte[] byteArray){
+        Bitmap background = BitmapFactory.decodeByteArray(byteArray, 0,
+                byteArray.length);
+        Bitmap back = Bitmap.createBitmap(background.getWidth(),
+                background.getHeight(), Bitmap.Config.ARGB_8888);
+        return back;
+    }
 
+    public Bitmap[] fetchBitmaps(Cursor CR, int questionNum){
+        Bitmap[] bitmaps = new Bitmap[4];
+        CR.moveToFirst();
+        byte[] pic1Bytes = CR.getBlob(3);
+        byte[] pic2Bytes = CR.getBlob(4);
+        byte[] pic3Bytes = CR.getBlob(5);
+        byte[] pic4Bytes = CR.getBlob(6);
+        bitmaps[0] = byteArrayToBitmap(pic1Bytes);
+        bitmaps[1] = byteArrayToBitmap(pic2Bytes);
+        bitmaps[2] = byteArrayToBitmap(pic3Bytes);
+        bitmaps[3] = byteArrayToBitmap(pic4Bytes);
+        return bitmaps;
+
+    }
 
     //This method loads new assets into screen based on the current question number.
     //it users the random number n to make sure we don't place the correct answer in the same location twice
     //and it also sets the correct answer to the proper option.
     public void loadQuestion() {
+
+        String stringNumForQuery = Integer.toString(1);
+        Cursor questionQuery = dop.getQuestionsForTest(dop, stringNumForQuery);
+        Bitmap[] pics = fetchBitmaps(questionQuery, 1);
+
         //determines rather we need to play third set of instructions here.
         String audio;
 //        if (question.getInstance().getCurrentQtype() == "Practice"){
@@ -393,11 +426,11 @@ public class questionsController extends AppCompatActivity {
                 }
             });
         }
-        int pic1id = this.getResources().getIdentifier("p" + currentQNum + "a", "drawable", this.getPackageName());
-        int pic2id = this.getResources().getIdentifier("p" + currentQNum + "b", "drawable", this.getPackageName());
-        int pic3id = this.getResources().getIdentifier("p" + currentQNum + "c", "drawable", this.getPackageName());
+//        int pic1id = this.getResources().getIdentifier("p" + currentQNum + "a", "drawable", this.getPackageName());
+//        int pic2id = this.getResources().getIdentifier("p" + currentQNum + "b", "drawable", this.getPackageName());
+//        int pic3id = this.getResources().getIdentifier("p" + currentQNum + "c", "drawable", this.getPackageName());
         if (numPosAnswers == 4){
-            int pic4id = this.getResources().getIdentifier("p" + currentQNum + "d", "drawable", this.getPackageName());
+//            int pic4id = this.getResources().getIdentifier("p" + currentQNum + "d", "drawable", this.getPackageName());
             Random rand = new Random();
             int prevn = n;
             while (n == prevn){
@@ -405,34 +438,51 @@ public class questionsController extends AppCompatActivity {
             }
             switch (n){
                 case 1 :
-                    opt1.setBackground(getResources().getDrawable(pic1id));
-                    opt2.setBackground(getResources().getDrawable(pic2id));
-                    opt3.setBackground(getResources().getDrawable(pic3id));
-                    opt4.setBackground(getResources().getDrawable(pic4id));
+//                    opt1.setBackground(getResources().getDrawable(pic1id));
+//                    opt2.setBackground(getResources().getDrawable(pic2id));
+//                    opt3.setBackground(getResources().getDrawable(pic3id));
+//                    opt4.setBackground(getResources().getDrawable(pic4id));
+
+                    opt1.setBackground(new BitmapDrawable(getResources(), pics[0]));
+                    opt2.setBackground(new BitmapDrawable(getResources(), pics[1]));
+                    opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
+                    opt4.setBackground(new BitmapDrawable(getResources(), pics[3]));
                     question.getInstance().setCorrectAnswer(2);
                     mp.start();
                     break;
                 case 2:
-                    opt1.setBackground(getResources().getDrawable(pic4id));
-                    opt2.setBackground(getResources().getDrawable(pic3id));
-                    opt3.setBackground(getResources().getDrawable(pic1id));
-                    opt4.setBackground(getResources().getDrawable(pic2id));
+//                    opt1.setBackground(getResources().getDrawable(pic4id));
+//                    opt2.setBackground(getResources().getDrawable(pic3id));
+//                    opt3.setBackground(getResources().getDrawable(pic1id));
+//                    opt4.setBackground(getResources().getDrawable(pic2id));
+                    opt1.setBackground(new BitmapDrawable(getResources(), pics[3]));
+                    opt2.setBackground(new BitmapDrawable(getResources(), pics[2]));
+                    opt3.setBackground(new BitmapDrawable(getResources(), pics[0]));
+                    opt4.setBackground(new BitmapDrawable(getResources(), pics[1]));
                     question.getInstance().setCorrectAnswer(4);
                     mp.start();
                     break;
                 case 3:
-                    opt1.setBackground(getResources().getDrawable(pic2id));
-                    opt2.setBackground(getResources().getDrawable(pic1id));
-                    opt3.setBackground(getResources().getDrawable(pic4id));
-                    opt4.setBackground(getResources().getDrawable(pic3id));
+//                    opt1.setBackground(getResources().getDrawable(pic2id));
+//                    opt2.setBackground(getResources().getDrawable(pic1id));
+//                    opt3.setBackground(getResources().getDrawable(pic4id));
+//                    opt4.setBackground(getResources().getDrawable(pic3id));
+                    opt1.setBackground(new BitmapDrawable(getResources(), pics[1]));
+                    opt2.setBackground(new BitmapDrawable(getResources(), pics[0]));
+                    opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
+                    opt4.setBackground(new BitmapDrawable(getResources(), pics[3]));
                     question.getInstance().setCorrectAnswer(1);
                     mp.start();
                     break;
                 case 4:
-                    opt1.setBackground(getResources().getDrawable(pic3id));
-                    opt2.setBackground(getResources().getDrawable(pic4id));
-                    opt3.setBackground(getResources().getDrawable(pic2id));
-                    opt4.setBackground(getResources().getDrawable(pic1id));
+//                    opt1.setBackground(getResources().getDrawable(pic3id));
+//                    opt2.setBackground(getResources().getDrawable(pic4id));
+//                    opt3.setBackground(getResources().getDrawable(pic2id));
+//                    opt4.setBackground(getResources().getDrawable(pic1id));
+                    opt1.setBackground(new BitmapDrawable(getResources(), pics[2]));
+                    opt2.setBackground(new BitmapDrawable(getResources(), pics[3]));
+                    opt3.setBackground(new BitmapDrawable(getResources(), pics[1]));
+                    opt4.setBackground(new BitmapDrawable(getResources(), pics[0]));
                     question.getInstance().setCorrectAnswer(3);
                     mp.start();
                     break;
@@ -445,25 +495,25 @@ public class questionsController extends AppCompatActivity {
             }
             switch (n) {
                 case 1:
-                    opt1.setBackground(getResources().getDrawable(pic1id));
-                    opt2.setBackground(getResources().getDrawable(pic2id));
-                    opt3.setBackground(getResources().getDrawable(pic3id));
+//                    opt1.setBackground(getResources().getDrawable(pic1id));
+//                    opt2.setBackground(getResources().getDrawable(pic2id));
+//                    opt3.setBackground(getResources().getDrawable(pic3id));
                     question.getInstance().setCorrectAnswer(2);
                     Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
                     mp.start();
                     break;
                 case 2:
-                    opt1.setBackground(getResources().getDrawable(pic3id));
-                    opt2.setBackground(getResources().getDrawable(pic1id));
-                    opt3.setBackground(getResources().getDrawable(pic2id));
+//                    opt1.setBackground(getResources().getDrawable(pic3id));
+//                    opt2.setBackground(getResources().getDrawable(pic1id));
+//                    opt3.setBackground(getResources().getDrawable(pic2id));
                     question.getInstance().setCorrectAnswer(3);
                     Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
                     mp.start();
                     break;
                 case 3:
-                    opt1.setBackground(getResources().getDrawable(pic2id));
-                    opt2.setBackground(getResources().getDrawable(pic3id));
-                    opt3.setBackground(getResources().getDrawable(pic1id));
+//                    opt1.setBackground(getResources().getDrawable(pic2id));
+//                    opt2.setBackground(getResources().getDrawable(pic3id));
+//                    opt3.setBackground(getResources().getDrawable(pic1id));
                     question.getInstance().setCorrectAnswer(1);
                     Log.d("answer", "current correct answer is " + question.getInstance().getCorrectAnswer());
                     mp.start();

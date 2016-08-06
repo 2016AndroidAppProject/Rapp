@@ -8,14 +8,19 @@ import android.view.View;
 import android.widget.Button;
 
 public class adminViewController extends AppCompatActivity {
-    Button userSetup;
-    Button administerReceptiveTest;
-    Button classSetup;
+    Button testsButton;
+    Button administerReceptiveTestButton;
+    Button settingsButton;
+    Button studentLiveButton;
+    Button exportResultsButton;
 
 
-    Intent goToUserSetup;
+
+    Intent goToTests;
     Intent goToStudentLive;
-    Intent goToClassSetup;
+    Intent goToAdministerReceptiveTest;
+    Intent goToExportResults;
+    Intent goToSettings;
 
     Context ctx = this;
 
@@ -24,32 +29,50 @@ public class adminViewController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.adminview_screen);
 
-        userSetup = (Button) findViewById(R.id.exportResultsButton);
-        administerReceptiveTest = (Button) findViewById(R.id.administerReceptiveTest);
-        classSetup = (Button) findViewById(R.id.settingsButton);
+        testsButton = (Button) findViewById(R.id.tests);
+        administerReceptiveTestButton = (Button) findViewById(R.id.administerReceptiveTest);
+        settingsButton = (Button) findViewById(R.id.settingsButton);
+        studentLiveButton = (Button) findViewById(R.id.studentLiveView);
+        exportResultsButton = (Button) findViewById(R.id.exportResultsButton);
 
-        goToUserSetup = new Intent(this, userSetupController.class);
+        goToTests = new Intent(this, testsController.class);
         goToStudentLive = new Intent(this, selectionController.class);
-        goToClassSetup = new Intent(this, classSetupController.class);
+        goToSettings = new Intent(this, settingsController.class);
+        goToAdministerReceptiveTest = new Intent(this, selectionController.class);
+        goToExportResults = new Intent(this, exportResultsController.class);
 
-        userSetup.setOnClickListener(new View.OnClickListener() {
+        testsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(goToUserSetup);
+                startActivity(goToTests);
             }
         });
 
-        administerReceptiveTest.setOnClickListener(new View.OnClickListener() {
+        administerReceptiveTestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(goToAdministerReceptiveTest);
+            }
+        });
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(goToSettings);
+            }
+        });
+
+        studentLiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(goToStudentLive);
             }
         });
 
-        classSetup.setOnClickListener(new View.OnClickListener() {
+        exportResultsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(goToClassSetup);
+                startActivity(goToExportResults);
             }
         });
 

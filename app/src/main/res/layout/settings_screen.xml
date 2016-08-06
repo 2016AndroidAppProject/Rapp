@@ -27,10 +27,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="RESULTS SETUP"
-                android:id="@+id/button"
+                android:id="@+id/resultsSetup"
                 android:textSize="35dp"
                 android:padding="20dp"
-                android:layout_alignTop="@+id/button5"
+                android:layout_alignTop="@+id/classroomSetup"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 
@@ -56,10 +56,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="TEST SETUP"
-                android:id="@+id/button4"
+                android:id="@+id/testSetup"
                 android:textSize="35dp"
                 android:padding="20dp"
-                android:layout_alignTop="@+id/button5"
+                android:layout_alignTop="@+id/classroomSetup"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_weight=".33" />
@@ -68,10 +68,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Classroom Setup"
-                android:id="@+id/button5"
+                android:id="@+id/classroomSetup"
                 android:textSize="35dp"
                 android:padding="20dp"
-                android:layout_alignTop="@+id/button6"
+                android:layout_alignTop="@+id/addUsersSetup"
                 android:layout_centerHorizontal="true"
                 android:layout_weight="0.33" />
 
@@ -79,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Add/Edit Users"
-                android:id="@+id/button6"
+                android:id="@+id/addUsersSetup"
                 android:textSize="35dp"
                 android:padding="20dp"
                 android:layout_centerVertical="true"

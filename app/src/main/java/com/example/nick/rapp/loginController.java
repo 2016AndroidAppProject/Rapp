@@ -1,5 +1,6 @@
 package com.example.nick.rapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,7 +15,9 @@ import android.widget.Toast;
 
 import android.widget.Button;
 
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 //This class is part of the controller component of the model-view-controller design.
@@ -44,6 +47,7 @@ public class loginController extends AppCompatActivity {
     int status;
 
     DatabaseOperations DOP;
+    byte[] audio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +87,21 @@ public class loginController extends AppCompatActivity {
         int pic3id = this.getResources().getIdentifier("p" + 1 + "c", "drawable", this.getPackageName());
         int pic4id = this.getResources().getIdentifier("p" + 1 + "d", "drawable", this.getPackageName());
 
+        int audioId = this.getResources().getIdentifier("a" + 1, "raw", this.getPackageName());
+
+
+        try {
+            audio = DOP.audioToByteArray((Activity) this, audioId);
+        } catch(FileNotFoundException ie) {
+            ie.printStackTrace();
+        } catch(IOException ie){
+            ie.printStackTrace();
+        }
+
         Bitmap pic1Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic1id);
-        Bitmap pic2Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic1id);
-        Bitmap pic3Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic1id);
-        Bitmap pic4Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic1id);
+        Bitmap pic2Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic2id);
+        Bitmap pic3Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic3id);
+        Bitmap pic4Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic4id);
 
         byte[] pic1 = DOP.jpgToByteArray(pic1Bitmap);
         byte[] pic2 = DOP.jpgToByteArray(pic2Bitmap);
@@ -94,7 +109,7 @@ public class loginController extends AppCompatActivity {
         byte[] pic4 = DOP.jpgToByteArray(pic4Bitmap);
 
 
-        DOP.addQuestion(DOP, "baby", pic1, pic2, pic3, pic4, 1, 1);
+        DOP.addQuestion(DOP, "baby", pic1, pic2, pic3, pic4, audio, 1, 1);
 
 
 
