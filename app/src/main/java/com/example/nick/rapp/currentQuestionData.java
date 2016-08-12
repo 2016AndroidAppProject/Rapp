@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -82,9 +83,16 @@ public class currentQuestionData {
 
     private DatabaseOperations dop;
 
+    //The following two hashmaps keep track of what the questionID's and
+    //words so that we can use those values
+    //when we are inserting new results.
+    private HashMap<Integer, String> wordIndex;
+    private HashMap<Integer, Integer> questionIdIndex;
 
 
-    public currentQuestionData(int currentQNum, int correctAnswer, int currentSelection,
+
+    public currentQuestionData(HashMap<Integer, String> wordIndex,
+                               HashMap<Integer, Integer> questionIdIndex,int currentQNum, int correctAnswer, int currentSelection,
                                int numPosAnswer, String currentQtype, int currentQIndex,
                                int attempts, byte[][] audioList, Bitmap[][] imageList,
                                int testID, int numPracticeItems, DatabaseOperations dop,
@@ -96,6 +104,8 @@ public class currentQuestionData {
                                Bitmap pic4Bitmap,
                                byte[] audioBytes, boolean firstQuestion, int pracCorrect, DatabaseOperations databaseOperations) {
 
+        this.wordIndex = wordIndex;
+        this.questionIdIndex = questionIdIndex;
         this.setCurrentQNum(currentQNum);
         this.setCorrectAnswer(correctAnswer);
         this.setCurrentSelection(currentSelection);
@@ -129,7 +139,7 @@ public class currentQuestionData {
     // that it is ready to hold data when we initialize it in another class.
     // It is first initialized in the login screen.java class.
     private static final currentQuestionData CURRENT_QUESTION_DATA =
-            new currentQuestionData(0, 0, 0, 0, null, 0, 0, null, null, 0, 0, null, null, null, null, null, 0, 0, null,
+            new currentQuestionData(null, null, 0, 0, 0, 0, null, 0, 0, null, null, 0, 0, null, null, null, null, null, 0, 0, null,
                                     null, null, null, null, null, true, 0, null);
 
 
@@ -151,6 +161,23 @@ public class currentQuestionData {
 //
 //    }
 
+
+    public HashMap<Integer, String> getWordIndex() {
+        return wordIndex;
+    }
+
+    public void setWordIndex(HashMap<Integer, String> wordIndex) {
+        this.wordIndex = wordIndex;
+    }
+
+
+    public HashMap<Integer, Integer> getQuestionIdIndex() {
+        return questionIdIndex;
+    }
+
+    public void setQuestionIdIndex(HashMap<Integer, Integer> questionIdIndex) {
+        this.questionIdIndex = questionIdIndex;
+    }
 
     public int getPracCorrect() {
         return pracCorrect;
@@ -406,6 +433,9 @@ public class currentQuestionData {
         setNumPosAnswer(getQuestionData().getInt(8));
         setTestSize(getQuestionData().getCount());
 
+        wordIndex = new HashMap<Integer, String>();
+        questionIdIndex = new HashMap<Integer, Integer>();
+
 
         //Initializing lists to store questionIndexs and questionAssets
         //audioList needs to be larger than the test size
@@ -420,11 +450,11 @@ public class currentQuestionData {
             j++;
         }
 
-        currentQNum = questionList[currentQIndex];
-
         //inserting the assets into lists so they are ready to be used.
         int i = 1;
         do {
+            questionIdIndex.put(i, getQuestionData().getInt(1));
+            wordIndex.put(i, getQuestionData().getString(9));
             audioList[i] = getQuestionData().getBlob(2);
             byte[] audioBytes = getQuestionData().getBlob(2);
             imageList[i][0] = getImage((getQuestionData().getBlob(3)));
@@ -436,18 +466,6 @@ public class currentQuestionData {
             }
             i++;
         } while (getQuestionData().moveToNext());
-    }
-
-    public void loadQuestionData(DatabaseOperations dop, int testID){
-
-
-        setPic1Bitmap(imageList[currentQNum][0]);
-        setPic2Bitmap(imageList[currentQNum][1]);
-        setPic3Bitmap(imageList[currentQNum][2]);
-        if (numPosAnswer == 4) {
-            setPic4Bitmap(imageList[currentQNum][3]);
-        }
-        setAudioBytes(audioList[getCurrentQNum()]);
 
         getQuestionData().moveToFirst();
 
@@ -479,8 +497,29 @@ public class currentQuestionData {
         setFirstQuestion(true);
         setAttempts(0);
 
+        currentQNum = questionList[currentQIndex];
+    }
 
 
+    public void loadQuestionData(DatabaseOperations dop, int testID){
+
+
+        setPic1Bitmap(imageList[currentQNum][0]);
+        setPic2Bitmap(imageList[currentQNum][1]);
+        setPic3Bitmap(imageList[currentQNum][2]);
+        if (numPosAnswer == 4) {
+            setPic4Bitmap(imageList[currentQNum][3]);
+        }
+        setAudioBytes(audioList[getCurrentQNum()]);
+
+    }
+
+    public int getCurrentQuestionID(){
+        return getQuestionIdIndex().get(currentQNum);
+    }
+
+    public String getCurrentQuestionWord(){
+        return getWordIndex().get(currentQNum);
     }
 
 
@@ -558,6 +597,11 @@ public class currentQuestionData {
 
     public void setNextQuestion(){
         currentQIndex++;
+//        if ((currentQIndex == 15)){
+//            int catchhere = 2;
+//            catchhere += 2;
+//            setCurrentQNum(getQuestionList()[getCurrentQIndex()]);
+//        }
         setCurrentQNum(getQuestionList()[getCurrentQIndex()]);
         setPic1Bitmap(getImageList()[getCurrentQNum()][0]);
         setPic2Bitmap(getImageList()[getCurrentQNum()][1]);

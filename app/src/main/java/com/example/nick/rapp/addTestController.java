@@ -325,35 +325,39 @@ public class addTestController extends AppCompatActivity {
         //creating the options which will be used to fetch the bitmaps from the the directory.
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap them_foil;
         Bitmap target;
+        Bitmap them_foil;
         Bitmap con_foil;
         Bitmap phon_foil;
         byte[] audio;
-        byte[] them_foilBlob = null;
         byte[] targetBlob = null;
+        byte[] them_foilBlob = null;
         byte[] con_foilBlob = null;
         byte[] phon_foilBlob = null;
+
         for (int i = 0; i < sortedList.size(); i++){
 
             String[] fileName1 = getFileName(sortedList.get(i)[0]);
             String extension1 = (fileName1[fileName1.length - 1].split("\\."))[1];
-            if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
-                them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
-                them_foilBlob = dop.jpgToByteArray(them_foil);
-            } else if (extension1.equalsIgnoreCase("png")){
-                them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
-                them_foilBlob = dop.pngToByteArray(them_foil);
-            }
-
-            String[] fileName2 = getFileName(sortedList.get(i)[1]);
-            String extension2 = (fileName2[fileName1.length - 1].split("\\."))[1];
             if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
                 targetBlob = dop.jpgToByteArray(target);
             } else if (extension1.equalsIgnoreCase("png")){
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
                 targetBlob  = dop.pngToByteArray(target);
+            }
+
+            String[] fileName2 = getFileName(sortedList.get(i)[1]);
+            String extension2 = (fileName2[fileName1.length - 1].split("\\."))[1];
+            if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
+
+
+                them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
+                them_foilBlob = dop.jpgToByteArray(them_foil);
+            } else if (extension1.equalsIgnoreCase("png")){
+
+                them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
+                them_foilBlob = dop.pngToByteArray(them_foil);
             }
 
             String[] fileName3 = getFileName(sortedList.get(i)[2]);
@@ -374,6 +378,7 @@ public class addTestController extends AppCompatActivity {
 
 
             if (sortedList.get(i)[3] != null) {
+
                 String[] fileName4 = getFileName(sortedList.get(i)[0]);
                 String extension4 = (fileName4[fileName1.length - 1].split("\\."))[1];
                 if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
@@ -388,7 +393,10 @@ public class addTestController extends AppCompatActivity {
 
             String word = fileName1[1];
             String type = fileName1[2];
-            String difficulty = fileName1[3];
+            String difficulty = null;
+            if (fileName1.length >= 4) {
+                difficulty = fileName1[3];
+            }
 
             char[] questionIndex = fileName1[0].toCharArray();
             int questionNum = 0;
@@ -527,7 +535,7 @@ public class addTestController extends AppCompatActivity {
         //on given test name and conditions given.
         // you can go on
         Toast.makeText(getApplicationContext(),
-                "Loaded new test " + newTestDirName,
+                "Loaded new test " + newTestName,
                 Toast.LENGTH_LONG).show();
         dop.addNewTest(dop, newTestName, newTestType, newTestId);
         resetUIItems();

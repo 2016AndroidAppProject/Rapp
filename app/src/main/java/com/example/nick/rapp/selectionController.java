@@ -21,6 +21,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 
 public class selectionController extends AppCompatActivity {
+    Intent prevIntent;
     ExpandableListView testView;
     Spinner studentSpinner;
     ArrayAdapter<String> adapter;
@@ -91,6 +92,7 @@ public class selectionController extends AppCompatActivity {
         testSelectionLayout.setVisibility(View.INVISIBLE);
 
         if (currentUserData.getInstance().getUserType().equals("Administrator")) {
+            prevIntent = new Intent(this, adminViewController.class);
             teacherSelectionLayout.setVisibility(View.VISIBLE);
             //need to set the teacher spinner and make the other layouts invisible
             ArrayList<String> teacherNames = dop.getTeacherNames(dop);
@@ -133,6 +135,7 @@ public class selectionController extends AppCompatActivity {
                 }
             });
         } else {
+            prevIntent = new Intent(this, loginController.class);
             ArrayList<String> testNames;
 
             ArrayAdapter<String> testAdapter;
@@ -344,6 +347,11 @@ public class selectionController extends AppCompatActivity {
 ////        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 //        }
 //    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(prevIntent);
+    }
 
     @Override
     public void onUserInteraction() {

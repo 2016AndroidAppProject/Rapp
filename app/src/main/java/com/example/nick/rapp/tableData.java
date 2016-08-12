@@ -38,24 +38,31 @@ public class tableData {
 
     }
 
-    public static abstract class RESULTINDEX implements BaseColumns {
-
+    public static abstract class TESTCOMPLETIONRECORDS implements BaseColumns {
+        public static final String RECORD_ID = "record_id";
         public static final String STUDENT_ID = "student_id";
-        public static final String RESULT_ID = "result_id";
-        public static final String TIME = "date";
+        public static final String STUDENT_NAME = "student_name";
+        public static final String NUM_QUESTIONS = "numquestions";
+        public static final String NUM_QUESTIONSCOMPLETE = "numquestions_complete";
+        public static final String NUM_QUESTIONSCORRECT = "numquestions_correct";
+        public static final String TEST_NAME = "test_name";
+        public static final String TEST_ID = "test_id";
+        public static final String DATE = "date";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
-        public static final String TABLE_NAME = "results_index";
+        public static final String TABLE_NAME = "TESTCOMPLETIONRECORDS";
     }
 
     public static abstract class RESULTS implements BaseColumns {
         public static final String RESULT_ID = "result_id";
         public static final String QUESTION_ID = "question_id";
-        public static final String FOIL_TYPE = "foil_type";
         public static final String WORD = "word";
         public static final String CORRECT = "correct";
         public static final String TEST_ID = "test_id";
+        public static final String TEST_NAME = "test_name";
+        public static final String STUDENT_ID = "student_id";
+        public static final String STUDENT_NAME = "student_name";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
@@ -87,6 +94,13 @@ public class tableData {
 
         public static final String DATABASE_NAME = "Rapp_info";
 
+        public static final String TABLE_NAME = "tests";
+    }
+
+    public static abstract class PRACTICEITEMSETS implements BaseColumns {
+        public static final String PRAC_ID = "prac_id";
+        public static final String PRAC_NAME = "prac_name";
+        public static final String DATABASE_NAME = "Rapp_info";
         public static final String TABLE_NAME = "tests";
     }
 }

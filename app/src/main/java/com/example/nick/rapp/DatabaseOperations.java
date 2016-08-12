@@ -25,7 +25,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class DatabaseOperations extends SQLiteOpenHelper {
@@ -43,29 +45,103 @@ public class DatabaseOperations extends SQLiteOpenHelper {
             + tableData.STUDENTINFO.STUDENT_ID+" INTEGER PRIMARY KEY," +
             tableData.STUDENTINFO.TEACHER_NAME+" TEXT);";
 
-    public String RESULTSINDEX_CREATE = "CREATE TABLE " + tableData.RESULTINDEX.TABLE_NAME +
-            "(" + tableData.RESULTINDEX.STUDENT_ID + " INTEGER," +
-            tableData.RESULTINDEX.RESULT_ID + " INTEGER PRIMARY KEY," +
-            tableData.RESULTINDEX.TIME + " DATETIME);";
+    public String PRACITEMS_CREATE = "CREATE TABLE " +
+            tableData.PRACTICEITEMSETS.TABLE_NAME+"(" + tableData.PRACTICEITEMSETS.PRAC_NAME + " TEXT,"
+            + tableData.PRACTICEITEMSETS.PRAC_ID + " INTEGER PRIMARY KEY);";
+
+    public Cursor getPracItemSets(DatabaseOperations dop){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.PRACTICEITEMSETS.PRAC_ID,
+                            tableData.PRACTICEITEMSETS.PRAC_NAME};
+        Cursor CR = SQ.query(tableData.PRACTICEITEMSETS.TABLE_NAME, columns, null, null, null, null, null);
+        return CR;
+    }
+
+    public void addNewPracItemSet(DatabaseOperations dop, int pracId, String pracName){
+        SQLiteDatabase SQLD = dop.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(tableData.PRACTICEITEMSETS.PRAC_ID, pracId);
+        cv.put(tableData.PRACTICEITEMSETS.PRAC_NAME, pracName);
+        long k = SQLD.insert(tableData.PRACTICEITEMSETS.TABLE_NAME, null, cv);
+    }
+
+    public String TESTCOMPLETIONRECORDS_CREATE = "CREATE TABLE " + tableData.TESTCOMPLETIONRECORDS.TABLE_NAME +
+            "(" + tableData.TESTCOMPLETIONRECORDS.RECORD_ID + " INTEGER PRIMARY KEY,"
+            + tableData.TESTCOMPLETIONRECORDS.STUDENT_ID + " INTEGER," +
+            tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME + " TEXT," +
+            tableData.TESTCOMPLETIONRECORDS.TEST_ID + " INTEGER," +
+            tableData.TESTCOMPLETIONRECORDS.TEST_NAME + " TEXT," +
+            tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS + " INTEGER," +
+            tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT + " INTEGER," +
+            tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE + " INTEGER," +
+            tableData.TESTCOMPLETIONRECORDS.DATE + " DATETIME);";
+
+    public Cursor getTestCompletionRecords(DatabaseOperations dop){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.TESTCOMPLETIONRECORDS.RECORD_ID,
+                tableData.TESTCOMPLETIONRECORDS.RECORD_ID,
+                tableData.TESTCOMPLETIONRECORDS.STUDENT_ID,
+                tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME,
+                tableData.TESTCOMPLETIONRECORDS.TEST_ID,
+                tableData.TESTCOMPLETIONRECORDS.TEST_NAME,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE,
+                tableData.TESTCOMPLETIONRECORDS.DATE};
+        Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns, null, null, null, null, null);
+        return CR;
+    }
+
+
+
+    public void addNewTestCompletionRecord(DatabaseOperations dop, int recordId, int studentId, String studentName, int testId,
+                                           String testName, int numQuestions, int numQuestionsCorrect, int numQuestionsComplete){
+                SQLiteDatabase SQLD = dop.getWritableDatabase();
+                ContentValues cv = new ContentValues();
+
+                cv.put(tableData.TESTCOMPLETIONRECORDS.RECORD_ID, recordId);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.STUDENT_ID, studentId);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME, studentName);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.TEST_ID, testId);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.TEST_NAME, testName);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS, numQuestions);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, numQuestionsCorrect);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, numQuestionsComplete);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String strDate = sdf.format(new Date());
+
+                ContentValues values = new ContentValues();
+                values.put("ColumnName", strDate);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.DATE, strDate);
+                long k = SQLD.insert(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, null, cv);
+    }
 
     public String RESULTS_CREATE = "CREATE TABLE " + tableData.RESULTS.TABLE_NAME +
-            "(" + tableData.RESULTS.FOIL_TYPE + " TEXT," +
+            "(" + tableData.RESULTS.QUESTION_ID + " INTEGER," +
             tableData.RESULTS.WORD + " TEXT," +
             tableData.RESULTS.CORRECT + " BOOLEAN," +
             tableData.RESULTS.TEST_ID + " INTEGER," +
-            tableData.RESULTS.RESULT_ID + " INTEGER," +
+            tableData.RESULTS.TEST_NAME + " TEXT," +
+            tableData.RESULTS.RESULT_ID + " INTEGER, " +
+            tableData.RESULTS.STUDENT_ID + " INTEGER, " +
+            tableData.RESULTS.STUDENT_NAME + " TEXT," +
 
-            tableData.RESULTS.QUESTION_ID + " INTEGER," +
+            "FOREIGN KEY (" + tableData.RESULTS.STUDENT_ID + ") REFERENCES " +
+            tableData.STUDENTINFO.TABLE_NAME + "(" + tableData.STUDENTINFO.STUDENT_ID + ")," +
+
             "FOREIGN KEY(" + tableData.QUESTIONS.QUESTION_ID + ") REFERENCES " +
             tableData.QUESTIONS.TABLE_NAME + "(" + tableData.QUESTIONS.QUESTION_ID + ")," +
 
-
-            "FOREIGN KEY(" + tableData.RESULTS.RESULT_ID + ") REFERENCES " +
-            tableData.RESULTINDEX.TABLE_NAME + "(" + tableData.RESULTINDEX.RESULT_ID + ")," +
-
-
             "FOREIGN KEY(" + tableData.RESULTS.TEST_ID + ") REFERENCES " +
-            tableData.TESTS.TABLE_NAME + "(" + tableData.TESTS.TEST_ID + "));";
+            tableData.TESTS.TABLE_NAME + "(" + tableData.TESTS.TEST_ID + ")," +
+            " PRIMARY KEY(" + tableData.RESULTS.TEST_ID + ", " + tableData.RESULTS.RESULT_ID + "));";
+
+
+
+
+
+
 
     public String QUESTIONS_CREATE = "CREATE TABLE " + tableData.QUESTIONS.TABLE_NAME +
             "(" + tableData.QUESTIONS.DIFFICULTY + " TEXT," +
@@ -100,10 +176,11 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sdb) {
         sdb.execSQL(USERINFO_CREATE);
         sdb.execSQL(STUDENTINFO_CREATE);
-        sdb.execSQL(RESULTSINDEX_CREATE);
+       // sdb.execSQL(TESTCOMPLETIONRECORDS_CREATE);
         sdb.execSQL(TESTS_CREATE);
         sdb.execSQL(QUESTIONS_CREATE);
         sdb.execSQL(RESULTS_CREATE);
+        sdb.execSQL(TESTCOMPLETIONRECORDS_CREATE);
         Log.d("Database operations", "USERINFO Table created");
         Log.d("Database operations", "STUDENTINFO Table created");
 
@@ -135,6 +212,25 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         Log.d("Database operations", "New user inserted");
     }
 
+    public void addNewResult(DatabaseOperations dop, int questionID, String word,
+                             boolean correct, int testID, String testName, int resultID, int studentID, String studentName){
+        SQLiteDatabase SQLD = dop.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(tableData.RESULTS.QUESTION_ID, questionID);
+        cv.put(tableData.RESULTS.WORD, word);
+        cv.put(tableData.RESULTS.CORRECT, correct);
+        cv.put(tableData.RESULTS.TEST_ID, testID);
+        cv.put(tableData.RESULTS.TEST_NAME, testName);
+        cv.put(tableData.RESULTS.RESULT_ID, resultID);
+        cv.put(tableData.RESULTS.STUDENT_ID, studentID);
+        cv.put(tableData.RESULTS.STUDENT_NAME, studentName);
+        long k = SQLD.insert(tableData.RESULTS.TABLE_NAME, null, cv);
+
+        Log.d("Database operations", "New result inserted");
+    }
+
+
     public void addNewTest(DatabaseOperations dop, String testName, String testType, int testID){
         SQLiteDatabase SQLD = dop.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -144,6 +240,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         cv.put(tableData.TESTS.TEST_ID, testID);
 
         long k = SQLD.insert(tableData.TESTS.TABLE_NAME, null, cv);
+        Log.d("Database operations", "New test inserted");
     }
 
 //    public void addNewQuestion(DatabaseOperations dop, int testID, int questionID, String word){
@@ -192,6 +289,21 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public int getTestIDByName(DatabaseOperations dop, String name){
         Cursor CR = getTests(dop);
+        CR.moveToFirst();
+        if (CR.getCount() == 0){
+            return 0;
+        }
+        do {
+            if (CR.getString(2).equals(name)){
+                return CR.getInt(0);
+            }
+        }
+        while (CR.moveToNext());
+        return 0;
+    }
+
+    public int getStudentIDByName(DatabaseOperations dop, String name){
+        Cursor CR = getStudentInfo(dop);
         CR.moveToFirst();
         if (CR.getCount() == 0){
             return 0;
@@ -287,7 +399,8 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         SQLiteDatabase SQ = dop.getReadableDatabase();
         String[] columns = {tableData.QUESTIONS.TEST_ID, tableData.QUESTIONS.QUESTION_ID , tableData.QUESTIONS.AUDIO ,
                 tableData.QUESTIONS.THEM_FOIL , tableData.QUESTIONS.TARGET, tableData.QUESTIONS.CON_FOIL,
-                tableData.QUESTIONS.PHON_FOIL, tableData.QUESTIONS.TYPE, tableData.QUESTIONS.NUM_ANSWERS};
+                tableData.QUESTIONS.PHON_FOIL, tableData.QUESTIONS.TYPE, tableData.QUESTIONS.NUM_ANSWERS,
+                tableData.QUESTIONS.WORD};
         String whereClause = tableData.QUESTIONS.TEST_ID.toString() + "=?";
         Cursor CR = SQ.query(tableData.QUESTIONS.TABLE_NAME, columns,
                 whereClause, new String[] {Integer.toString(testID)}, null, null, null);

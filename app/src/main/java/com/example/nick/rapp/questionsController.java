@@ -2,6 +2,7 @@ package com.example.nick.rapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
@@ -67,7 +68,18 @@ public class questionsController extends AppCompatActivity {
 
     int n;
 
+    int testId;
+    int studentId;
+    String testName;
+    String studentName;
+
+    int resultId;
+
     int audioTest;
+
+    int numQuestions;
+    int numQuestionsCorrect;
+    int numQuestionsComplete;
 
 
 
@@ -130,25 +142,39 @@ public class questionsController extends AppCompatActivity {
         mp = new MediaPlayer();
         ctx = this;
 
-        n = 1;
-        
         currentQuestionData = currentQuestionData.getInstance();
         currentUserData = currentUserData.getInstance();
 
-        audioTest = 0;
 
         dop = new DatabaseOperations(ctx);
+        n = 1;
+        resultId = 1;
+        testName = currentUserData.getSelectedTest();
+        studentName = currentUserData.getSelectedStudent();
+        testId = dop.getTestIDByName(dop, currentUserData.getSelectedTest());
+        studentId = dop.getStudentIDByName(dop, currentUserData.getSelectedStudent());
+
+
+        
+
+        audioTest = 0;
+
+
 
 
 
 
         //setting testNum to 1 for testing purposes, in final version testNum will be
         //set to the testID that was indicated in the previous screen.
-        currentQuestionData.setTestID(dop.getTestIDByName(dop, currentUserData.getSelectedTest()));
+        currentQuestionData.setTestID(testId);
         DatabaseOperations dop = new DatabaseOperations(ctx);
         currentQuestionData.setDop(dop);
         currentQuestionData.loadInitialData(dop);
         currentQuestionData.loadQuestionData(currentQuestionData.getDop(), currentQuestionData.getTestID());
+
+        numQuestions = currentQuestionData.getQuestionList().length;
+        numQuestionsCorrect = 0;
+        numQuestionsComplete = 0;
 
 
         numPosAnswers = currentQuestionData.getNumPosAnswer();
@@ -310,11 +336,11 @@ public class questionsController extends AppCompatActivity {
             //code to set the current currentQuestionData to the next currentQuestionData OR
             //forward them to the first practice item if they just successfully
             //completed the second practice currentQuestionData.
-            if (currentQuestionData.getPracCorrect() == 2){
-                currentQuestionData.setQuestionNum(currentQuestionData.getNumPracticeItems());
-            } else {
-                currentQuestionData.setNextQuestion();
-            }
+//            if (currentQuestionData.getPracCorrect() == 2){
+//                currentQuestionData.setQuestionNum(currentQuestionData.getNumPracticeItems());
+//            } else {
+//                currentQuestionData.setNextQuestion();
+//            }
         } else {
             currentQuestionData.setFirstQuestion(false);
         }
@@ -323,9 +349,7 @@ public class questionsController extends AppCompatActivity {
         //currentQIndex describes the position in the questionList array that
         //the currentQuestionData is located at.
 
-
-
-        currentQuestionData.setCurrentQIndex(currentQuestionData.getQuestionNum());
+       // currentQuestionData.setCurrentQIndex(currentQuestionData.getCurr);
         currentQuestionData.findCurrentQNum();
         currentQuestionData.setAttempts(0);
         //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
@@ -390,7 +414,7 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), pics[1]));
                     opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
                     opt4.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    currentQuestionData.setCorrectAnswer(2);
+                    currentQuestionData.setCorrectAnswer(1);
                     mp.start();
                     break;
                 case 2:
@@ -402,7 +426,7 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), pics[2]));
                     opt3.setBackground(new BitmapDrawable(getResources(), pics[0]));
                     opt4.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    currentQuestionData.setCorrectAnswer(4);
+                    currentQuestionData.setCorrectAnswer(3);
                     mp.start();
                     break;
                 case 3:
@@ -414,7 +438,7 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), pics[0]));
                     opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
                     opt4.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    currentQuestionData.setCorrectAnswer(1);
+                    currentQuestionData.setCorrectAnswer(2);
                     mp.start();
                     break;
                 case 4:
@@ -426,7 +450,7 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), pics[3]));
                     opt3.setBackground(new BitmapDrawable(getResources(), pics[1]));
                     opt4.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    currentQuestionData.setCorrectAnswer(3);
+                    currentQuestionData.setCorrectAnswer(4);
                     mp.start();
                     break;
             }
@@ -441,7 +465,7 @@ public class questionsController extends AppCompatActivity {
                     opt1.setBackground(new BitmapDrawable(getResources(), pics[0]));
                     opt2.setBackground(new BitmapDrawable(getResources(), pics[1]));
                     opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    currentQuestionData.setCorrectAnswer(2);
+                    currentQuestionData.setCorrectAnswer(1);
 
                     mp.start();
                     break;
@@ -449,10 +473,10 @@ public class questionsController extends AppCompatActivity {
 //                    opt1.setBackground(getResources().getDrawable(pic3id));
 //                    opt2.setBackground(getResources().getDrawable(pic1id));
 //                    opt3.setBackground(getResources().getDrawable(pic2id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    currentQuestionData.setCorrectAnswer(3);
+                    opt1.setBackground(new BitmapDrawable(getResources(), pics[2]));
+                    opt2.setBackground(new BitmapDrawable(getResources(), pics[0]));
+                    opt3.setBackground(new BitmapDrawable(getResources(), pics[1]));
+                    currentQuestionData.setCorrectAnswer(2);
 
                     mp.start();
                     break;
@@ -460,12 +484,12 @@ public class questionsController extends AppCompatActivity {
 //                    opt1.setBackground(getResources().getDrawable(pic2id));
 //                    opt2.setBackground(getResources().getDrawable(pic3id));
 //                    opt3.setBackground(getResources().getDrawable(pic1id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[1]));
+                    opt1.setBackground(new BitmapDrawable(getResources(), pics[1]));
+                    opt2.setBackground(new BitmapDrawable(getResources(), pics[2]));
+                    opt3.setBackground(new BitmapDrawable(getResources(), pics[0]));
 
 
-                    currentQuestionData.setCorrectAnswer(1);
+                    currentQuestionData.setCorrectAnswer(3);
                     mp.start();
                     break;
             }
@@ -533,6 +557,8 @@ public class questionsController extends AppCompatActivity {
         if (currentQuestionData.getCurrentQIndex() == (currentQuestionData.getTestSize() - 1)) {
             //go to last activity
             //RECORD RESULTS HERE
+            dop.addNewTestCompletionRecord(dop, generateRandomID(), studentId, studentName, testId,
+                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
             startActivity(proceedIntent);
         } else if ((currentQuestionData.getCurrentQIndex() == (currentQuestionData.getNumPracticeItems() - 1)
                 || currentQuestionData.getPracCorrect() == 2)){
@@ -541,6 +567,42 @@ public class questionsController extends AppCompatActivity {
             loadQuestion();
         }
     }
+
+
+
+
+    public boolean isUniqueId(int newId, Cursor CR){
+        do {
+            if (newId == CR.getInt(1)) {
+                return false;
+            }
+        }
+        while (CR.moveToNext());
+        return true;
+    }
+
+    public int generateRandomID(){
+        int id;
+        //  DatabaseOperations DOP = new DatabaseOperations(CTX);
+        Cursor CR = dop.getTestCompletionRecords(dop);
+
+        int numRecords = CR.getCount();
+
+        if (numRecords == 0){
+            id = 1;
+            return id;
+        }
+        CR.moveToFirst();
+
+        Random rand = new Random();
+
+        id = rand.nextInt((100000 - 0) + 1) + 0;
+        while (isUniqueId(id, CR) == false) {
+            id = rand.nextInt((100000 - 0) + 1) + 0;
+        }
+        return id;
+    }
+
 
 
 
@@ -563,8 +625,22 @@ public class questionsController extends AppCompatActivity {
     //of currentQuestionData answered.
     public void answer(View view) {
             boolean checked = ((RadioButton) view).isChecked();
+            numQuestionsComplete++;
             switch (view.getId()) {
                 case R.id.opt1:
+                    if (currentQuestionData.getCorrectAnswer() == 1){
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                true, testId, testName, resultId, studentId, studentName);
+                        numQuestionsCorrect++;
+                        resultId++;
+                    } else {
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                false, testId,testName, resultId, studentId, studentName);
+                        resultId++;
+                    }
+
                     if ((currentQuestionData.getCorrectAnswer() == 1) ||
                      (currentQuestionData.getCurrentQtype() != "Practice")) {
                         processAnswer();
@@ -573,6 +649,20 @@ public class questionsController extends AppCompatActivity {
                     }
                     break;
                 case R.id.opt2:
+                    if (currentQuestionData.getCorrectAnswer() == 2){
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                true, testId, testName, resultId, studentId, studentName);
+                        numQuestionsCorrect++;
+                        resultId++;
+                    } else {
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                false, testId,testName, resultId, studentId, studentName);
+                        resultId++;
+                    }
+
+
                     if ((currentQuestionData.getCorrectAnswer() == 2) ||
                             (currentQuestionData.getCurrentQtype() != "Practice")) {
                         processAnswer();
@@ -581,6 +671,19 @@ public class questionsController extends AppCompatActivity {
                     }
                     break;
                 case R.id.opt3:
+                    if (currentQuestionData.getCorrectAnswer() == 3){
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                true, testId, testName, resultId, studentId, studentName);
+                        numQuestionsCorrect++;
+                        resultId++;
+                    } else {
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                false, testId,testName, resultId, studentId, studentName);
+                        resultId++;
+                    }
+
                     if ((currentQuestionData.getCorrectAnswer() == 3) ||
                             (currentQuestionData.getCurrentQtype() != "Practice")) {
                         processAnswer();
@@ -589,6 +692,19 @@ public class questionsController extends AppCompatActivity {
                     }
                     break;
                 case R.id.opt4:
+                    if (currentQuestionData.getCorrectAnswer() == 4){
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                true, testId, testName, resultId, studentId, studentName);
+                        resultId++;
+                        numQuestionsCorrect++;
+                    } else {
+                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                currentQuestionData.getCurrentQuestionWord(),
+                                false, testId,testName, resultId, studentId, studentName);
+                        resultId++;
+                    }
+
                     if ((currentQuestionData.getCorrectAnswer() == 4) ||
                             (currentQuestionData.getCurrentQtype() != "Practice")) {
                         processAnswer();
@@ -619,6 +735,7 @@ public class questionsController extends AppCompatActivity {
 
     public void playMp3(byte[] mp3SoundByteArray) {
         try {
+
             audioTest++;
             // create temp file that will hold byte array
             File tempMp3 = File.createTempFile("tempFile", "mp3", getCacheDir());
@@ -626,8 +743,6 @@ public class questionsController extends AppCompatActivity {
             FileOutputStream fos = new FileOutputStream(tempMp3);
             fos.write(mp3SoundByteArray);
             fos.close();
-
-            mp = new MediaPlayer();
 
             // Tried passing path directly, but kept getting
             // "Prepare failed.: status=0x1"
