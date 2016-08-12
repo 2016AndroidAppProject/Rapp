@@ -53,7 +53,18 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.33"></LinearLayout>
+            android:layout_weight="0.33"
+            android:weightSum="1">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="94dp"
+                android:text="checkDatabase"
+                android:id="@+id/checkDatabase"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0.09" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"

@@ -69,6 +69,11 @@ public class loginController extends AppCompatActivity {
         //Following code is used to ensure that there is a blank item at the top of all the records
         Cursor studentCR = DOP.getStudentInfo(DOP);
         Cursor userCR = DOP.getUserInfo(DOP);
+        Cursor testCR = DOP.getTests(DOP);
+
+        if (testCR.getCount() == 0){
+            DOP.addNewTest(DOP, "", "", 0);
+        }
 
         if (studentCR.getCount() == 0){
             DOP.addNewStudent(DOP, "", 0, "");
@@ -79,37 +84,40 @@ public class loginController extends AppCompatActivity {
         }
 
 
+
         //Following code is used to relate the sample test to the test and questions tables.
-        DOP.addNewTest(DOP, "sampleTest", "Administrator", 1);
+//        DOP.addNewTest(DOP, "sampleTest", "Administrator", 1);
 
-        int pic1id = this.getResources().getIdentifier("p" + 1 + "a", "drawable", this.getPackageName());
-        int pic2id = this.getResources().getIdentifier("p" + 1 + "b", "drawable", this.getPackageName());
-        int pic3id = this.getResources().getIdentifier("p" + 1 + "c", "drawable", this.getPackageName());
-        int pic4id = this.getResources().getIdentifier("p" + 1 + "d", "drawable", this.getPackageName());
+//        int pic1id = this.getResources().getIdentifier("p" + 1 + "a", "drawable", this.getPackageName());
+//        int pic2id = this.getResources().getIdentifier("p" + 1 + "b", "drawable", this.getPackageName());
+//        int pic3id = this.getResources().getIdentifier("p" + 1 + "c", "drawable", this.getPackageName());
+//        int pic4id = this.getResources().getIdentifier("p" + 1 + "d", "drawable", this.getPackageName());
 
-        int audioId = this.getResources().getIdentifier("a" + 1, "raw", this.getPackageName());
-
-
-        try {
-            audio = DOP.audioToByteArray((Activity) this, audioId);
-        } catch(FileNotFoundException ie) {
-            ie.printStackTrace();
-        } catch(IOException ie){
-            ie.printStackTrace();
-        }
-
-        Bitmap pic1Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic1id);
-        Bitmap pic2Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic2id);
-        Bitmap pic3Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic3id);
-        Bitmap pic4Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic4id);
-
-        byte[] pic1 = DOP.jpgToByteArray(pic1Bitmap);
-        byte[] pic2 = DOP.jpgToByteArray(pic2Bitmap);
-        byte[] pic3 = DOP.jpgToByteArray(pic3Bitmap);
-        byte[] pic4 = DOP.jpgToByteArray(pic4Bitmap);
+//        int audioId = this.getResources().getIdentifier("a" + 1, "raw", this.getPackageName());
 
 
-        DOP.addQuestion(DOP, "baby", pic1, pic2, pic3, pic4, audio, 1, 1);
+//        try {
+//            audio = DOP.audioToByteArray((Activity) this, audioId);
+//        } catch(FileNotFoundException ie) {
+//            ie.printStackTrace();
+//        } catch(IOException ie){
+//            ie.printStackTrace();
+//        }
+
+//        Bitmap pic1Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic1id);
+//        Bitmap pic2Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic2id);
+//        Bitmap pic3Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic3id);
+//        Bitmap pic4Bitmap = BitmapFactory.decodeResource(CTX.getResources(), pic4id);
+//
+//
+//        byte[] pic2 = DOP.jpgToByteArray(pic2Bitmap);
+//        byte[] pic3 = DOP.jpgToByteArray(pic3Bitmap);
+//        byte[] pic4 = DOP.jpgToByteArray(pic4Bitmap);
+//        byte[] pic1 = DOP.jpgToByteArray(pic1Bitmap);
+
+
+
+
 
 
 
@@ -217,6 +225,14 @@ public class loginController extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public Bitmap byteArrayToBitmap(byte[] byteArray){
+        Bitmap background = BitmapFactory.decodeByteArray(byteArray, 0,
+                byteArray.length);
+        Bitmap back = Bitmap.createBitmap(background.getWidth(),
+                background.getHeight(), Bitmap.Config.ARGB_8888);
+        return back;
     }
 
 

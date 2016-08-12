@@ -13,6 +13,7 @@ public class adminViewController extends AppCompatActivity {
     Button settingsButton;
     Button studentLiveButton;
     Button exportResultsButton;
+    Button openDatabaseManager;
 
 
 
@@ -21,6 +22,7 @@ public class adminViewController extends AppCompatActivity {
     Intent goToAdministerReceptiveTest;
     Intent goToExportResults;
     Intent goToSettings;
+    Intent databaseManager;
 
     Context ctx = this;
 
@@ -34,12 +36,14 @@ public class adminViewController extends AppCompatActivity {
         settingsButton = (Button) findViewById(R.id.settingsButton);
         studentLiveButton = (Button) findViewById(R.id.studentLiveView);
         exportResultsButton = (Button) findViewById(R.id.exportResultsButton);
+        openDatabaseManager = (Button) findViewById(R.id.checkDatabase);
 
         goToTests = new Intent(this, testsController.class);
         goToStudentLive = new Intent(this, selectionController.class);
         goToSettings = new Intent(this, settingsController.class);
         goToAdministerReceptiveTest = new Intent(this, selectionController.class);
         goToExportResults = new Intent(this, exportResultsController.class);
+        databaseManager = new Intent(this, AndroidDatabaseManager.class);
 
         testsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +77,13 @@ public class adminViewController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(goToExportResults);
+            }
+        });
+
+        openDatabaseManager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(databaseManager);
             }
         });
 

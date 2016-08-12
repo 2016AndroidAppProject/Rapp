@@ -13,7 +13,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2"
+        android:id="@+id/newTestNameField"
         android:hint="Enter name for new test"
         android:textSize="25dp"
         android:layout_alignParentTop="true"
@@ -30,56 +30,67 @@
         android:textSize="35dp"
         android:textStyle="bold" />
 
-    <RadioButton
+    <RadioGroup
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Administrators ONLY"
-        android:layout_below="@+id/editText2"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginTop="117dp"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        android:background="#FFFFFF"
-        android:id="@+id/radioButton6"
-        android:padding="10dp" />
+        android:layout_alignParentEnd="true">
 
-    <RadioButton
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Who can access this test?"
+            android:id="@+id/textView13"
+            android:layout_below="@+id/newTestNameField"
+            android:layout_alignLeft="@+id/administratorOnly"
+            android:layout_alignStart="@+id/administratorOnly"
+            android:layout_marginTop="46dp"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Administrators ONLY"
+            android:layout_below="@+id/newTestNameField"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="117dp"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:background="#FFFFFF"
+            android:id="@+id/administratorOnly"
+            android:padding="10dp" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Administrator AND Teacher"
+            android:layout_marginTop="50dp"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:background="#FFFFFF"
+            android:id="@+id/administratorAndTeacher"
+            android:layout_below="@+id/administratorOnly"
+            android:layout_alignLeft="@+id/administratorOnly"
+            android:layout_alignStart="@+id/administratorOnly"
+            android:layout_alignRight="@+id/administratorOnly"
+            android:layout_alignEnd="@+id/administratorOnly"
+            android:padding="10dp" />
+    </RadioGroup>
+
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Administrator and Teacher"
-        android:layout_marginTop="50dp"
+        android:id="@+id/newTestDirField"
+        android:hint="Enter name of test assets folder"
         android:textSize="25dp"
-        android:textStyle="bold"
-        android:background="#FFFFFF"
-        android:id="@+id/radioButton5"
-        android:layout_below="@+id/radioButton6"
-        android:layout_alignLeft="@+id/radioButton6"
-        android:layout_alignStart="@+id/radioButton6"
-        android:layout_alignRight="@+id/radioButton6"
-        android:layout_alignEnd="@+id/radioButton6" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Who can access this test?"
-        android:id="@+id/textView13"
-        android:layout_below="@+id/editText2"
-        android:layout_alignLeft="@+id/radioButton6"
-        android:layout_alignStart="@+id/radioButton6"
-        android:layout_marginTop="46dp"
-        android:textSize="25dp"
-        android:textStyle="bold" />
-
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner2"
-        android:layout_below="@+id/radioButton6"
-        android:layout_toLeftOf="@+id/addTest"
-        android:layout_toStartOf="@+id/addTest" />
+        android:layout_marginTop="179dp"
+        android:layout_below="@+id/newTestNameField"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

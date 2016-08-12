@@ -71,6 +71,9 @@ public class tableData {
         public static final String PHON_FOIL = "phon_foil";
         public static final String WORD = "word";
         public static final String AUDIO = "audio";
+        public static final String DIFFICULTY = "difficulty";
+        public static final String TYPE = "type";
+        public static final String NUM_ANSWERS = "NUM_ANSWERS";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
