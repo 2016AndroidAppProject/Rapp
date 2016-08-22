@@ -17,24 +17,26 @@
         android:layout_marginEnd="407dp"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:id="@+id/resultsButtons">
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Aggregated by word and child"
-            android:id="@+id/radioButton"
+            android:id="@+id/wordAndChild"
             android:padding="30dp"
             android:layout_margin="10dp"
             android:background="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="25dp" />
+            android:textSize="25dp"
+            android:checked="false" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Aggregated by child"
-            android:id="@+id/radioButton2"
+            android:id="@+id/child"
             android:padding="30dp"
             android:checked="false"
             android:layout_margin="10dp"
@@ -46,23 +48,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Aggregated by word"
-            android:id="@+id/radioButton3"
+            android:id="@+id/word"
             android:padding="30dp"
             android:layout_margin="10dp"
             android:background="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="25dp" />
+            android:textSize="25dp"
+            android:checked="false" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Disaggregated"
-            android:id="@+id/radioButton4"
+            android:id="@+id/disaggregated"
             android:padding="30dp"
             android:layout_margin="10dp"
             android:background="#FFFFFF"
             android:textSize="25dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:checked="false" />
     </RadioGroup>
 
     <TextView

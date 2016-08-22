@@ -61,7 +61,7 @@ public class loginController extends AppCompatActivity {
         loginButton = (Button) findViewById(R.id.loginButton);
 
         //Login class prepares an intent to change activity to the practice screens.
-        teacherLoginIntent = new Intent(this, selectionController.class);
+        teacherLoginIntent = new Intent(this, teacherViewController.class);
         adminLoginIntent = new Intent(this, adminViewController.class);
 
         DOP = new DatabaseOperations(CTX);
@@ -70,9 +70,20 @@ public class loginController extends AppCompatActivity {
         Cursor studentCR = DOP.getStudentInfo(DOP);
         Cursor userCR = DOP.getUserInfo(DOP);
         Cursor testCR = DOP.getTests(DOP);
+        Cursor pracItemCR = DOP.getPracItemSets(DOP);
+        Cursor resultModeCR = DOP.getResultMode(DOP);
+
+        if (resultModeCR.getCount() == 0){
+            DOP.addNewSettings(DOP, "disaggregated");
+        }
+
+        if (pracItemCR.getCount() == 0){
+            DOP.addNewPracItemSet(DOP, -1, "");
+            DOP.addNewPracItemSet(DOP, 0, "NO PRACTICE ITEM");
+        }
 
         if (testCR.getCount() == 0){
-            DOP.addNewTest(DOP, "", "", 0);
+            DOP.addNewTest(DOP, "", "", 0, 0);
         }
 
         if (studentCR.getCount() == 0){

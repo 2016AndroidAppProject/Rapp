@@ -91,6 +91,7 @@ public class tableData {
         public static final String TEST_ID = "test_id";
         public static final String TEST_NAME = "test_name";
         public static final String TEST_TYPE = "test_type";
+        public static final String PRAC_ID = "prac_id";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
@@ -101,6 +102,12 @@ public class tableData {
         public static final String PRAC_ID = "prac_id";
         public static final String PRAC_NAME = "prac_name";
         public static final String DATABASE_NAME = "Rapp_info";
-        public static final String TABLE_NAME = "tests";
+        public static final String TABLE_NAME = "pracItems";
+    }
+
+    public static abstract class SETTINGS implements BaseColumns {
+        public static final String RESULT_MODE = "result_mode";
+        public static final String DATABASE_NAME = "Rapp_info";
+        public static final String TABLE_NAME = "settings";
     }
 }

@@ -14,6 +14,7 @@ public class adminViewController extends AppCompatActivity {
     Button studentLiveButton;
     Button exportResultsButton;
     Button openDatabaseManager;
+    Button returnLoginButton;
 
 
 
@@ -23,6 +24,7 @@ public class adminViewController extends AppCompatActivity {
     Intent goToExportResults;
     Intent goToSettings;
     Intent databaseManager;
+    Intent returnToLogin;
 
     Context ctx = this;
 
@@ -37,6 +39,7 @@ public class adminViewController extends AppCompatActivity {
         studentLiveButton = (Button) findViewById(R.id.studentLiveView);
         exportResultsButton = (Button) findViewById(R.id.exportResultsButton);
         openDatabaseManager = (Button) findViewById(R.id.checkDatabase);
+        returnLoginButton = (Button) findViewById(R.id.returnLogin);
 
         goToTests = new Intent(this, testsController.class);
         goToStudentLive = new Intent(this, selectionController.class);
@@ -44,6 +47,7 @@ public class adminViewController extends AppCompatActivity {
         goToAdministerReceptiveTest = new Intent(this, selectionController.class);
         goToExportResults = new Intent(this, exportResultsController.class);
         databaseManager = new Intent(this, AndroidDatabaseManager.class);
+        returnToLogin = new Intent(this, loginController.class);
 
         testsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +88,13 @@ public class adminViewController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(databaseManager);
+            }
+        });
+
+        returnLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(returnToLogin);
             }
         });
 

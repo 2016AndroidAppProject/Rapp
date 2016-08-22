@@ -36,21 +36,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/addPracItemSet"
-            android:hint="Enter name for new test"
+            android:hint="Enter name for new practice item set"
             android:textSize="25dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:text="Enter name for new Practice Item Set" />
+            android:layout_centerHorizontal="true" />
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/pracItemDirField"
-            android:hint="Enter name of test assets folder"
+            android:hint="Enter name of new practice set assets folder"
             android:textSize="25dp"
             android:layout_centerVertical="true"
             android:layout_alignLeft="@+id/addPracItemSet"
-            android:layout_alignStart="@+id/addPracItemSet"
-            android:text="Enter name of Prac Item Assets Folder" />
+            android:layout_alignStart="@+id/addPracItemSet" />
     </RelativeLayout>
 </RelativeLayout>

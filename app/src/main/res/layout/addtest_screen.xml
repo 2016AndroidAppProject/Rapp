@@ -16,8 +16,9 @@
         android:id="@+id/newTestNameField"
         android:hint="Enter name for new test"
         android:textSize="25dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -34,7 +35,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:id="@+id/radioGroup">
 
         <TextView
             android:layout_width="wrap_content"
@@ -88,9 +90,33 @@
         android:id="@+id/newTestDirField"
         android:hint="Enter name of test assets folder"
         android:textSize="25dp"
-        android:layout_marginTop="179dp"
-        android:layout_below="@+id/newTestNameField"
+        android:layout_above="@+id/addTest"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="77dp" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pracItemSpinner"
+        android:layout_below="@+id/textView16"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="#FFFFFF"
+        android:layout_toLeftOf="@+id/addTest"
+        android:layout_toStartOf="@+id/addTest" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Choose practice set to be used with new test:"
+        android:id="@+id/textView16"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:layout_alignTop="@+id/radioGroup"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="51dp" />
 
 </RelativeLayout>

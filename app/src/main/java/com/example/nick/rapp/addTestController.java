@@ -9,10 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.File;
@@ -41,6 +44,11 @@ public class addTestController extends AppCompatActivity {
     RadioButton AdministratorOnly;
     RadioButton AdministratorAndTeacher;
 
+    Spinner pracItemSpinner;
+    ArrayAdapter<String> pracAdapter;
+    String selectedPracItem;
+    boolean pracItemSelected;
+
 
     DatabaseOperations dop;
 
@@ -62,10 +70,45 @@ public class addTestController extends AppCompatActivity {
 
         AdministratorOnly = (RadioButton) findViewById(R.id.administratorOnly);
         AdministratorAndTeacher = (RadioButton) findViewById(R.id.administratorAndTeacher);
+        pracItemSelected = false;
+
+        selectedPracItem = "";
 
 
 
         dop = new DatabaseOperations(ctx);
+
+        pracItemSpinner = (Spinner) findViewById(R.id.pracItemSpinner);
+
+        ArrayList<String> pracItemNames = dop.getPracNames();
+        ArrayAdapter<String> pracAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, pracItemNames);
+        pracAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        pracItemSpinner.setAdapter(pracAdapter);
+
+        if (pracItemNames.size() == 0){
+            Toast.makeText(getBaseContext(), "There are no practice item sets currently registered", Toast.LENGTH_LONG).show();
+        }
+
+        pracItemSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (pracItemSelected == true) {
+                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
+                    selectedPracItem = (String) parent.getItemAtPosition(position);
+                } else {
+                    pracItemSelected = true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
 
@@ -130,62 +173,68 @@ public class addTestController extends AppCompatActivity {
         newTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Detect if admin/teacher options have been set, if not display message
-                if (newTestType == null){
+                if (selectedPracItem.equals("")) {
                     Toast.makeText(getApplicationContext(),
-                            "Please select either Administrator ONLY or Administrator and Teacher Only",
+                            "Please select a practice item or select NO PRACTICE ITEM.",
                             Toast.LENGTH_LONG).show();
                 } else {
-
-
-                    //check if name field is filled, if not display message
-                    if (newTestNameField.getText().toString().equals("")){
+                    //Detect if admin/teacher options have been set, if not display message
+                    if (newTestType == null) {
                         Toast.makeText(getApplicationContext(),
-                                "Please enter a test name for the new test",
+                                "Please select either Administrator ONLY or Administrator and Teacher Only",
                                 Toast.LENGTH_LONG).show();
-
                     } else {
-                        newTestName = newTestNameField.getText().toString();
-                        //check if entered name is unique (and thus valid), if not display message.
-                        if (isUnique(dop, newTestName) == false){
-                            Toast.makeText(getApplicationContext(),
-                                    "There is a test with the name " + newTestName + " already, please enter a different" +
-                                            "name",
-                                    Toast.LENGTH_LONG).show();
-                            newTestName = null;
-                            newTestNameField.setText("");
-                        } else {
-                            //Detect if test dir field has not been set, if not display message
-                            //Detect if testDir could not be found, if not display message.
-                            if (newTestDirField.getText().toString().equals("")){
-                                Toast.makeText(getApplicationContext(),
-                                        "Please enter the name of the folder where the test assets are located.",
-                                        Toast.LENGTH_LONG).show();
-                            } else {
-                                //detect if external storage is mounted correctly
-                                // and readable!
-                                newTestDirName = newTestDirField.getText().toString();
-                                if (Environment.getExternalStorageState().startsWith(
-                                        Environment.MEDIA_MOUNTED) || (isExternalStorageWritable() || isExternalStorageReadable())) {
 
-                                    pathToNewTestDir = Environment.getExternalStorageDirectory() + "/" + newTestDirName + "/";
-                                    newTestDir = new File (pathToNewTestDir);
-                                    //detect if file created is an actual file
-                                    if (newTestDir.exists()){
-                                        loadTest();
+
+                        //check if name field is filled, if not display message
+                        if (newTestNameField.getText().toString().equals("")) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Please enter a test name for the new test",
+                                    Toast.LENGTH_LONG).show();
+
+                        } else {
+                            newTestName = newTestNameField.getText().toString();
+                            //check if entered name is unique (and thus valid), if not display message.
+                            if (isUnique(dop, newTestName) == false) {
+                                Toast.makeText(getApplicationContext(),
+                                        "There is a test with the name " + newTestName + " already, please enter a different" +
+                                                "name",
+                                        Toast.LENGTH_LONG).show();
+                                newTestName = null;
+                                newTestNameField.setText("");
+                            } else {
+                                //Detect if test dir field has not been set, if not display message
+                                //Detect if testDir could not be found, if not display message.
+                                if (newTestDirField.getText().toString().equals("")) {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Please enter the name of the folder where the test assets are located.",
+                                            Toast.LENGTH_LONG).show();
+                                } else {
+                                    //detect if external storage is mounted correctly
+                                    // and readable!
+                                    newTestDirName = newTestDirField.getText().toString();
+                                    if (Environment.getExternalStorageState().startsWith(
+                                            Environment.MEDIA_MOUNTED) || (isExternalStorageWritable() || isExternalStorageReadable())) {
+
+                                        pathToNewTestDir = Environment.getExternalStorageDirectory() + "/" + newTestDirName + "/";
+                                        newTestDir = new File(pathToNewTestDir);
+                                        //detect if file created is an actual file
+                                        if (newTestDir.exists()) {
+                                            loadTest();
+
+                                        } else {
+                                            Toast.makeText(getApplicationContext(),
+                                                    "The directory you typed in does not exist. Please recheck your spelling and" +
+                                                            " confirm that the directory is correctly stored on your device.",
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+
 
                                     } else {
                                         Toast.makeText(getApplicationContext(),
-                                                "The directory you typed in does not exist. Please recheck your spelling and" +
-                                                        " confirm that the directory is correctly stored on your device.",
+                                                "There is problem with the tablets memory, please contact the administrators",
                                                 Toast.LENGTH_LONG).show();
                                     }
-
-
-                                } else {
-                                    Toast.makeText(getApplicationContext(),
-                                            "There is problem with the tablets memory, please contact the administrators",
-                                            Toast.LENGTH_LONG).show();
                                 }
                             }
                         }
@@ -537,7 +586,8 @@ public class addTestController extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),
                 "Loaded new test " + newTestName,
                 Toast.LENGTH_LONG).show();
-        dop.addNewTest(dop, newTestName, newTestType, newTestId);
+        int selectedPracID = dop.getPracIDByName(selectedPracItem);
+        dop.addNewTest(dop, newTestName, newTestType, newTestId, selectedPracID);
         resetUIItems();
     }
 

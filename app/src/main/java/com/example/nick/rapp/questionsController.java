@@ -143,6 +143,14 @@ public class questionsController extends AppCompatActivity {
         ctx = this;
 
         currentQuestionData = currentQuestionData.getInstance();
+
+
+        //Need to check if there is still some questionData, and if so, reset questionData to its
+        //new state.
+        if (currentQuestionData.isOldData() == true){
+            currentQuestionData = new currentQuestionData(null, null, null, 0, 0, 0, 0, null, 0, 0, null, null, 0, 0, null, null, null, null, null, 0, 0, null,
+                    null, null, null, null, null, true, 0, null, 0, false, null);
+        }
         currentUserData = currentUserData.getInstance();
 
 
@@ -331,16 +339,16 @@ public class questionsController extends AppCompatActivity {
         //we are not on the first currentQuestionData. If we are loading the questions for the first time, we want
         //it to load the first currentQuestionData.
         if (currentQuestionData.getFirstQuestion() == false) {
+            if ((currentQuestionData.getPracCorrect() == 2) || (currentQuestionData.getCurrentQIndex() == (currentQuestionData.getNumPractice() - 1))){
+                currentQuestionData.setCurrentQIndex(currentQuestionData.getNumPractice() - 1);
+                currentQuestionData.setCurrentQtype("Test");
+            }
             currentQuestionData.setNextQuestion();
 
             //code to set the current currentQuestionData to the next currentQuestionData OR
             //forward them to the first practice item if they just successfully
             //completed the second practice currentQuestionData.
-//            if (currentQuestionData.getPracCorrect() == 2){
-//                currentQuestionData.setQuestionNum(currentQuestionData.getNumPracticeItems());
-//            } else {
-//                currentQuestionData.setNextQuestion();
-//            }
+
         } else {
             currentQuestionData.setFirstQuestion(false);
         }
@@ -353,7 +361,7 @@ public class questionsController extends AppCompatActivity {
         currentQuestionData.findCurrentQNum();
         currentQuestionData.setAttempts(0);
         //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
-        if (currentQuestionData.getCurrentQIndex() < currentQuestionData.getQuestionNum()){
+        if (currentQuestionData.getCurrentQIndex() < currentQuestionData.getNumPractice()){
             currentQuestionData.setCurrentQtype("Practice");
         } else  {
             currentQuestionData.setCurrentQtype("Test");
@@ -559,8 +567,10 @@ public class questionsController extends AppCompatActivity {
             //RECORD RESULTS HERE
             dop.addNewTestCompletionRecord(dop, generateRandomID(), studentId, studentName, testId,
                     testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
+            currentQuestionData.setOldData(true);
             startActivity(proceedIntent);
-        } else if ((currentQuestionData.getCurrentQIndex() == (currentQuestionData.getNumPracticeItems() - 1)
+            this.finish();
+        } else if ((currentQuestionData.getCurrentQIndex() == (currentQuestionData.getNumPractice() - 1)
                 || currentQuestionData.getPracCorrect() == 2)){
             transitionToTestItems();
         } else {

@@ -165,7 +165,7 @@
                 android:id="@+id/textView7"
                 android:layout_marginLeft="444dp"
                 android:layout_marginStart="444dp"
-                android:layout_alignBottom="@+id/testSpinner"
+                android:layout_alignBottom="@+id/testsSpinner"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_gravity="center_vertical"
@@ -176,7 +176,7 @@
             <Spinner
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/testSpinner"
+                android:id="@+id/testsSpinner"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/textView7"
                 android:layout_toEndOf="@+id/textView7"

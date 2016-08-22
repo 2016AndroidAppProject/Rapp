@@ -46,12 +46,12 @@ public class editPracticeItemsController extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.addtest_screen);
+        setContentView(R.layout.editpitems_screen);
         newPIDirField = (EditText) findViewById(R.id.pracItemDirField);
         addPIButton = (Button) findViewById(R.id.addNewPracSetButton);
         ctx = this;
 
-        newPISetField = (EditText) findViewById(R.id.newTestNameField);
+        newPISetField = (EditText) findViewById(R.id.addPracItemSet);
 
         dop = new DatabaseOperations(ctx);
 
@@ -201,8 +201,9 @@ public class editPracticeItemsController extends AppCompatActivity {
 
 
             String word = fileName1[1];
-            String type = fileName1[2];
-            String difficulty = fileName1[3];
+            String type = "Practice";
+            String difficulty = null;
+
 
             char[] questionIndex = fileName1[0].toCharArray();
             int questionNum = 0;
@@ -392,7 +393,7 @@ public class editPracticeItemsController extends AppCompatActivity {
         CR.moveToFirst();
         do {
 
-            if (piSetName.equalsIgnoreCase(CR.getString(2))){
+            if (piSetName.equalsIgnoreCase(CR.getString(1))){
                 return false;
             }
         }

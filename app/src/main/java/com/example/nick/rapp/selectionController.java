@@ -3,7 +3,6 @@ package com.example.nick.rapp;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
@@ -85,7 +82,7 @@ public class selectionController extends AppCompatActivity {
 
         teacherSpinner = (Spinner) findViewById(R.id.teacherSpinner);
         studentSpinner = (Spinner) findViewById(R.id.studentSpinner);
-        testSpinner = (Spinner) findViewById(R.id.testSpinner);
+        testSpinner = (Spinner) findViewById(R.id.testsSpinner);
 
         teacherSelectionLayout.setVisibility(View.INVISIBLE);
         studentSelectionLayout.setVisibility(View.INVISIBLE);
@@ -100,8 +97,7 @@ public class selectionController extends AppCompatActivity {
                     (this, android.R.layout.simple_spinner_item, teacherNames);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             teacherSpinner.setAdapter(adapter);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            teacherSpinner.setAdapter(adapter);
+
 
             teacherSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -135,7 +131,7 @@ public class selectionController extends AppCompatActivity {
                 }
             });
         } else {
-            prevIntent = new Intent(this, loginController.class);
+            prevIntent = new Intent(this, teacherViewController.class);
             ArrayList<String> testNames;
 
             ArrayAdapter<String> testAdapter;
