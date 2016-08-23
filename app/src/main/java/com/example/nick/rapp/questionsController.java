@@ -9,7 +9,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -80,6 +79,8 @@ public class questionsController extends AppCompatActivity {
     int numQuestions;
     int numQuestionsCorrect;
     int numQuestionsComplete;
+
+    int recordID;
 
 
 
@@ -186,6 +187,11 @@ public class questionsController extends AppCompatActivity {
 
 
         numPosAnswers = currentQuestionData.getNumPosAnswer();
+
+        recordID = generateRandomID();
+
+        dop.addNewTestCompletionRecord(dop, recordID, studentId, studentName, testId,
+                testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
 
 
 
@@ -552,6 +558,7 @@ public class questionsController extends AppCompatActivity {
     //the user will continue to the next currentQuestionData, they will have finished the test,
     //or they will have finished the practice questions.
     public void processAnswer(){
+        dop.updateTestCompletionRecord(dop, recordID, numQuestionsCorrect, numQuestionsComplete);
         //Code to add +1 to pracCorrect if attempts = 0
         //so that when user gets two practice questions right on their first attempt
         //they are forwarded to the first real practice item regardless of rather
@@ -565,8 +572,9 @@ public class questionsController extends AppCompatActivity {
         if (currentQuestionData.getCurrentQIndex() == (currentQuestionData.getTestSize() - 1)) {
             //go to last activity
             //RECORD RESULTS HERE
-            dop.addNewTestCompletionRecord(dop, generateRandomID(), studentId, studentName, testId,
-                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
+//            dop.addNewTestCompletionRecord(dop, generateRandomID(), studentId, studentName, testId,
+//                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
+
             currentQuestionData.setOldData(true);
             startActivity(proceedIntent);
             this.finish();
@@ -641,13 +649,13 @@ public class questionsController extends AppCompatActivity {
                     if (currentQuestionData.getCorrectAnswer() == 1){
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, studentId, studentName);
+                                true, testId, testName, resultId, recordID, studentId, studentName);
                         numQuestionsCorrect++;
                         resultId++;
                     } else {
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, studentId, studentName);
+                                false, testId,testName, resultId, recordID, studentId, studentName);
                         resultId++;
                     }
 
@@ -662,13 +670,13 @@ public class questionsController extends AppCompatActivity {
                     if (currentQuestionData.getCorrectAnswer() == 2){
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, studentId, studentName);
+                                true, testId, testName, resultId, recordID, studentId, studentName);
                         numQuestionsCorrect++;
                         resultId++;
                     } else {
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, studentId, studentName);
+                                false, testId,testName, resultId, recordID, studentId, studentName);
                         resultId++;
                     }
 
@@ -684,13 +692,13 @@ public class questionsController extends AppCompatActivity {
                     if (currentQuestionData.getCorrectAnswer() == 3){
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, studentId, studentName);
+                                true, testId, testName, resultId, recordID, studentId, studentName);
                         numQuestionsCorrect++;
                         resultId++;
                     } else {
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, studentId, studentName);
+                                false, testId,testName, resultId, recordID, studentId, studentName);
                         resultId++;
                     }
 
@@ -705,13 +713,13 @@ public class questionsController extends AppCompatActivity {
                     if (currentQuestionData.getCorrectAnswer() == 4){
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, studentId, studentName);
+                                true, testId, testName, resultId, recordID, studentId, studentName);
                         resultId++;
                         numQuestionsCorrect++;
                     } else {
                         dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
                                 currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, studentId, studentName);
+                                false, testId,testName, resultId, recordID, studentId, studentName);
                         resultId++;
                     }
 

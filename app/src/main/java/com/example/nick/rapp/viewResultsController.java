@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,15 +28,23 @@ public class viewResultsController extends AppCompatActivity {
     Cursor settings;
     Cursor tests;
     Cursor results;
+    TextView modeNotice;
+    TextView aggregatedScore;
+
+    ListView resultsView;
+
+    int recordID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewresults_screen);
+        resultsView = (ListView) findViewById(R.id.resultsList);
         ctx = this;
         dop = new DatabaseOperations(ctx);
 
         testSpinner = (Spinner) findViewById(R.id.testsSpinner);
+        aggregatedScore = (TextView) findViewById(R.id.aggregated);
 
         tests = dop.getTests(dop);
         testNames = dop.getTestNamesForTeachers(tests);
@@ -45,6 +55,9 @@ public class viewResultsController extends AppCompatActivity {
         settings = dop.getResultMode(dop);
         settings.moveToFirst();
         resultsMode = settings.getString(0);
+
+        modeNotice = (TextView) findViewById(R.id.modeNotice);
+        modeNotice.setText(resultsMode);
 
 
         testSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -59,7 +72,51 @@ public class viewResultsController extends AppCompatActivity {
                 if (testSelected == true) {
                     Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                     selectedTest = (String) parent.getItemAtPosition(position);
-                    results = dop.getResults(dop, selectedTest);
+                    if (resultsMode.equals("disaggregated")) {
+                        results = dop.getResults(dop, selectedTest);
+                        if (results.getCount() == 0){
+                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
+                            resultsView.setAdapter(resultsAdapter);
+                        } else {
+                            results.moveToFirst();
+                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
+                            resultsView.setAdapter(resultsAdapter);
+
+                        }
+                    } else if (resultsMode.equals("word")){
+                        results = dop.getResultWords(dop, selectedTest);
+                        if (results.getCount() == 0){
+                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
+                            resultsView.setAdapter(resultsAdapter);
+                        } else {
+                            results.moveToFirst();
+                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
+                            resultsView.setAdapter(resultsAdapter);
+
+                        }
+                    } else if (resultsMode.equals("child")){
+                        results = dop.getCompletionRecordsByStudent(dop, selectedTest);
+                        if (results.getCount() == 0){
+                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
+                            resultsView.setAdapter(resultsAdapter);
+                        } else {
+                            results.moveToFirst();
+                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
+                            resultsView.setAdapter(resultsAdapter);
+
+                        }
+                    } else if (resultsMode.equals("wordAndChild")){
+                        aggregatedScore.setText(" Students answered correctly "
+                                + String.valueOf(dop.percentageCorrectResults(dop, selectedTest)) + "% of the time.");
+                    }
+
+
+
+
+
                 } else {
                     testSelected = true;
                 }

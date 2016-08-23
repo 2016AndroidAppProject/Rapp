@@ -90,19 +90,24 @@ public class classSetupController extends AppCompatActivity {
                 public void onClick(View v) {
                     newStudentFirstName = newStudentFirstNameField.getText().toString();
                     Cursor CR = dop.getStudentInfo(dop);
-                    if (CR.getCount() == 0){
-                        dop.addNewStudent(dop, newStudentFirstName, generateRandomID(), selectedTeacher);
+                    if (selectedTeacher.equals("")) {
                         Toast.makeText(getBaseContext(),
-                                newStudentFirstName + " has been successfully added!", Toast.LENGTH_LONG).show();
-                        newStudentFirstNameField.setText("");
+                                "Pleas select a teacher to add a student", Toast.LENGTH_LONG).show();
 
                     } else {
-                        boolean isUnique = isUniqueName(newStudentFirstName, CR);
-                        if (isUnique == false) {
-                            Toast.makeText(getBaseContext(), "There is already a student with that name in that teachers class." +
-                                    " Please add initials to the name to make it unique.", Toast.LENGTH_LONG).show();
+                        if (CR.getCount() == 0) {
+                            dop.addNewStudent(dop, newStudentFirstName, generateRandomID(), selectedTeacher);
+                            Toast.makeText(getBaseContext(),
+                                    newStudentFirstName + " has been successfully added!", Toast.LENGTH_LONG).show();
                             newStudentFirstNameField.setText("");
+
                         } else {
+                            boolean isUnique = isUniqueName(newStudentFirstName, CR);
+                            if (isUnique == false) {
+                                Toast.makeText(getBaseContext(), "There is already a student with that name in that teachers class." +
+                                        " Please add initials to the name to make it unique.", Toast.LENGTH_LONG).show();
+                                newStudentFirstNameField.setText("");
+                            } else {
 
                                 if (newStudentFirstName.equals("")) {
                                     Toast.makeText(getBaseContext(), "Please fill in the student name field", Toast.LENGTH_LONG).show();
@@ -113,8 +118,9 @@ public class classSetupController extends AppCompatActivity {
                                     newStudentFirstNameField.setText("");
                                 }
                             }
-                    }
+                        }
 
+                    }
                 }
              });
 

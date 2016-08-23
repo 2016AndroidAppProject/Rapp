@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Aggregated by word"
-            android:id="@+id/word"
+            android:id="@+id/wordOnly"
             android:padding="30dp"
             android:layout_margin="10dp"
             android:background="#FFFFFF"

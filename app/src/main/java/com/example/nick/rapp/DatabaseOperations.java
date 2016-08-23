@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 
 public class DatabaseOperations extends SQLiteOpenHelper {
@@ -119,6 +120,24 @@ public class DatabaseOperations extends SQLiteOpenHelper {
                 long k = SQLD.insert(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, null, cv);
     }
 
+    public void updateTestCompletionRecord(DatabaseOperations dop, int recordId,
+                                           int numQuestionsCorrect, int numQuestionsComplete){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        String strFilter = tableData.TESTCOMPLETIONRECORDS.RECORD_ID + "=" + recordId;
+        ContentValues cv = new ContentValues();
+
+        cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT,numQuestionsCorrect);
+        cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE,numQuestionsComplete);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String strDate = sdf.format(new Date());
+
+//        ContentValues values = new ContentValues();
+//        values.put("ColumnName", strDate);
+        cv.put(tableData.TESTCOMPLETIONRECORDS.DATE, strDate);
+
+        SQ.update(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, cv, strFilter, null);
+    }
+
     public String RESULTS_CREATE = "CREATE TABLE " + tableData.RESULTS.TABLE_NAME +
             "(" + tableData.RESULTS.QUESTION_ID + " INTEGER," +
             tableData.RESULTS.WORD + " TEXT," +
@@ -126,8 +145,12 @@ public class DatabaseOperations extends SQLiteOpenHelper {
             tableData.RESULTS.TEST_ID + " INTEGER," +
             tableData.RESULTS.TEST_NAME + " TEXT," +
             tableData.RESULTS.RESULT_ID + " INTEGER, " +
+            tableData.RESULTS.RECORD_ID + " INTEGER," +
             tableData.RESULTS.STUDENT_ID + " INTEGER, " +
             tableData.RESULTS.STUDENT_NAME + " TEXT," +
+
+            "FOREIGN KEY (" + tableData.RESULTS.RECORD_ID + ") REFERENCES " +
+            tableData.TESTCOMPLETIONRECORDS.TABLE_NAME + "(" + tableData.TESTCOMPLETIONRECORDS.RECORD_ID + ")," +
 
             "FOREIGN KEY (" + tableData.RESULTS.STUDENT_ID + ") REFERENCES " +
             tableData.STUDENTINFO.TABLE_NAME + "(" + tableData.STUDENTINFO.STUDENT_ID + ")," +
@@ -137,7 +160,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
             "FOREIGN KEY(" + tableData.RESULTS.TEST_ID + ") REFERENCES " +
             tableData.TESTS.TABLE_NAME + "(" + tableData.TESTS.TEST_ID + ")," +
-            " PRIMARY KEY(" + tableData.RESULTS.TEST_ID + ", " + tableData.RESULTS.RESULT_ID + "));";
+            " PRIMARY KEY(" + tableData.RESULTS.RECORD_ID + ", " + tableData.RESULTS.RESULT_ID + "));";
 
 
 
@@ -224,7 +247,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
 
     public void addNewResult(DatabaseOperations dop, int questionID, String word,
-                             boolean correct, int testID, String testName, int resultID, int studentID, String studentName){
+                             boolean correct, int testID, String testName, int resultID, int recordID, int studentID, String studentName){
         SQLiteDatabase SQLD = dop.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -234,6 +257,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         cv.put(tableData.RESULTS.TEST_ID, testID);
         cv.put(tableData.RESULTS.TEST_NAME, testName);
         cv.put(tableData.RESULTS.RESULT_ID, resultID);
+        cv.put(tableData.RESULTS.RECORD_ID, recordID);
         cv.put(tableData.RESULTS.STUDENT_ID, studentID);
         cv.put(tableData.RESULTS.STUDENT_NAME, studentName);
         long k = SQLD.insert(tableData.RESULTS.TABLE_NAME, null, cv);
@@ -485,12 +509,110 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getResults(DatabaseOperations dop, String testName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
         String whereClause = tableData.RESULTS.TEST_NAME + "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 whereClause, new String[] {testName}, null, null, null);
+        return CR;
+    }
+
+    public Cursor getAllResults(DatabaseOperations dop){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
+        Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+                null, null, null, null, null);
+        return CR;
+    }
+
+    public Cursor getResultWords(DatabaseOperations dop, String testName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.WORD};
+        String whereClause = tableData.RESULTS.TEST_NAME + "=?";
+        Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+                whereClause, new String[] {testName}, tableData.RESULTS.WORD, null, null);
+        return CR;
+    }
+
+    public Cursor getCompletionRecordsByStudent(DatabaseOperations dop, String testName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.TESTCOMPLETIONRECORDS.RECORD_ID, tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
+                tableData.TESTCOMPLETIONRECORDS.DATE};
+        String whereClause = tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=?";
+        Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
+                whereClause, new String[] {testName}, null, null, null);
+
+        ArrayList<String> students = new ArrayList<String>();
+        return CR;
+    }
+
+    public double percentageCorrectResults(DatabaseOperations dop, String testName){
+        Double percentCorrect = 0.0;
+        int totalResults = 0;
+        int correctResults = 0;
+        Cursor CR = dop.getResults(dop, testName);
         CR.moveToFirst();
-        String test = CR.getString(0);
+        do {
+            totalResults++;
+            if (CR.getInt(4) == 1){
+                correctResults++;
+            }
+        } while (CR.moveToNext());
+
+        percentCorrect = ((double) correctResults / totalResults) * 100;
+        double finalPercCorrect = (double) Math.round(percentCorrect * 100) / 100;
+        return finalPercCorrect;
+    }
+
+
+
+    public HashMap<String, Double> getWordsCorrrect(DatabaseOperations dop, Cursor resultsForTest){
+        HashMap<String, int[]> wordsCorrect = new HashMap<String, int[]>();
+        HashMap<String, Double> wordsCorrectPercentages = new HashMap<String, Double>();
+
+        resultsForTest.moveToFirst();
+
+        //For each word, we create an array of two int values, the first value stores the total number of times
+        //that word pops up in results.
+        //the second value stores the number of times that word was correctly answered in the result.
+        do {
+            if (wordsCorrect.get(resultsForTest.getString(2)) == null){
+                int[] numCorrect = new int[2];
+                numCorrect[0] = 1;
+                if (resultsForTest.getInt(4) == 1){
+                    numCorrect[1] = 1;
+                } else if (resultsForTest.getInt(4) == 0){
+                    numCorrect[1] = 0;
+                }
+                wordsCorrect.put(resultsForTest.getString(2), numCorrect);
+            } else {
+                int[] numCorrect = new int[2];
+                numCorrect[0] = wordsCorrect.get(resultsForTest.getString(2))[0] + 1;
+                if (resultsForTest.getInt(4) == 1){
+                    numCorrect[1] = wordsCorrect.get(resultsForTest.getString(2))[1] + 1;
+                } else if (resultsForTest.getInt(4) == 0){
+                    numCorrect[1] = wordsCorrect.get(resultsForTest.getString(2))[1];;
+                }
+                wordsCorrect.put(resultsForTest.getString(2), numCorrect);
+            }
+
+        } while (resultsForTest.moveToNext());
+
+        for (String word : wordsCorrect.keySet()) {
+            wordsCorrectPercentages.put(word, ((double) wordsCorrect.get(word)[1] / wordsCorrect.get(word)[0]));
+        }
+
+        return wordsCorrectPercentages;
+
+    }
+
+    public Cursor getCompletionRecordByID(DatabaseOperations dop, int recordID){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
+                            tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.DATE};
+        String whereClause = tableData.TESTCOMPLETIONRECORDS.RECORD_ID + "=?";
+        Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns, whereClause,
+                new String[] {Integer.toString(recordID)}, null, null, null);
         return CR;
     }
 

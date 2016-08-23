@@ -32,13 +32,12 @@
         android:layout_below="@+id/textView17" />
 
     <Spinner
-        android:layout_width="wrap_content"
+        android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:id="@+id/testsSpinner"
         android:background="#FFFFFF"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/textView22"
-        android:layout_toEndOf="@+id/textView22" />
+        android:layout_toRightOf="@+id/textView22" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,4 +51,38 @@
         android:textStyle="bold"
         android:textSize="25dp"
         android:layout_marginTop="35dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Current Result mode is:"
+        android:id="@+id/textView24"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/testsSpinner"
+        android:layout_toEndOf="@+id/testsSpinner"
+        android:layout_marginLeft="43dp"
+        android:layout_marginStart="43dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Disaggregated"
+        android:id="@+id/modeNotice"
+        android:layout_below="@+id/textView22"
+        android:layout_alignLeft="@+id/textView24"
+        android:layout_alignStart="@+id/textView24" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/aggregated"
+        android:layout_above="@+id/resultsList"
+        android:layout_toRightOf="@+id/textView17"
+        android:layout_toEndOf="@+id/textView17"
+        android:textStyle="bold" />
+
 </RelativeLayout>

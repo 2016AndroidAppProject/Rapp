@@ -39,7 +39,7 @@ public class tableData {
     }
 
     public static abstract class TESTCOMPLETIONRECORDS implements BaseColumns {
-        public static final String RECORD_ID = "record_id";
+        public static final String RECORD_ID = "_id";
         public static final String STUDENT_ID = "student_id";
         public static final String STUDENT_NAME = "student_name";
         public static final String NUM_QUESTIONS = "numquestions";
@@ -55,7 +55,8 @@ public class tableData {
     }
 
     public static abstract class RESULTS implements BaseColumns {
-        public static final String RESULT_ID = "result_id";
+        public static final String RESULT_ID = "_id";
+        public static final String RECORD_ID = "record_id";
         public static final String QUESTION_ID = "question_id";
         public static final String WORD = "word";
         public static final String CORRECT = "correct";
