@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.nick.rapp">
+    package="com.example.nick.ProgressMonitoringTool">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".loginController"
+            android:name="com.example.nick.ProgressMonitoringTool.loginController"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,10 +26,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".questionsController" />
-        <activity android:name=".doneController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.questionsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.doneController" />
         <activity
-            android:name=".AndroidDatabaseManager"
+            android:name="com.example.nick.ProgressMonitoringTool.AndroidDatabaseManager"
             android:theme="@style/Theme.AppCompat.Light" />
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
@@ -39,22 +39,22 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".proceedController" />
-        <activity android:name=".instructionController" />
-        <activity android:name=".selectionController" />
-        <activity android:name=".adminViewController" />
-        <activity android:name=".userSetupController" />
-        <activity android:name=".classSetupController" />
-        <activity android:name=".settingsController" />
-        <activity android:name=".testSetupController" />
-        <activity android:name=".resultsSetupController" />
-        <activity android:name=".testsController" />
-        <activity android:name=".addTestController" />
-        <activity android:name=".editTestsController" />
-        <activity android:name=".editPracticeItemsController" />
-        <activity android:name=".exportResultsController" />
-        <activity android:name=".viewResultsController" />
-        <activity android:name=".teacherViewController"></activity>
+        <activity android:name="com.example.nick.ProgressMonitoringTool.proceedController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.instructionController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.selectionController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.adminViewController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.userSetupController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.classSetupController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.settingsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.testSetupController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.resultsSetupController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.testsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.addTestController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.editTestsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.editPracticeItemsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.exportResultsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.viewResultsController" />
+        <activity android:name="com.example.nick.ProgressMonitoringTool.teacherViewController"></activity>
     </application>
 
 </manifest>

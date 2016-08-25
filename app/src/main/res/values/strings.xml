@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Rapp</string>
+    <string name="app_name">Progress Monitoring Tool</string>
     <string name="testText">test!</string>
     <string name="userName">blank</string>
     <string name="passWord">blank</string>

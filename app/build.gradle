@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.0"
 
     defaultConfig {
-        applicationId "com.example.nick.rapp"
+        applicationId "com.example.nick.ProgressMonitoringTool"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -36,4 +36,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
     compile 'com.google.android.gms:play-services:9.0.2'
     compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+    compile 'com.opencsv:opencsv:3.8'
 }
