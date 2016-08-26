@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -47,6 +48,8 @@ public class questionsController extends AppCompatActivity {
     currentQuestionData currentQuestionData;
     currentUserData currentUserData;
     DatabaseOperations dop;
+
+    TextView practiceNotice;
 
 
     //We get the number of possible answers from the questionData so that we
@@ -143,6 +146,12 @@ public class questionsController extends AppCompatActivity {
         mp = new MediaPlayer();
         ctx = this;
 
+        practiceNotice = (TextView) this.findViewById(R.id.practiceNotice);
+        practiceNotice.setVisibility(View.INVISIBLE);
+        if (currentUserData.getInstance().isPracticeMode() == true){
+            practiceNotice.setVisibility(View.VISIBLE);
+        }
+
         currentQuestionData = currentQuestionData.getInstance();
 
 
@@ -190,8 +199,10 @@ public class questionsController extends AppCompatActivity {
 
         recordID = generateRandomID();
 
-        dop.addNewTestCompletionRecord(dop, recordID, studentId, studentName, testId,
-                testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
+        if (currentUserData.isPracticeMode() == false) {
+            dop.addNewTestCompletionRecord(dop, recordID, studentId, studentName, testId,
+                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
+        }
 
 
 
@@ -647,15 +658,19 @@ public class questionsController extends AppCompatActivity {
             switch (view.getId()) {
                 case R.id.opt1:
                     if (currentQuestionData.getCorrectAnswer() == 1){
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         numQuestionsCorrect++;
                         resultId++;
                     } else {
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         resultId++;
                     }
 
@@ -668,15 +683,19 @@ public class questionsController extends AppCompatActivity {
                     break;
                 case R.id.opt2:
                     if (currentQuestionData.getCorrectAnswer() == 2){
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         numQuestionsCorrect++;
                         resultId++;
                     } else {
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         resultId++;
                     }
 
@@ -690,15 +709,19 @@ public class questionsController extends AppCompatActivity {
                     break;
                 case R.id.opt3:
                     if (currentQuestionData.getCorrectAnswer() == 3){
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         numQuestionsCorrect++;
                         resultId++;
                     } else {
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         resultId++;
                     }
 
@@ -711,15 +734,19 @@ public class questionsController extends AppCompatActivity {
                     break;
                 case R.id.opt4:
                     if (currentQuestionData.getCorrectAnswer() == 4){
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                true, testId, testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         resultId++;
                         numQuestionsCorrect++;
                     } else {
-                        dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                currentQuestionData.getCurrentQuestionWord(),
-                                false, testId,testName, resultId, recordID, studentId, studentName);
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
+                                    currentQuestionData.getCurrentQuestionWord(),
+                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                        }
                         resultId++;
                     }
 

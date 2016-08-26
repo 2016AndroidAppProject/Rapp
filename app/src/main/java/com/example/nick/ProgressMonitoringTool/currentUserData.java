@@ -20,23 +20,26 @@ public class currentUserData {
     private String selectedTeacher;
     private String selectedTest;
     private String selectedStudent;
+    private boolean practiceMode;
+
 //    private Activity prevAct;
 //    private Activity currentAct;
 
     public currentUserData(String userName, String password, String userType, String userRealName,
-                           String selectedTeacher, String selectedTest, String selectedStudent) {
+                           String selectedTeacher, String selectedTest, String selectedStudent, boolean practiceMode) {
         this.userName = userName;
         this.password = password;
         this.userType = userType;
         this.selectedTeacher = selectedTeacher;
         this.selectedTest = selectedTest;
         this.selectedStudent = selectedStudent;
+        this.practiceMode = practiceMode;
     }
 
 
     //SINGLETON PATTERN: The user is instantiated here so that the user is ready to hold data when initialized in
     //the other class. The userData is initialized in the loginController.java class.
-    private static final currentUserData CURRENT_USER_DATA = new currentUserData(null, null, null, null, null, null, null);
+    private static final currentUserData CURRENT_USER_DATA = new currentUserData(null, null, null, null, null, null, null, false);
 //
 //    public Activity getPrevAct() {
 //        return prevAct;
@@ -54,6 +57,14 @@ public class currentUserData {
 //        this.currentAct = currentAct;
 //    }
 
+
+    public boolean isPracticeMode() {
+        return practiceMode;
+    }
+
+    public void setPracticeMode(boolean practiceMode) {
+        this.practiceMode = practiceMode;
+    }
 
     public String getPassword() {
         return password;

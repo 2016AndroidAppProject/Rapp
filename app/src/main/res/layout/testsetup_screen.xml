@@ -14,23 +14,90 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:hint="Enter number of items to test"
-       android:layout_marginLeft="119dp"
-       android:layout_marginStart="119dp"
-       android:layout_marginTop="102dp"
+       android:layout_marginLeft="118dp"
+       android:layout_marginStart="118dp"
+       android:layout_marginTop="79dp"
        android:textSize="30dp"
-       android:layout_alignParentTop="true"
+       android:id="@+id/changeNumItems"
+       android:layout_below="@+id/textView26"
        android:layout_alignParentLeft="true"
-       android:layout_alignParentStart="true"
-       android:id="@+id/editText" />
+       android:layout_alignParentStart="true" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Check if shortened tests should maintain proportions of test items (difficulty,  types of form class, filler items)"
-        android:id="@+id/checkBox"
+        android:id="@+id/maintainProp"
         android:layout_marginTop="79dp"
-        android:layout_below="@+id/editText"
-        android:layout_alignLeft="@+id/editText"
-        android:layout_alignStart="@+id/editText"
-        android:textSize="35dp" />
+        android:layout_below="@+id/changeNumItems"
+        android:layout_alignLeft="@+id/changeNumItems"
+        android:layout_alignStart="@+id/changeNumItems"
+        android:textSize="35dp"
+        android:checked="false"
+        android:scaleX="2.00"
+        android:scaleY="2.00"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Number of items is currently set to:"
+        android:id="@+id/textView26"
+        android:layout_marginTop="48dp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:textSize="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/changeNumItems"
+        android:layout_alignStart="@+id/changeNumItems" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Type a number or type &quot;All&quot; to change the number of items to be tested"
+        android:id="@+id/textView27"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:textSize="25dp"
+        android:layout_below="@+id/textView26"
+        android:layout_alignLeft="@+id/changeNumItems"
+        android:layout_alignStart="@+id/changeNumItems"
+        android:layout_marginTop="34dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UPDATE SETTINGS"
+        android:id="@+id/updateSettings"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="42dp"
+        android:textSize="45dp"
+        android:padding="35dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="&quot;All&quot;"
+        android:id="@+id/currentNumItemSetting"
+        android:textColor="#000000"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:layout_above="@+id/textView27"
+        android:layout_toRightOf="@+id/changeNumItems"
+        android:layout_toEndOf="@+id/changeNumItems" />
+
+ <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:textAppearance="?android:attr/textAppearanceMedium"
+     android:text="Check if shortened tests should maintain proportions of test items (difficulty,  types of form class, filler items)"
+     android:id="@+id/textView28"
+     android:layout_centerVertical="true"
+     android:layout_toRightOf="@+id/maintainProp"
+     android:layout_alignRight="@+id/currentNumItemSetting"
+     android:layout_alignEnd="@+id/currentNumItemSetting"
+     android:layout_marginLeft="15dp" />
 </RelativeLayout>

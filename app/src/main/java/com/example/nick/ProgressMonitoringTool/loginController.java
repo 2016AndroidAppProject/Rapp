@@ -36,6 +36,7 @@ public class loginController extends AppCompatActivity {
     currentUserData currentUserData;
     currentQuestionData currentQuestionData;
 
+
     Context CTX = this;
 
     int status;
@@ -68,7 +69,7 @@ public class loginController extends AppCompatActivity {
         Cursor resultModeCR = DOP.getResultMode(DOP);
 
         if (resultModeCR.getCount() == 0){
-            DOP.addNewSettings(DOP, "disaggregated");
+            DOP.addNewSettings(DOP, "disaggregated", true, "All");
         }
 
         if (pracItemCR.getCount() == 0){

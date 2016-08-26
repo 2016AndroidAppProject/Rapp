@@ -16,6 +16,8 @@ public class adminViewController extends AppCompatActivity {
     Button openDatabaseManager;
     Button returnLoginButton;
 
+    currentUserData currentUserData;
+
 
 
     Intent goToTests;
@@ -59,6 +61,7 @@ public class adminViewController extends AppCompatActivity {
         administerReceptiveTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentUserData.getInstance().setPracticeMode(false);
                 startActivity(goToAdministerReceptiveTest);
             }
         });
@@ -73,6 +76,7 @@ public class adminViewController extends AppCompatActivity {
         studentLiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentUserData.getInstance().setPracticeMode(true);
                 startActivity(goToStudentLive);
             }
         });

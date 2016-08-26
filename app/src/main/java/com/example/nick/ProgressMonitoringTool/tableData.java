@@ -108,6 +108,9 @@ public class tableData {
 
     public static abstract class SETTINGS implements BaseColumns {
         public static final String RESULT_MODE = "result_mode";
+        public static final String MAINTAIN_PROPORTIONS = "maintain_proportions";
+        public static final String NUM_ITEMSTOTEST = "num_itemstotest";
+
         public static final String DATABASE_NAME = "Rapp_info";
         public static final String TABLE_NAME = "settings";
     }

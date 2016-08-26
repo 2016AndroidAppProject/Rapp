@@ -32,6 +32,7 @@ public class teacherViewController extends AppCompatActivity {
         goToSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentUserData.getInstance().setPracticeMode(false);
                 startActivity(goToSelection);
             }
         });

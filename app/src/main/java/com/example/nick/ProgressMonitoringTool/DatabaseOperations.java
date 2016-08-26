@@ -186,7 +186,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
             tableData.TESTS.PRAC_ID + " INTEGER);";
 
     public String SETTINGS_CREATE = "CREATE TABLE " + tableData.SETTINGS.TABLE_NAME +
-            "(" + tableData.SETTINGS.RESULT_MODE + " STRING);";
+            "(" + tableData.SETTINGS.RESULT_MODE + " STRING," +
+                tableData.SETTINGS.MAINTAIN_PROPORTIONS + " BOOLEAN," +
+                tableData.SETTINGS.NUM_ITEMSTOTEST + " STRING);";
 
     public DatabaseOperations(Context context) {
             //, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -230,14 +232,17 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         Log.d("Database operations", "New user inserted");
     }
 
-    public void addNewSettings(DatabaseOperations dop, String resultMode){
+    public void addNewSettings(DatabaseOperations dop, String resultMode, boolean maintainProportions, String numItemsToTest){
         SQLiteDatabase SQLD = dop.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put(tableData.SETTINGS.RESULT_MODE, resultMode);
+        cv.put(tableData.SETTINGS.MAINTAIN_PROPORTIONS, maintainProportions);
+        cv.put(tableData.SETTINGS.NUM_ITEMSTOTEST, numItemsToTest);
         long k = SQLD.insert(tableData.SETTINGS.TABLE_NAME, null, cv);
 
     }
+
 
 
 
@@ -346,6 +351,40 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         Cursor CR = SQ.query(tableData.SETTINGS.TABLE_NAME, columns, null, null, null, null, null);
 
         return CR;
+    }
+
+    public Cursor getMaintainProp(DatabaseOperations dop){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.SETTINGS.MAINTAIN_PROPORTIONS};
+        Cursor CR = SQ.query(tableData.SETTINGS.TABLE_NAME, columns, null, null, null, null, null);
+
+        return CR;
+    }
+
+    public Cursor getNumItemsToTest(DatabaseOperations dop){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.SETTINGS.NUM_ITEMSTOTEST};
+        Cursor CR = SQ.query(tableData.SETTINGS.TABLE_NAME, columns, null, null, null, null, null);
+
+        return CR;
+    }
+
+    public void updateNumItemsToTest(DatabaseOperations dop, String newItemString){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        //String strFilter = tableData.SETTINGS.RESULT_MODE + "=?";
+        ContentValues cv = new ContentValues();
+        cv.put(tableData.SETTINGS.NUM_ITEMSTOTEST, newItemString);
+
+        SQ.update(tableData.SETTINGS.TABLE_NAME, cv, null, null);
+    }
+
+    public void updateMaintainProp(DatabaseOperations dop, boolean maintainProp){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        //String strFilter = tableData.SETTINGS.RESULT_MODE + "=?";
+        ContentValues cv = new ContentValues();
+        cv.put(tableData.SETTINGS.MAINTAIN_PROPORTIONS, maintainProp);
+
+        SQ.update(tableData.SETTINGS.TABLE_NAME, cv, null, null);
     }
 
     public void updateResultMode(DatabaseOperations dop, String newMode){
@@ -728,7 +767,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
 
 
-    public static byte[] pngToByteArray(Bitmap bitmap) {
+    public static byte[] pngToByteArray(Bitmap bitmap) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
         byte[] result = outputStream.toByteArray();
@@ -741,7 +780,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         return result;
     }
 
-    public static byte[] jpgToByteArray(Bitmap bitmap) {
+    public static byte[] jpgToByteArray(Bitmap bitmap) throws IOException {
 //        byte[] byteArray;
 //        int width = bitmap.getWidth();
 //        int height = bitmap.getHeight();

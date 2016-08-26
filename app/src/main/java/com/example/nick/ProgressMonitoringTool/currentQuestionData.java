@@ -500,24 +500,26 @@ public class currentQuestionData {
         setAudioList(new byte[getTestSize() + getNumPractice() + 1][]);
         setImageList(new Bitmap[getTestSize() + getNumPractice() + 1][4]);
 
-        //Creating indexes for each currentQuestionData, starting with 1, up to testSize
-        int j = 1;
-        for (int i = 0; i < getTestSize(); i++){
-            getQuestionList()[i] = j;
-            j++;
-        }
-
-        int y = 1;
-        for (int i = 0; i < getNumPractice(); i++){
-            getPracticeList()[i] = y;
-            y++;
-        }
+//        //Creating indexes for each currentQuestionData, starting with 1, up to testSize
+//        int j = 1;
+//        for (int i = 0; i < getTestSize(); i++){
+//
+//            j++;
+//        }
+//
+//        int y = 1;
+//        for (int i = 0; i < getNumPractice(); i++){
+//
+//            y++;
+//        }
 
         //inserting the assets into lists so they are ready to be used.
         getPracticeItemData().moveToFirst();
         getQuestionData().moveToFirst();
-        int i = 1;
+        int i = 0;
         do {
+            int questionNum = getQuestionData().getInt(1);
+            questionList[i] = questionNum;
             questionIdIndex.put(getQuestionData().getInt(1), i);
             wordIndex.put(i, getQuestionData().getString(9));
             audioList[i] = getQuestionData().getBlob(2);
@@ -533,8 +535,11 @@ public class currentQuestionData {
         } while (getQuestionData().moveToNext());
 
         if (getPracticeItemData().getCount() != 0) {
+
             int practiceIndex = 1;
+            i = 0;
             do {
+                practiceList[i] = getPracticeItemData().getInt(1);
                 pracIdIndex.put(practiceIndex, i);
                 wordIndex.put(i, getPracticeItemData().getString(9));
                 audioList[i] = getPracticeItemData().getBlob(2);
@@ -594,6 +599,10 @@ public class currentQuestionData {
 
     public void loadQuestionData(DatabaseOperations dop, int testID){
         if (currentQtype.equals("Practice")){
+//            while (pracIdIndex.get(currentQNum) == null){
+//                currentQIndex++;
+//                findCurrentQNum();
+//            }
             setPic1Bitmap(imageList[pracIdIndex.get(currentQNum)][0]);
             setPic2Bitmap(imageList[pracIdIndex.get(currentQNum)][1]);
             setPic3Bitmap(imageList[pracIdIndex.get(currentQNum)][2]);
@@ -603,7 +612,10 @@ public class currentQuestionData {
             setAudioBytes(audioList[pracIdIndex.get(currentQNum)]);
 
         } else if (currentQtype.equals("Test")) {
-
+//            while (questionIdIndex.get(currentQNum) == null){
+//                currentQIndex++;
+//                findCurrentQNum();
+//            }
             setPic1Bitmap(imageList[questionIdIndex.get(currentQNum)][0]);
             setPic2Bitmap(imageList[questionIdIndex.get(currentQNum)][1]);
             setPic3Bitmap(imageList[questionIdIndex.get(currentQNum)][2]);
@@ -616,7 +628,12 @@ public class currentQuestionData {
     }
 
     public int getCurrentQuestionID(){
-        return getQuestionIdIndex().get(currentQNum);
+        if (currentQtype.equals("Practice")){
+            return getPracIdIndex().get(currentQNum);
+        } else if (currentQtype.equals("Test")) {
+            return getQuestionIdIndex().get(currentQNum);
+        }
+        return 0;
     }
 
     public String getCurrentQuestionWord(){
@@ -703,8 +720,12 @@ public class currentQuestionData {
 //            catchhere += 2;
 //            setCurrentQNum(getQuestionList()[getCurrentQIndex()]);
 //        }
-        setCurrentQNum(getQuestionList()[getCurrentQIndex()]);
+        findCurrentQNum();
         if (currentQtype.equals("Practice")){
+//            while (pracIdIndex.get(currentQNum) == null){
+//                currentQIndex++;
+//                findCurrentQNum();
+//            }
             setPic1Bitmap(imageList[pracIdIndex.get(currentQNum)][0]);
             setPic2Bitmap(imageList[pracIdIndex.get(currentQNum)][1]);
             setPic3Bitmap(imageList[pracIdIndex.get(currentQNum)][2]);
@@ -714,7 +735,10 @@ public class currentQuestionData {
             setAudioBytes(audioList[pracIdIndex.get(currentQNum)]);
 
         } else if (currentQtype.equals("Test")) {
-
+//            while (questionIdIndex.get(currentQNum) == null){
+//                currentQIndex++;
+//                findCurrentQNum();
+//            }
             setPic1Bitmap(imageList[questionIdIndex.get(currentQNum)][0]);
             setPic2Bitmap(imageList[questionIdIndex.get(currentQNum)][1]);
             setPic3Bitmap(imageList[questionIdIndex.get(currentQNum)][2]);

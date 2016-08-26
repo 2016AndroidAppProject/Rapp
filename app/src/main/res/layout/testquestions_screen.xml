@@ -65,6 +65,18 @@
                 android:layout_alignRight="@+id/opt3pic"
                 android:layout_margin="7dp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="PRACTICE MODE: NO DATA WILL BE STORED"
+                android:id="@+id/practiceNotice"
+                android:textColor="#fe0303"
+                android:textStyle="bold"
+                android:textSize="35dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
         </RelativeLayout>
 
         <RelativeLayout
@@ -182,6 +194,7 @@
                 android:layout_margin="7dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentBottom="true" />
+
         </RelativeLayout>
 
     </LinearLayout>

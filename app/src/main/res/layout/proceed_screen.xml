@@ -29,6 +29,19 @@
         android:text="PRESS BUTTON TO PROCEED"
         android:id="@+id/textView"
         android:textSize="60dp"
+        android:layout_above="@+id/proceed"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="PRACTICE MODE: NO DATA WILL BE STORED"
+        android:id="@+id/practiceNotice"
+        android:textColor="#fe0303"
+        android:textStyle="bold"
+        android:textSize="35dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 

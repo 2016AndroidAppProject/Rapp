@@ -55,6 +55,8 @@ public class addTestController extends AppCompatActivity {
     int newTestId;
 
     boolean validFileExtensions;
+    boolean invalidFileContent;
+    String invalidFileMessage;
 
 
     @Override
@@ -74,6 +76,10 @@ public class addTestController extends AppCompatActivity {
         selectedPracItem = "";
 
         validFileExtensions = true;
+
+        invalidFileContent = false;
+
+        invalidFileMessage = "";
 
 
 
@@ -254,7 +260,12 @@ public class addTestController extends AppCompatActivity {
         //sort the images from the directory by question
             ArrayList<File[]> filesSorted = getSortedFileList(imagesFiles);
             //create questions based on the files, and insert into question table
-        if (validFileExtensions == true) {
+        if (invalidFileContent == true){
+            Toast.makeText(getApplicationContext(),
+                    invalidFileMessage,
+                    Toast.LENGTH_LONG).show();
+            invalidFileContent = false;
+        } else if (validFileExtensions == true) {
             insertNewQuestions(filesSorted);
             //reset the add test UI and create a new test with the appropriate id.
             finishLoading();
@@ -399,10 +410,18 @@ public class addTestController extends AppCompatActivity {
             String extension1 = (fileName1[fileName1.length - 1].split("\\."))[1];
             if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
-                targetBlob = dop.jpgToByteArray(target);
+                try {
+                    targetBlob = dop.jpgToByteArray(target);
+                } catch (IOException e){
+
+                }
             } else if (extension1.equalsIgnoreCase("png")){
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
-                targetBlob  = dop.pngToByteArray(target);
+                try {
+                    targetBlob = dop.pngToByteArray(target);
+                } catch (IOException e){
+
+                }
             }
 
             String[] fileName2 = getFileName(sortedList.get(i)[1]);
@@ -411,21 +430,37 @@ public class addTestController extends AppCompatActivity {
 
 
                 them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
-                them_foilBlob = dop.jpgToByteArray(them_foil);
+                try {
+                    them_foilBlob = dop.jpgToByteArray(them_foil);
+                } catch (IOException e){
+
+                }
             } else if (extension1.equalsIgnoreCase("png")){
 
                 them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
-                them_foilBlob = dop.pngToByteArray(them_foil);
+                try {
+                    them_foilBlob = dop.pngToByteArray(them_foil);
+                } catch (IOException e){
+
+                }
             }
 
             String[] fileName3 = getFileName(sortedList.get(i)[2]);
             String extension3 = (fileName3[fileName1.length - 1].split("\\."))[1];
             if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                 con_foil = BitmapFactory.decodeFile(sortedList.get(i)[2].getAbsolutePath(), options);
-                con_foilBlob = dop.jpgToByteArray(con_foil);
+                try {
+                    con_foilBlob = dop.jpgToByteArray(con_foil);
+                } catch (IOException e){
+
+                }
             } else if (extension1.equalsIgnoreCase("png")){
                 con_foil = BitmapFactory.decodeFile(sortedList.get(i)[2].getAbsolutePath(), options);
-                con_foilBlob = dop.pngToByteArray(con_foil);
+                try {
+                    con_foilBlob = dop.pngToByteArray(con_foil);
+                } catch (IOException e){
+
+                }
             }
 
             try {
@@ -437,14 +472,22 @@ public class addTestController extends AppCompatActivity {
 
             if (sortedList.get(i)[3] != null) {
 
-                String[] fileName4 = getFileName(sortedList.get(i)[0]);
-                String extension4 = (fileName4[fileName1.length - 1].split("\\."))[1];
-                if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
+                String[] fileName4 = getFileName(sortedList.get(i)[3]);
+                String extension4 = (fileName4[fileName4.length - 1].split("\\."))[1];
+                if (extension4.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                     phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
-                    phon_foilBlob = dop.jpgToByteArray(phon_foil);
-                } else if (extension1.equalsIgnoreCase("png")){
-                    phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
-                    phon_foilBlob = dop.pngToByteArray(phon_foil);
+                    try {
+                        phon_foilBlob = dop.jpgToByteArray(phon_foil);
+                    } catch (IOException e){
+
+                    }
+                } else if (extension4.equalsIgnoreCase("png")){
+                        phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
+                    try {
+                        phon_foilBlob = dop.pngToByteArray(phon_foil);
+                    } catch (IOException e){
+
+                    }
                 }
             }
 
@@ -500,7 +543,8 @@ public class addTestController extends AppCompatActivity {
         for (int i = 0; i < listOfImageFiles.length; i++){
             String[] fileName = new String[0];
             fileName = getFileName(listOfImageFiles[i]);
-            if (validFileExtensions == false){
+            isFileContentValid(listOfImageFiles[i]);
+            if ((validFileExtensions == false) || (invalidFileContent == true)){
                 break;
             }
             char[] questionIndex = fileName[0].toCharArray();
@@ -579,6 +623,69 @@ public class addTestController extends AppCompatActivity {
             }
         }
         return sortedFiles;
+    }
+
+
+    public void isFileContentValid(File file){
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap currentImage;
+        byte[] currentBlob = null;
+        byte[] audioBlob = null;
+
+        boolean valid = false;
+        String[] brokenDownFileName = new String[4];
+        String fullFilePath = file.getAbsolutePath();
+        String[] splitFilePath = fullFilePath.split("/");
+        String fileName =  splitFilePath[splitFilePath.length - 1];
+        brokenDownFileName = fileName.split("-");
+        String[] lastPart = brokenDownFileName[brokenDownFileName.length - 1].split("\\.");
+
+        if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg")) {
+            try {
+                currentImage = BitmapFactory.decodeFile(fullFilePath, options);
+                currentBlob = dop.jpgToByteArray(currentImage);
+            } catch (IOException e) {
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            } catch (NullPointerException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+        } else if (lastPart[1].equalsIgnoreCase("png")){
+            try {
+                    currentImage = BitmapFactory.decodeFile(fullFilePath, options);
+                    currentBlob = dop.jpgToByteArray(currentImage);
+                } catch (IOException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+
+            }
+            catch (NullPointerException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+        } else if (lastPart[1].equalsIgnoreCase("mp3")){
+            try {
+                audioBlob = dop.audioToByteArray(file);
+            } catch (IOException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+            catch (NullPointerException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+
+        }
+
     }
 
 

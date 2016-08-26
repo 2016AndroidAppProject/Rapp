@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +20,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 
 public class selectionController extends AppCompatActivity {
+    TextView practiceNotice;
     Intent prevIntent;
     ExpandableListView testView;
     Spinner studentSpinner;
@@ -35,6 +38,7 @@ public class selectionController extends AppCompatActivity {
     boolean teacherSelected;
     boolean studentSelected;
     boolean testSelected;
+    Button beginButton;
 
 
     Spinner testSpinner;
@@ -70,6 +74,17 @@ public class selectionController extends AppCompatActivity {
         teacherSelected = false;
         studentSelected = false;
         testSelected = false;
+
+        beginButton = (Button) this.findViewById(R.id.beginButton);
+        beginButton.setVisibility(View.INVISIBLE);
+
+        practiceNotice = (TextView) this.findViewById(R.id.practiceNotice);
+        practiceNotice.setVisibility(View.INVISIBLE);
+        if (userData.getInstance().isPracticeMode() == true){
+            practiceNotice.setVisibility(View.VISIBLE);
+        }
+
+
 
         dop = new DatabaseOperations(ctx);
         studentSelectionLayout = (LinearLayout) this.findViewById(R.id.studentSelection);
@@ -191,6 +206,7 @@ public class selectionController extends AppCompatActivity {
                     Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                     selectedStudent = (String) parent.getItemAtPosition(position);
                     userData.getInstance().setSelectedStudent(selectedStudent);
+                    beginButton.setVisibility(View.VISIBLE);
                 } else {
                     studentSelected = true;
                 }

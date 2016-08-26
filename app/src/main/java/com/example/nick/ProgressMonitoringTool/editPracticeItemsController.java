@@ -149,10 +149,18 @@ public class editPracticeItemsController extends AppCompatActivity {
             String extension1 = (fileName1[fileName1.length - 1].split("\\."))[1];
             if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
-                targetBlob = dop.jpgToByteArray(target);
+                try {
+                    targetBlob = dop.jpgToByteArray(target);
+                } catch (IOException e){
+
+                }
             } else if (extension1.equalsIgnoreCase("png")){
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
-                targetBlob  = dop.pngToByteArray(target);
+                try {
+                    targetBlob = dop.pngToByteArray(target);
+                } catch (IOException e){
+
+                }
             }
 
             String[] fileName2 = getFileName(sortedList.get(i)[1]);
@@ -161,21 +169,37 @@ public class editPracticeItemsController extends AppCompatActivity {
 
 
                 them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
-                them_foilBlob = dop.jpgToByteArray(them_foil);
+                try {
+                    them_foilBlob = dop.jpgToByteArray(them_foil);
+                } catch (IOException e){
+
+                }
             } else if (extension1.equalsIgnoreCase("png")){
 
                 them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
-                them_foilBlob = dop.pngToByteArray(them_foil);
+                try {
+                    them_foilBlob = dop.pngToByteArray(them_foil);
+                } catch (IOException e){
+
+                }
             }
 
             String[] fileName3 = getFileName(sortedList.get(i)[2]);
             String extension3 = (fileName3[fileName1.length - 1].split("\\."))[1];
             if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                 con_foil = BitmapFactory.decodeFile(sortedList.get(i)[2].getAbsolutePath(), options);
-                con_foilBlob = dop.jpgToByteArray(con_foil);
+                try {
+                    con_foilBlob = dop.jpgToByteArray(con_foil);
+                } catch (IOException e){
+
+                }
             } else if (extension1.equalsIgnoreCase("png")){
                 con_foil = BitmapFactory.decodeFile(sortedList.get(i)[2].getAbsolutePath(), options);
-                con_foilBlob = dop.pngToByteArray(con_foil);
+                try {
+                    con_foilBlob = dop.pngToByteArray(con_foil);
+                } catch (IOException e){
+
+                }
             }
 
             try {
@@ -190,10 +214,18 @@ public class editPracticeItemsController extends AppCompatActivity {
                 String extension4 = (fileName4[fileName1.length - 1].split("\\."))[1];
                 if (extension1.equalsIgnoreCase("jpg") || extension1.equalsIgnoreCase("jpeg")) {
                     phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
-                    phon_foilBlob = dop.jpgToByteArray(phon_foil);
+                    try {
+                        phon_foilBlob = dop.jpgToByteArray(phon_foil);
+                    } catch (IOException e){
+
+                    }
                 } else if (extension1.equalsIgnoreCase("png")){
                     phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
-                    phon_foilBlob = dop.pngToByteArray(phon_foil);
+                    try {
+                        phon_foilBlob = dop.pngToByteArray(phon_foil);
+                    } catch (IOException e){
+
+                    }
                 }
             }
 
