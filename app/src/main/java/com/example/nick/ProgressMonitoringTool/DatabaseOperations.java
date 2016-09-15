@@ -32,14 +32,16 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
 
     public String USERINFO_CREATE = "CREATE TABLE "+
-            tableData.USERINFO.TABLE_NAME+"(" + tableData.USERINFO.USER_NAME+" TEXT PRIMARY KEY,"
+            tableData.USERINFO.TABLE_NAME+"(" + tableData.USERINFO.USER_NAME+" TEXT,"
             + tableData.USERINFO.USER_PASSWORD+" TEXT," + tableData.USERINFO.USER_TYPE+" TEXT," +
-            tableData.USERINFO.USER_LASTNAME+" TEXT);";
+            tableData.USERINFO.USER_LASTNAME+" TEXT," +
+            tableData.USERINFO.USER_ID + " INTEGER PRIMARY KEY);";
 
     public String STUDENTINFO_CREATE = "CREATE TABLE "+
             tableData.STUDENTINFO.TABLE_NAME+"(" + tableData.STUDENTINFO.STUDENT_FIRSTNAME+" TEXT,"
             + tableData.STUDENTINFO.STUDENT_ID+" INTEGER PRIMARY KEY," +
-            tableData.STUDENTINFO.TEACHER_NAME+" TEXT);";
+            tableData.STUDENTINFO.TEACHER_NAME+" TEXT," +
+            tableData.STUDENTINFO.STATUS+ " TEXT);";
 
     public String PRACITEMS_CREATE = "CREATE TABLE " +
             tableData.PRACTICEITEMSETS.TABLE_NAME+"(" + tableData.PRACTICEITEMSETS.PRAC_NAME + " TEXT,"
@@ -72,7 +74,8 @@ public class DatabaseOperations extends SQLiteOpenHelper {
             tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS + " INTEGER," +
             tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT + " INTEGER," +
             tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE + " INTEGER," +
-            tableData.TESTCOMPLETIONRECORDS.DATE + " DATETIME);";
+            tableData.TESTCOMPLETIONRECORDS.DATE + " DATETIME," +
+            tableData.TESTCOMPLETIONRECORDS.TEST_GIVER + " TEXT);";
 
     public Cursor getTestCompletionRecords(DatabaseOperations dop){
         SQLiteDatabase SQ = dop.getReadableDatabase();
@@ -93,7 +96,8 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
 
     public void addNewTestCompletionRecord(DatabaseOperations dop, int recordId, int studentId, String studentName, int testId,
-                                           String testName, int numQuestions, int numQuestionsCorrect, int numQuestionsComplete){
+                                           String testName, int numQuestions, int numQuestionsCorrect, int numQuestionsComplete,
+                                           String testGiver ){
                 SQLiteDatabase SQLD = dop.getWritableDatabase();
                 ContentValues cv = new ContentValues();
 
@@ -105,6 +109,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
                 cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS, numQuestions);
                 cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, numQuestionsCorrect);
                 cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, numQuestionsComplete);
+                cv.put(tableData.TESTCOMPLETIONRECORDS.TEST_GIVER, testGiver);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String strDate = sdf.format(new Date());
@@ -113,6 +118,19 @@ public class DatabaseOperations extends SQLiteOpenHelper {
                 values.put("ColumnName", strDate);
                 cv.put(tableData.TESTCOMPLETIONRECORDS.DATE, strDate);
                 long k = SQLD.insert(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, null, cv);
+    }
+
+    public void updateUser(DatabaseOperations dop, String selectedUserName, String newUserName, String editPassword,String editUserType,String userLastName, int editID){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        String strFilter = tableData.USERINFO.USER_ID + "=" + editID;
+        ContentValues cv = new ContentValues();
+        cv.put(tableData.USERINFO.USER_NAME, newUserName);
+        cv.put(tableData.USERINFO.USER_TYPE, editUserType);
+        cv.put(tableData.USERINFO.USER_PASSWORD, editPassword);
+        cv.put(tableData.USERINFO.USER_LASTNAME, userLastName);
+
+        SQ.update(tableData.USERINFO.TABLE_NAME, cv, strFilter, null);
+
     }
 
     public void updateTestCompletionRecord(DatabaseOperations dop, int recordId,
@@ -143,6 +161,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
             tableData.RESULTS.RECORD_ID + " INTEGER," +
             tableData.RESULTS.STUDENT_ID + " INTEGER, " +
             tableData.RESULTS.STUDENT_NAME + " TEXT," +
+            tableData.RESULTS.TYPE + " TEXT," +
+            tableData.RESULTS.ANSWER + " TEXT," +
+            tableData.RESULTS.TEST_GIVER + " TEXT," +
 
             "FOREIGN KEY (" + tableData.RESULTS.RECORD_ID + ") REFERENCES " +
             tableData.TESTCOMPLETIONRECORDS.TABLE_NAME + "(" + tableData.TESTCOMPLETIONRECORDS.RECORD_ID + ")," +
@@ -155,7 +176,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
             "FOREIGN KEY(" + tableData.RESULTS.TEST_ID + ") REFERENCES " +
             tableData.TESTS.TABLE_NAME + "(" + tableData.TESTS.TEST_ID + ")," +
-            " PRIMARY KEY(" + tableData.RESULTS.RECORD_ID + ", " + tableData.RESULTS.RESULT_ID + "));";
+            " PRIMARY KEY("  + tableData.RESULTS.RECORD_ID + ", " + tableData.RESULTS.RESULT_ID + "));";
 
 
 
@@ -219,7 +240,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     //currently it is linked to a button on the adminview_screen but in the final product
     //it will be on its own screen farther into settings.
     public void addNewUser(DatabaseOperations dop, String userName, String password,
-                           String userType,String userLastName){
+                           String userType,String userLastName, int userID){
         SQLiteDatabase SQLD = dop.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -227,6 +248,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         cv.put(tableData.USERINFO.USER_PASSWORD, password);
         cv.put(tableData.USERINFO.USER_TYPE, userType);
         cv.put(tableData.USERINFO.USER_LASTNAME, userLastName);
+        cv.put(tableData.USERINFO.USER_ID, userID);
         long k = SQLD.insert(tableData.USERINFO.TABLE_NAME, null, cv);
 
         Log.d("Database operations", "New user inserted");
@@ -247,7 +269,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
 
     public void addNewResult(DatabaseOperations dop, int questionID, String word,
-                             boolean correct, int testID, String testName, int resultID, int recordID, int studentID, String studentName){
+                             boolean correct, int testID, String testName, int resultID,
+                             int recordID, int studentID, String studentName, String type, String answer,
+                             String testGiver){
         SQLiteDatabase SQLD = dop.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -260,6 +284,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         cv.put(tableData.RESULTS.RECORD_ID, recordID);
         cv.put(tableData.RESULTS.STUDENT_ID, studentID);
         cv.put(tableData.RESULTS.STUDENT_NAME, studentName);
+        cv.put(tableData.RESULTS.TYPE, type);
+        cv.put(tableData.RESULTS.ANSWER, answer);
+        cv.put(tableData.RESULTS.TEST_GIVER, testGiver);
         long k = SQLD.insert(tableData.RESULTS.TABLE_NAME, null, cv);
 
         Log.d("Database operations", "New result inserted");
@@ -298,6 +325,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
         cv.put(tableData.STUDENTINFO.STUDENT_ID, studentID);
         cv.put(tableData.STUDENTINFO.TEACHER_NAME, teacherName);
+        cv.put(tableData.STUDENTINFO.STATUS, "Active");
         long k = SQLD.insert(tableData.STUDENTINFO.TABLE_NAME, null, cv);
 
         Log.d("Database operations", "New student inserted");
@@ -333,16 +361,33 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         return id;
     }
 
+//    String whereClause = tableData.QUESTIONS.TEST_ID.toString() + "=?";
+//    Cursor CR = SQ.query(tableData.QUESTIONS.TABLE_NAME, columns,
+//            whereClause, new String[] {Integer.toString(testID)}, null, null, null);
+//    return CR;
 
-    public Cursor getStudentInfo(DatabaseOperations dop){
+//    Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+//            whereClause, new String[] {testName}, null, null, null);
+
+    public Cursor getActiveStudentInfo(DatabaseOperations dop){
         SQLiteDatabase SQ = dop.getReadableDatabase();
         String[] columns = {tableData.STUDENTINFO.STUDENT_FIRSTNAME,
-                tableData.STUDENTINFO.STUDENT_ID, tableData.STUDENTINFO.TEACHER_NAME};
-        Cursor CR = SQ.query(tableData.STUDENTINFO.TABLE_NAME, columns, null, null, null, null, null);
+                tableData.STUDENTINFO.STUDENT_ID, tableData.STUDENTINFO.TEACHER_NAME, tableData.STUDENTINFO.STATUS};
+        String whereClause = tableData.STUDENTINFO.STATUS + "=?";
+        String active = "Active";
+        Cursor CR = SQ.query(tableData.STUDENTINFO.TABLE_NAME, columns, whereClause, new String[] {active}, null, null, null);
 
         return CR;
 
 
+    }
+
+    public Cursor getAllStudentInfo(DatabaseOperations dop, String teacherName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.STUDENTINFO.STUDENT_FIRSTNAME,
+                tableData.STUDENTINFO.STUDENT_ID, tableData.STUDENTINFO.TEACHER_NAME, tableData.STUDENTINFO.STATUS};
+        Cursor CR = SQ.query(tableData.STUDENTINFO.TABLE_NAME, columns, null, null, null, null, null, null);
+        return CR;
     }
 
     public Cursor getResultMode(DatabaseOperations dop){
@@ -395,6 +440,51 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
         SQ.update(tableData.SETTINGS.TABLE_NAME, cv, null, null);
     }
+
+
+    public int lookupStudentID(DatabaseOperations dop, String teacherName, String studentName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.STUDENTINFO.STUDENT_ID};
+        String whereClause = tableData.STUDENTINFO.TEACHER_NAME + "=? AND " +
+                tableData.STUDENTINFO.STUDENT_FIRSTNAME + "=?";
+        Cursor CR = SQ.query(tableData.STUDENTINFO.TABLE_NAME, columns, whereClause, new String[] {teacherName, studentName}, null, null, null);
+        if (CR.getCount() == 0){
+            return 0;
+        } else {
+            CR.moveToFirst();
+            return CR.getInt(0);
+        }
+
+    }
+
+    public void updateStudentStatus(DatabaseOperations dop, int studentID, String newStatus){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        String strFilter = tableData.STUDENTINFO.STUDENT_ID + "=" + studentID;
+        ContentValues cv = new ContentValues();
+        cv.put(tableData.STUDENTINFO.STATUS, newStatus);
+        SQ.update(tableData.STUDENTINFO.TABLE_NAME, cv, strFilter, null);
+    }
+
+//    public void updateTestCompletionRecord(DatabaseOperations dop, int recordId,
+//                                           int numQuestionsCorrect, int numQuestionsComplete){
+//        SQLiteDatabase SQ = dop.getWritableDatabase();
+//        String strFilter = tableData.TESTCOMPLETIONRECORDS.RECORD_ID + "=" + recordId;
+//        ContentValues cv = new ContentValues();
+//
+//        cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT,numQuestionsCorrect);
+//        cv.put(tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE,numQuestionsComplete);
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String strDate = sdf.format(new Date());
+//
+////        ContentValues values = new ContentValues();
+////        values.put("ColumnName", strDate);
+//        cv.put(tableData.TESTCOMPLETIONRECORDS.DATE, strDate);
+//
+//        SQ.update(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, cv, strFilter, null);
+
+
+
+
     public Cursor getTests(DatabaseOperations dop){
         SQLiteDatabase SQ = dop.getReadableDatabase();
         String[] columns = {tableData.TESTS.TEST_ID, tableData.TESTS.TEST_TYPE, tableData.TESTS.TEST_NAME,
@@ -402,6 +492,8 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         Cursor CR = SQ.query(tableData.TESTS.TABLE_NAME, columns, null, null, null, null, null, null);
         return CR;
     }
+
+
 
     public Cursor getPracItemSetsByTestID(DatabaseOperations dop, int testID){
         Cursor tests = getTests(this);
@@ -437,7 +529,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     }
 
     public int getStudentIDByName(DatabaseOperations dop, String name){
-        Cursor CR = getStudentInfo(dop);
+        Cursor CR = getActiveStudentInfo(dop);
         CR.moveToFirst();
         if (CR.getCount() == 0){
             return 0;
@@ -485,9 +577,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     //Method for retrieving an array of names, either last names or first.
     //if the int is 0 it will get the firstNames from column 0,
     //if the int is 1 it will get the lastNames from column 1.
-    public ArrayList<String> getStudentNames(DatabaseOperations dop, String teacher){
+    public ArrayList<String> getActiveStudentNames(DatabaseOperations dop, String teacher){
         ArrayList<String> studentNames = new ArrayList<String>();
-        Cursor CR = getStudentInfo(dop);
+        Cursor CR = getActiveStudentInfo(dop);
         CR.moveToFirst();
         do {
             if (CR.getString(2).equals(teacher) || CR.getString(2).equals("")) {
@@ -496,6 +588,58 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         }
         while (CR.moveToNext());
         return studentNames;
+    }
+
+    public ArrayList<String> getAllStudentNames(DatabaseOperations dop, String teacher){
+        ArrayList<String> studentNames = new ArrayList<String>();
+        Cursor CR = getAllStudentInfo(dop, teacher);
+        CR.moveToFirst();
+        do {
+            if (CR.getString(2).equals(teacher) || CR.getString(2).equals("")) {
+                studentNames.add(CR.getString(0));
+            }
+        }
+        while (CR.moveToNext());
+        return studentNames;
+    }
+
+    public ArrayList<String> getAllUserNames(DatabaseOperations dop){
+        ArrayList<String> userNames = new ArrayList<String>();
+        Cursor CR = getUserInfo(dop);
+        CR.moveToFirst();
+        do {
+                userNames.add(CR.getString(0));
+        }
+        while (CR.moveToNext());
+        return userNames;
+    }
+
+    public Cursor getSpecificUserInfo(DatabaseOperations dop, String userName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.USERINFO.USER_LASTNAME, tableData.USERINFO.USER_NAME, tableData.USERINFO.USER_PASSWORD, tableData.USERINFO.USER_TYPE, tableData.USERINFO.USER_ID};
+        String whereClause = tableData.USERINFO.USER_NAME + "=?";
+        Cursor CR = SQ.query(tableData.USERINFO.TABLE_NAME, columns,
+                whereClause, new String[] {userName}, null, null, null);
+        return CR;
+    }
+
+    public void deleteUser(DatabaseOperations dop, int id){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        String whereClause = tableData.USERINFO.USER_ID + "=?";
+        SQ.delete(tableData.USERINFO.TABLE_NAME, whereClause, new String[] {String.valueOf(id)} );
+    }
+
+
+
+
+    public String getStudentStatus(DatabaseOperations dop, int studentID){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.STUDENTINFO.STATUS};
+        String whereClause = tableData.STUDENTINFO.STUDENT_ID + "=?";
+        Cursor CR = SQ.query(tableData.STUDENTINFO.TABLE_NAME, columns,
+                whereClause, new String[] {Integer.toString(studentID)}, null, null, null);
+        CR.moveToFirst();
+        return CR.getString(0);
     }
 
     //Method for retrieving a name of all the teachers to display in the app
@@ -521,7 +665,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     public Cursor getUserInfo(DatabaseOperations dop){
         SQLiteDatabase SQ = dop.getReadableDatabase();
         String[] columns = {tableData.USERINFO.USER_NAME, tableData.USERINFO.USER_PASSWORD, tableData.USERINFO.USER_TYPE,
-                            tableData.USERINFO.USER_LASTNAME};
+                            tableData.USERINFO.USER_LASTNAME, tableData.USERINFO.USER_ID};
         Cursor CR = SQ.query(tableData.USERINFO.TABLE_NAME, columns, null, null, null, null, null);
 
         return CR;
@@ -543,12 +687,45 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getResults(DatabaseOperations dop, String testName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.ANSWER, tableData.RESULTS.TYPE};
         String whereClause = tableData.RESULTS.TEST_NAME + "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 whereClause, new String[] {testName}, null, null, null);
         return CR;
     }
+
+
+
+
+    public Cursor getResultsForTeacher(DatabaseOperations dop, String testName, String teacherName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.ANSWER};
+        String whereClause = tableData.RESULTS.TEST_NAME + "=? AND " +
+                tableData.RESULTS.TEST_GIVER + "=?";
+        Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+                whereClause, new String[] {testName, teacherName}, null, null, null);
+        return CR;
+    }
+
+    public Cursor getResultsByCompletionID(DatabaseOperations dop, int recordID){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.TYPE, tableData.RESULTS.ANSWER};
+        String whereClause = tableData.RESULTS.RECORD_ID+ "=?";
+        Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+                whereClause, new String[] {String.valueOf(recordID)}, null, null, null);
+        return CR;
+    }
+
+    public Cursor getResultsForStudent(DatabaseOperations dop, String studentName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
+        String whereClause = tableData.RESULTS.STUDENT_NAME+ "=?";
+        Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+                whereClause, new String[] {studentName}, null, null, null);
+        return CR;
+    }
+
+
 
     public Cursor getAllResults(DatabaseOperations dop){
         SQLiteDatabase SQ = dop.getReadableDatabase();
@@ -557,6 +734,20 @@ public class DatabaseOperations extends SQLiteOpenHelper {
                 null, null, null, null, null);
         return CR;
     }
+
+
+    //    String whereClause = tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME+ "=? AND " + tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=?";
+//    Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
+//            whereClause, new String[] {studentName, testName}, null, null, null);
+    public Cursor getResultWordsForTeacher(DatabaseOperations dop, String testName, String teacherName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.WORD};
+        String whereClause = tableData.RESULTS.TEST_NAME + "=? AND " + tableData.RESULTS.TEST_GIVER + "=?";
+        Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
+                whereClause, new String[] {testName, teacherName}, tableData.RESULTS.WORD, null, null);
+        return CR;
+    }
+
 
     public Cursor getResultWords(DatabaseOperations dop, String testName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
@@ -567,11 +758,11 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         return CR;
     }
 
-    public Cursor getCompletionRecordsByStudent(DatabaseOperations dop, String testName){
+    public Cursor getCompletionRecordsByTest(DatabaseOperations dop, String testName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
         String[] columns = {tableData.TESTCOMPLETIONRECORDS.RECORD_ID, tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME,
                 tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
-                tableData.TESTCOMPLETIONRECORDS.DATE};
+                tableData.TESTCOMPLETIONRECORDS.DATE, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, tableData.TESTCOMPLETIONRECORDS.TEST_GIVER};
         String whereClause = tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=?";
         Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
                 whereClause, new String[] {testName}, null, null, null);
@@ -580,11 +771,38 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         return CR;
     }
 
-    public double percentageCorrectResults(DatabaseOperations dop, String testName){
+    public Cursor getCompletionRecordsByTestForTeacher(DatabaseOperations dop, String testName, String teacherName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.TESTCOMPLETIONRECORDS.RECORD_ID, tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
+                tableData.TESTCOMPLETIONRECORDS.DATE, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, tableData.TESTCOMPLETIONRECORDS.TEST_GIVER};
+        String whereClause = tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=? AND " + tableData.TESTCOMPLETIONRECORDS.TEST_GIVER + "=?";
+        Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
+                whereClause, new String[] {testName, teacherName}, null, null, null);
+
+        ArrayList<String> students = new ArrayList<String>();
+        return CR;
+    }
+
+    public Cursor getCompletionRecordsByStudentAndTest(DatabaseOperations dop, String studentName, String testName){
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String[] columns = {tableData.TESTCOMPLETIONRECORDS.RECORD_ID, tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
+                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE,
+                tableData.TESTCOMPLETIONRECORDS.DATE, tableData.TESTCOMPLETIONRECORDS.TEST_GIVER};
+        String whereClause = tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME+ "=? AND " + tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=?";
+        Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
+                whereClause, new String[] {studentName, testName}, null, null, null);
+        return CR;
+    }
+
+
+
+    public double percentageCorrectResultsForTeacher(DatabaseOperations dop, String testName, String teacherName){
         Double percentCorrect = 0.0;
         int totalResults = 0;
         int correctResults = 0;
-        Cursor CR = dop.getResults(dop, testName);
+        Cursor CR = dop.getResultsForTeacher(dop, testName, teacherName);
         CR.moveToFirst();
         do {
             totalResults++;
@@ -643,11 +861,57 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     public Cursor getCompletionRecordByID(DatabaseOperations dop, int recordID){
         SQLiteDatabase SQ = dop.getReadableDatabase();
         String[] columns = {tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
-                            tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.DATE};
+                            tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.DATE, tableData.TESTCOMPLETIONRECORDS.RECORD_ID,
+                            tableData.TESTCOMPLETIONRECORDS.TEST_GIVER};
         String whereClause = tableData.TESTCOMPLETIONRECORDS.RECORD_ID + "=?";
         Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns, whereClause,
                 new String[] {Integer.toString(recordID)}, null, null, null);
         return CR;
+    }
+
+
+    public Cursor getMostRecentCompletionRecord(DatabaseOperations dop, String studentName, String testName){
+        Cursor completionRecords = dop.getCompletionRecordsByStudentAndTest(dop, studentName, testName);
+        String currentDate = "0000-0000-0000 00:00:00";
+        int newestRecordID = 0;
+        if (completionRecords.getCount() == 0){
+            return null;
+        }
+        completionRecords.moveToFirst();
+        do {
+            if (compareDates(completionRecords.getString(5), currentDate).equals(completionRecords.getString(5))){
+                currentDate = completionRecords.getString(5);
+                newestRecordID = completionRecords.getInt(0);
+            }
+
+        } while (completionRecords.moveToNext());
+
+        Cursor newestRecord = dop.getCompletionRecordByID(dop, newestRecordID);
+
+        return newestRecord;
+    }
+
+    public Cursor getMostRecentResultsByCompletionRecord(DatabaseOperations dop, Cursor completionRecord){
+        completionRecord.moveToFirst();
+        int recordID = completionRecord.getInt(4);
+
+        Cursor mostRecentResults = dop.getResultsByCompletionID(dop, recordID);
+        return mostRecentResults;
+    }
+
+    public HashMap<String, Integer> getWordsAlreadyAnswered(DatabaseOperations dop, Cursor completionRecord){
+        Cursor recentResults = getMostRecentResultsByCompletionRecord(dop, completionRecord);
+        recentResults.moveToFirst();
+        HashMap wordsAlreadyAnswered = new HashMap<String, Integer>();
+        int i =0;
+        do {
+            if ((wordsAlreadyAnswered.get(recentResults.getString(2)) == null) && (!recentResults.getString(5).equalsIgnoreCase("PRACTICE"))
+                    && (!(recentResults.getString(5).equalsIgnoreCase("FILLER")))){
+                wordsAlreadyAnswered.put(recentResults.getString(2), i);
+            }
+            i++;
+        } while (recentResults.moveToNext());
+        return wordsAlreadyAnswered;
     }
 
 //    public String RESULTS_CREATE = "CREATE TABLE " + tableData.RESULTS.TABLE_NAME +
@@ -703,25 +967,69 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     }
 
 
-//    public File[] getImages(){
-//
-//    }
-//
-//    public File[] getAudio(){
-//
-//    }
-//
+//    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//    String strDate = sdf.format(new Date());
+
+    public String compareDates(String date1, String date2){
 
 
+        String[] splitDate1 = date1.split("-|\\:|\\ ");
+        String[] splitDate2 = date2.split("-|\\:|\\ ");
+        int year1 = Integer.parseInt(splitDate1[0]);
+        int year2 = Integer.parseInt(splitDate2[0]);
 
+        if (year1 < year2){
+            return date2;
+        } else if (year2 < year1){
+            return date1;
+        }
 
+        int month1 = Integer.parseInt(splitDate1[1]);
+        int month2 = Integer.parseInt(splitDate2[1]);
 
-    //The following code is used to construct a set of questions that are related to a single test
-    //(meaning, these questions are part of that test). It uses the testName field to infer
-    //which test to link all the new questions to, and it takes in arrays
-    //of images and audios to create the questions.
-    public void createQuestions(DatabaseOperations dop, String testName, File[] images, File[] audio){
+        if (month1 < month2){
+            return date2;
+        } else if (month2 < month1){
+            return date1;
+        }
 
+        int day1 = Integer.parseInt(splitDate1[2]);
+        int day2 = Integer.parseInt(splitDate2[2]);
+
+        if (day1 < day2){
+            return date2;
+        } else if (day2 < day1){
+            return date1;
+        }
+
+        int hour1 = Integer.parseInt(splitDate1[3]);
+        int hour2 = Integer.parseInt(splitDate2[3]);
+
+        if (hour1 < hour2){
+            return date2;
+        } else if (hour2 < hour1){
+            return date1;
+        }
+
+        int minute1 = Integer.parseInt(splitDate1[4]);
+        int minute2 = Integer.parseInt(splitDate2[4]);
+
+        if (minute1 < minute2){
+            return date2;
+        } else if (minute2 < minute1){
+            return date1;
+        }
+
+        int second1 = Integer.parseInt(splitDate1[5]);
+        int second2 = Integer.parseInt(splitDate2[5]);
+
+        if (second1 < second2){
+            return date2;
+        } else if (second2 < second1){
+            return date1;
+        }
+
+        return date1;
     }
 
 

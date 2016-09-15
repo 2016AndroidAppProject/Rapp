@@ -197,6 +197,40 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RETAKE TEST"
+            android:id="@+id/restartButton"
+            android:onClick="beginTest"
+            android:textColor="#000000"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="40dp"
+            android:textSize="35dp"
+            android:layout_alignBottom="@+id/beginButton"
+            android:layout_alignLeft="@+id/testSelection"
+            android:layout_alignStart="@+id/testSelection" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CONTINUE TEST"
+            android:id="@+id/continueButton"
+            android:onClick="continueTest"
+            android:textColor="#000000"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="40dp"
+            android:textSize="35dp"
+            android:layout_alignBottom="@+id/beginButton"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="58dp"
+            android:layout_marginEnd="58dp" />
+
     </RelativeLayout>
 
 

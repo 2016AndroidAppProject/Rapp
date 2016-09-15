@@ -72,10 +72,9 @@ public class viewResultsController extends AppCompatActivity {
                 //Need to, first off, prevent behavior from automatically being triggered
                 //when screen is created.
                 if (testSelected == true) {
-                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                     selectedTest = (String) parent.getItemAtPosition(position);
-                    if (resultsMode.equals("disaggregated")) {
-                        results = dop.getResults(dop, selectedTest);
+                    if (resultsMode.equals("wordAndChild")) {
+                        results = dop.getResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
                         if (results.getCount() == 0){
                             Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
                             resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
@@ -87,7 +86,7 @@ public class viewResultsController extends AppCompatActivity {
 
                         }
                     } else if (resultsMode.equals("word")){
-                        results = dop.getResultWords(dop, selectedTest);
+                        results = dop.getResultWordsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
                         if (results.getCount() == 0){
                             Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
                             resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
@@ -99,7 +98,7 @@ public class viewResultsController extends AppCompatActivity {
 
                         }
                     } else if (resultsMode.equals("child")){
-                        results = dop.getCompletionRecordsByStudent(dop, selectedTest);
+                        results = dop.getCompletionRecordsByTestForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
                         if (results.getCount() == 0){
                             Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
                             resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
@@ -110,10 +109,13 @@ public class viewResultsController extends AppCompatActivity {
                             resultsView.setAdapter(resultsAdapter);
 
                         }
-                    } else if (resultsMode.equals("wordAndChild")){
+                    } else if (resultsMode.equals("Average")){
                         aggregatedScore.setText(" Students answered correctly "
-                                + String.valueOf(dop.percentageCorrectResults(dop, selectedTest)) + "% of the time.");
+                                + String.valueOf(dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName())) + "% of the time.");
+                    } else if (resultsMode.equals("noResults")){
+                        Toast.makeText(getBaseContext(), "Viewing results is currently disabled", Toast.LENGTH_LONG).show();
                     }
+                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
 
 
 

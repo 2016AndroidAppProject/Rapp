@@ -13,17 +13,14 @@
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="407dp"
-        android:layout_marginEnd="407dp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/resultsButtons">
+        android:id="@+id/resultsButtons"
+        android:layout_below="@+id/textView12"
+        android:layout_centerHorizontal="true">
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aggregated by word and child"
+            android:text="Data averaged across all words and children"
             android:id="@+id/wordAndChild"
             android:padding="30dp"
             android:layout_margin="10dp"
@@ -35,7 +32,7 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aggregated by child"
+            android:text="Data for each child"
             android:id="@+id/child"
             android:padding="30dp"
             android:checked="false"
@@ -47,7 +44,7 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aggregated by word"
+            android:text="Data for each word"
             android:id="@+id/wordOnly"
             android:padding="30dp"
             android:layout_margin="10dp"
@@ -59,8 +56,20 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Disaggregated"
+            android:text="Data for each word and child"
             android:id="@+id/disaggregated"
+            android:padding="30dp"
+            android:layout_margin="10dp"
+            android:background="#FFFFFF"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No results displayed"
+            android:id="@+id/noResults"
             android:padding="30dp"
             android:layout_margin="10dp"
             android:background="#FFFFFF"
@@ -79,5 +88,5 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textStyle="bold"
-        android:textSize="35dp" />
+        android:textSize="30dp" />
 </RelativeLayout>

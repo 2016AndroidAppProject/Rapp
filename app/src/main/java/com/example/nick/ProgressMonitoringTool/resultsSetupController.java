@@ -39,14 +39,16 @@ public class resultsSetupController extends AppCompatActivity {
                 RadioButton rb = (RadioButton) group.findViewById(checkedId);
                 if (null != rb && checkedId > -1) {
                     Toast.makeText(getApplicationContext(), rb.getText(), Toast.LENGTH_SHORT).show();
-                    if (rb.getText().equals("Aggregated by word and child")){
-                        dop.updateResultMode(dop, "wordAndChild");
-                    } else if (rb.getText().equals("Aggregated by child")){
+                    if (rb.getText().equals("Data averaged across all words and children")){
+                        dop.updateResultMode(dop, "Average");
+                    } else if (rb.getText().equals("Data for each child")){
                         dop.updateResultMode(dop, "child");
-                    } else if (rb.getText().equals("Aggregated by word")){
+                    } else if (rb.getText().equals("Data for each word")){
                         dop.updateResultMode(dop, "word");
-                    } else if (rb.getText().equals("Disaggregated")){
-                        dop.updateResultMode(dop, "disaggregated");
+                    } else if (rb.getText().equals("Data for each word and child")){
+                        dop.updateResultMode(dop, "wordAndChild");
+                    } else if (rb.getText().equals("No results displayed")){
+                        dop.updateResultMode(dop, "noResults");
                     }
                 }
 

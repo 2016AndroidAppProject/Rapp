@@ -39,7 +39,10 @@
             android:hint="Enter name for new practice item set"
             android:textSize="25dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
 
         <EditText
             android:layout_width="wrap_content"
@@ -49,6 +52,9 @@
             android:textSize="25dp"
             android:layout_centerVertical="true"
             android:layout_alignLeft="@+id/addPracItemSet"
-            android:layout_alignStart="@+id/addPracItemSet" />
+            android:layout_alignStart="@+id/addPracItemSet"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
     </RelativeLayout>
 </RelativeLayout>

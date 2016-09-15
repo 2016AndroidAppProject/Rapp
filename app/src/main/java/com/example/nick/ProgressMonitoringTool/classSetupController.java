@@ -17,11 +17,16 @@ import java.util.Random;
 
 public class classSetupController extends AppCompatActivity {
     Button addNewStudentButton;
+    Button makeStudentInactiveButton;
 
     Context ctx = this;
 
     Spinner teacherSpinner;
+    Spinner studentSpinner;
     ArrayAdapter<String> adapter;
+
+    Boolean teacherSelected;
+    Boolean studentSelected;
 
 
 
@@ -39,15 +44,28 @@ public class classSetupController extends AppCompatActivity {
     EditText newStudentFirstNameField;
 
     String selectedTeacher;
+    String selectedStudent;
+    String selectedStudentStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.classsetup_screen);
         addNewStudentButton = (Button) findViewById(R.id.addNewStudentButton);
+        makeStudentInactiveButton = (Button) findViewById(R.id.makeStudentInactiveButton);
 
         newStudentFirstNameField = (EditText) findViewById(R.id.addStudentFNameField);
         newStudentFirstNameField.setVisibility(View.GONE);
+
+        teacherSelected = false;
+        studentSelected = false;
+
+        selectedTeacher = "";
+        selectedStudent = "";
+
+        studentSpinner = (Spinner) findViewById(R.id.studentSpinner);
+
+
 
 
         dop = new DatabaseOperations(ctx);
@@ -68,11 +86,62 @@ public class classSetupController extends AppCompatActivity {
 
 
             teacherSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                ArrayList<String> studentNames;
+                ArrayAdapter<String> studentAdapter;
+
+
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " teacherSelected", Toast.LENGTH_LONG).show();
-                    selectedTeacher = (String) parent.getItemAtPosition(position);
-                    newStudentFirstNameField.setVisibility(View.VISIBLE);
+                    if (teacherSelected == true) {
+                        Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " teacherSelected", Toast.LENGTH_LONG).show();
+                        selectedTeacher = (String) parent.getItemAtPosition(position);
+                        newStudentFirstNameField.setVisibility(View.VISIBLE);
+
+                        studentNames = dop.getAllStudentNames(dop, selectedTeacher);
+
+                        for (int i = 0; i < studentNames.size(); i++){
+                            if (studentNames.get(i).equals("")){
+
+                            } else {
+                                int studentID = dop.lookupStudentID(dop, selectedTeacher, studentNames.get(i));
+                                String status = dop.getStudentStatus(dop, studentID);
+                                studentNames.set(i, studentNames.get(i) + " " + status);
+                            }
+                        }
+                        studentAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, studentNames);
+                        studentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        studentSpinner.setAdapter(studentAdapter);
+                        studentSelected = false;
+                    } else {
+                        teacherSelected = true;
+                    }
+
+
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            studentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (studentSelected == true) {
+
+
+                        String[] selectedString = ((String) parent.getItemAtPosition(position)).split(" ");
+                        selectedStudent = selectedString[0];
+                        Toast.makeText(getBaseContext(), selectedStudent + " selected", Toast.LENGTH_LONG).show();
+                        selectedStudentStatus = selectedString[1];
+                    } else {
+                        studentSelected = true;
+                    }
 
                 }
 
@@ -88,8 +157,11 @@ public class classSetupController extends AppCompatActivity {
             addNewStudentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ArrayList<String> studentNames;
+                    ArrayAdapter<String> studentAdapter;
+
                     newStudentFirstName = newStudentFirstNameField.getText().toString();
-                    Cursor CR = dop.getStudentInfo(dop);
+                    Cursor CR = dop.getActiveStudentInfo(dop);
                     if (selectedTeacher.equals("")) {
                         Toast.makeText(getBaseContext(),
                                 "Pleas select a teacher to add a student", Toast.LENGTH_LONG).show();
@@ -116,6 +188,21 @@ public class classSetupController extends AppCompatActivity {
                                     Toast.makeText(getBaseContext(),
                                             newStudentFirstName + " has been successfully added!", Toast.LENGTH_LONG).show();
                                     newStudentFirstNameField.setText("");
+                                    studentNames = dop.getAllStudentNames(dop, selectedTeacher);
+
+                                    for (int i = 0; i < studentNames.size(); i++){
+                                        if (studentNames.get(i).equals("")){
+
+                                        } else {
+                                            int studentID = dop.lookupStudentID(dop, selectedTeacher, studentNames.get(i));
+                                            String status = dop.getStudentStatus(dop, studentID);
+                                            studentNames.set(i, studentNames.get(i) + " " + status);
+                                        }
+                                    }
+                                    studentAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, studentNames);
+                                    studentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    studentSpinner.setAdapter(studentAdapter);
+                                    studentSelected = false;
                                 }
                             }
                         }
@@ -123,6 +210,47 @@ public class classSetupController extends AppCompatActivity {
                     }
                 }
              });
+
+        makeStudentInactiveButton.setOnClickListener(new View.OnClickListener() {
+            ArrayList<String> studentNames;
+            ArrayAdapter<String> studentAdapter;
+
+            @Override
+            public void onClick(View v) {
+                if (selectedStudent.equals("")) {
+                    Toast.makeText(getBaseContext(), "Please select a student to change their status", Toast.LENGTH_LONG).show();
+                } else {
+                    int studentID = dop.lookupStudentID(dop, selectedTeacher, selectedStudent);
+                    if (selectedStudentStatus.equals("Active")) {
+                        dop.updateStudentStatus(dop, studentID, "Inactive");
+                        Toast.makeText(getBaseContext(), selectedStudent + " status changed to INACTIVE", Toast.LENGTH_LONG).show();
+                    } else if (selectedStudentStatus.equals("Inactive")) {
+                        dop.updateStudentStatus(dop, studentID, "Active");
+                        Toast.makeText(getBaseContext(), selectedStudent + " status changed to ACTIVE", Toast.LENGTH_LONG).show();
+                    }
+                }
+                if (dop.getActiveStudentNames(dop, selectedTeacher).size() == 0) {
+                    Toast.makeText(getBaseContext(), "There are no students currently registered for this teacher", Toast.LENGTH_LONG).show();
+                } else {
+                    studentNames = dop.getAllStudentNames(dop, selectedTeacher);
+
+                    for (int i = 0; i < studentNames.size(); i++){
+                        if (studentNames.get(i).equals("")){
+
+                        } else {
+                            int studentID = dop.lookupStudentID(dop, selectedTeacher, studentNames.get(i));
+                            String status = dop.getStudentStatus(dop, studentID);
+                            studentNames.set(i, studentNames.get(i) + " " + status);
+                        }
+                    }
+                    studentAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, studentNames);
+                    studentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    studentSpinner.setAdapter(studentAdapter);
+                    studentSelected = false;
+
+                }
+            }
+        });
 
     }
 
@@ -155,7 +283,7 @@ public class classSetupController extends AppCompatActivity {
     public int generateRandomID(){
         int id;
         //  DatabaseOperations DOP = new DatabaseOperations(CTX);
-        Cursor CR = dop.getStudentInfo(dop);
+        Cursor CR = dop.getActiveStudentInfo(dop);
 
         int numStuds = CR.getCount();
 

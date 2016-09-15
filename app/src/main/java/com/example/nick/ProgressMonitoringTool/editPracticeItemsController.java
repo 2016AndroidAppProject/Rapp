@@ -40,6 +40,10 @@ public class editPracticeItemsController extends AppCompatActivity {
 
     int newPISetID;
 
+    boolean validFileExtensions;
+    boolean invalidFileContent;
+    String invalidFileMessage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,12 @@ public class editPracticeItemsController extends AppCompatActivity {
         newPIDirField = (EditText) findViewById(R.id.pracItemDirField);
         addPIButton = (Button) findViewById(R.id.addNewPracSetButton);
         ctx = this;
+
+        validFileExtensions = true;
+
+        invalidFileContent = false;
+
+        invalidFileMessage = "";
 
         newPISetField = (EditText) findViewById(R.id.addPracItemSet);
 
@@ -118,15 +128,26 @@ public class editPracticeItemsController extends AppCompatActivity {
         newPISetID = generatePISetID(dop);
         imagesFiles = newPIDir.listFiles();
 
-
         //sort the images from the directory by question
         ArrayList<File[]> filesSorted = getSortedFileList(imagesFiles);
 
-        //create questions based on the files, and insert into question table
-        insertNewPracticeSet(filesSorted);
-
-        //reset the add test UI and create a new test with the appropriate id.
-        finishLoading();
+        if (invalidFileContent == true){
+            Toast.makeText(getApplicationContext(),
+                    invalidFileMessage,
+                    Toast.LENGTH_LONG).show();
+            invalidFileContent = false;
+        } else if (validFileExtensions == true) {
+            insertNewPracticeSet(filesSorted);
+            //reset the add test UI and create a new test with the appropriate id.
+            finishLoading();
+        } else {
+            Toast.makeText(getApplicationContext(),
+                    "One or more files are an incorrect file type. Please make sure " +
+                            "all image files are PNG, JPG, or JPEG, and all audio files" +
+                            "are mp3. ",
+                    Toast.LENGTH_LONG).show();
+            validFileExtensions = true;
+        }
     }
 
 
@@ -267,6 +288,11 @@ public class editPracticeItemsController extends AppCompatActivity {
     //into an array list of arrays; the array list is an array list beacuse we dont know
     //exactly how much files will be thrown out of the directory, but each array in the array list
     //has only 4 files; the test files will be sorted out by the prefix at the beginning of their file name.
+    //Beacuse other kinds of files exist can exist inside the directory and also beacuse we want to
+    //break the process down, we will go through the directory and load all the files
+    //into an array list of arrays; the array list is an array list beacuse we dont know
+    //exactly how much files will be thrown out of the directory, but each array in the array list
+    //has only 4 files; the test files will be sorted out by the prefix at the beginning of their file name.
     public ArrayList<File[]> getSortedFileList(File[] listOfImageFiles){
         ArrayList<File[]> sortedFiles = new ArrayList<File[]>();
         //need a hashmap to keep track of where in our array list an array with a certain question number
@@ -277,7 +303,12 @@ public class editPracticeItemsController extends AppCompatActivity {
         int questionNum = 0;
         char itemLetter = ' ';
         for (int i = 0; i < listOfImageFiles.length; i++){
-            String[] fileName = getFileName(listOfImageFiles[i]);
+            String[] fileName = new String[0];
+            fileName = getFileName(listOfImageFiles[i]);
+            isFileContentValid(listOfImageFiles[i]);
+            if ((validFileExtensions == false) || (invalidFileContent == true)){
+                break;
+            }
             char[] questionIndex = fileName[0].toCharArray();
 
             //some numbers are greater than 10, so we account for that here.
@@ -357,12 +388,21 @@ public class editPracticeItemsController extends AppCompatActivity {
     }
 
 
+
     public String[] getFileName(File file){
+        String[] brokenDownFileName = new String[4];
         String fullFilePath = file.getAbsolutePath();
         String[] splitFilePath = fullFilePath.split("/");
         String fileName =  splitFilePath[splitFilePath.length - 1];
-        String[] brokenDownFileName = fileName.split("-");
+        brokenDownFileName = fileName.split("-");
+        String[] lastPart = brokenDownFileName[brokenDownFileName.length - 1].split("\\.");
+        if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg")  ||
+                lastPart[1].equalsIgnoreCase("png") || lastPart[1].equalsIgnoreCase("mp3")){
+            return brokenDownFileName;
+        }
+        validFileExtensions = false;
         return brokenDownFileName;
+
     }
 
 
@@ -449,5 +489,68 @@ public class editPracticeItemsController extends AppCompatActivity {
         }
         return false;
     }
+
+    public void isFileContentValid(File file){
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap currentImage;
+        byte[] currentBlob = null;
+        byte[] audioBlob = null;
+
+        boolean valid = false;
+        String[] brokenDownFileName = new String[4];
+        String fullFilePath = file.getAbsolutePath();
+        String[] splitFilePath = fullFilePath.split("/");
+        String fileName =  splitFilePath[splitFilePath.length - 1];
+        brokenDownFileName = fileName.split("-");
+        String[] lastPart = brokenDownFileName[brokenDownFileName.length - 1].split("\\.");
+
+        if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg")) {
+            try {
+                currentImage = BitmapFactory.decodeFile(fullFilePath, options);
+                currentBlob = dop.jpgToByteArray(currentImage);
+            } catch (IOException e) {
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            } catch (NullPointerException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+        } else if (lastPart[1].equalsIgnoreCase("png")){
+            try {
+                currentImage = BitmapFactory.decodeFile(fullFilePath, options);
+                currentBlob = dop.jpgToByteArray(currentImage);
+            } catch (IOException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+
+            }
+            catch (NullPointerException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+        } else if (lastPart[1].equalsIgnoreCase("mp3")){
+            try {
+                audioBlob = dop.audioToByteArray(file);
+            } catch (IOException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+            catch (NullPointerException e){
+                invalidFileContent = true;
+                invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
+                        " Please convert the file again (Save it as a proper file type in a image editing program).";
+            }
+
+        }
+
+    }
+
 
 }

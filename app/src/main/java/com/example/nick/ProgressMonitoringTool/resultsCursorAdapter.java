@@ -65,7 +65,7 @@ public class resultsCursorAdapter extends CursorAdapter {
 
         // Extract properties from cursor
 
-        if (testMode.equals("disaggregated")) {
+        if (testMode.equals("wordAndChild")) {
             TextView resultStudent = (TextView) view.findViewById(R.id.student);
             TextView resultWord = (TextView) view.findViewById(R.id.word);
             TextView resultCorrect = (TextView) view.findViewById(R.id.correct);
@@ -109,16 +109,12 @@ public class resultsCursorAdapter extends CursorAdapter {
             resultWord.setText("Students answered  " + word + " correctly");
             resultTestPercentageCorrect.setText(String.valueOf(finalPercCorrect) + "% of the time");
 
-        } else
-        if (testMode.equals("wordAndChild")){
-
-        } else
-        if (testMode.equals("child")){
+        } else if (testMode.equals("child")){
             TextView resultStudent = (TextView) view.findViewById(R.id.student);
             TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
 
             studentName = resultCursor.getString(1);
-            percentageCorrect = ((double) resultCursor.getInt(2) / resultCursor.getInt(3));
+            percentageCorrect = (((double) resultCursor.getInt(2) / resultCursor.getInt(5)) * 100);
             double finalPercCorrect = (double) Math.round(percentageCorrect * 100) / 100;
 
             resultStudent.setText(studentName + " answered correctly ");

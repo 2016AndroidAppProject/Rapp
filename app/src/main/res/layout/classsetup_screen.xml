@@ -22,8 +22,9 @@
             android:layout_height="wrap_content"
             android:text="Tap to add new student"
             android:id="@+id/addNewStudentButton"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_below="@+id/addStudentFNameField"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -35,28 +36,61 @@
             android:focusable="true"
             android:textColor="#000000"
             android:ems="10"
-            android:layout_above="@+id/addNewStudentButton"
-            android:layout_alignLeft="@+id/addNewStudentButton"
-            android:layout_marginBottom="75dp" />
+            android:layout_below="@+id/teacherSpinner"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <Spinner
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/teacherSpinner"
             android:background="#FFFFFF"
-            android:layout_above="@+id/addStudentFNameField"
-            android:layout_alignRight="@+id/addNewStudentButton"
-            android:layout_alignEnd="@+id/addNewStudentButton" />
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="90dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change student status"
+            android:id="@+id/makeStudentInactiveButton"
+            android:layout_below="@+id/studentSpinner"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="56dp" />
+
+        <Spinner
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/studentSpinner"
+            android:background="#FFFFFF"
+            android:layout_marginTop="126dp"
+            android:layout_below="@+id/addNewStudentButton"
+            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choose teacher and enter name to add child to that teacher&apos;s class:"
+        android:text="Choose teacher whose class you would like to edit:"
         android:id="@+id/textView6"
         android:layout_marginTop="111dp"
         android:textSize="25dp"
         android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/relativeLayout2"
+        android:layout_toStartOf="@+id/relativeLayout2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose a student in that class that you would like to make active/inactive:"
+        android:id="@+id/textView29"
+        android:textSize="25dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="189dp"
         android:layout_toLeftOf="@+id/relativeLayout2"
         android:layout_toStartOf="@+id/relativeLayout2" />
 </RelativeLayout>

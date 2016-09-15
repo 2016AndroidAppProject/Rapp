@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Random;
 
 
@@ -33,7 +35,7 @@ import java.util.Random;
 
 //THIS CLASS MAY BE BROKEN UP INTO TWO CLASSES, A SCREEN CONTROLLER AND A QUESTION CONTROLLER
 
-//This class is responsible for managing the userData and questionData while the user interacts
+//This class is responsible for managing the userData and testItemData while the user interacts
 //with the questions. It is responsible for loading new questions into currentQuestionData, changing the audio and
 //visual assets displayed on the testquestions_screen and figuring
 // out if that currentQuestionData is of the type practice, filler, or test.
@@ -52,7 +54,7 @@ public class questionsController extends AppCompatActivity {
     TextView practiceNotice;
 
 
-    //We get the number of possible answers from the questionData so that we
+    //We get the number of possible answers from the testItemData so that we
     //know how many pics we need to put up.
     int numPosAnswers;
 
@@ -79,11 +81,33 @@ public class questionsController extends AppCompatActivity {
 
     int audioTest;
 
+    boolean fillerItemComplete;
+    HashMap<Integer, String> fillerWordIndex;
+
     int numQuestions;
     int numQuestionsCorrect;
     int numQuestionsComplete;
 
+    int numTestItemsComplete;
+
+    int trueNumTestItemsComplete;
+
     int recordID;
+
+    Bitmap image1;
+    Bitmap image2;
+    Bitmap image3;
+    Bitmap image4;
+
+    byte[] currentAudio;
+
+    boolean continuingTest;
+    boolean practiceMode;
+
+    HashMap<String, Integer> alreadyAnsweredWords;
+
+    String currentUserName;
+
 
 
 
@@ -146,62 +170,69 @@ public class questionsController extends AppCompatActivity {
         mp = new MediaPlayer();
         ctx = this;
 
+        numTestItemsComplete = 0;
+        trueNumTestItemsComplete = 0;
+        if (currentUserData.getInstance().isContinueTest()){
+            continuingTest = true;
+        } else {
+            continuingTest = false;
+        }
+
         practiceNotice = (TextView) this.findViewById(R.id.practiceNotice);
         practiceNotice.setVisibility(View.INVISIBLE);
-        if (currentUserData.getInstance().isPracticeMode() == true){
+        practiceMode = currentUserData.getInstance().isPracticeMode();
+        if (practiceMode == true){
             practiceNotice.setVisibility(View.VISIBLE);
         }
 
         currentQuestionData = currentQuestionData.getInstance();
-
-
-        //Need to check if there is still some questionData, and if so, reset questionData to its
-        //new state.
-        if (currentQuestionData.isOldData() == true){
-            currentQuestionData = new currentQuestionData(null, null, null, 0, 0, 0, 0, null, 0, 0, null, null, 0, 0, null, null, null, null, null, 0, 0, null,
-                    null, null, null, null, null, true, 0, null, 0, false, null);
-        }
-        currentUserData = currentUserData.getInstance();
-
-
         dop = new DatabaseOperations(ctx);
+
+        fillerItemComplete = false;
+        fillerWordIndex = new HashMap<Integer, String>();
+
+        currentUserData = currentUserData.getInstance();
+        //Getting teh relevant information from the currentUserData (whose the current student, test?)
+        testId = dop.getTestIDByName(dop, currentUserData.getSelectedTest());
         n = 1;
-        resultId = 1;
+
         testName = currentUserData.getSelectedTest();
         studentName = currentUserData.getSelectedStudent();
-        testId = dop.getTestIDByName(dop, currentUserData.getSelectedTest());
+
         studentId = dop.getStudentIDByName(dop, currentUserData.getSelectedStudent());
 
+        if (currentQuestionData.oldData == true){
+            currentQuestionData =  new currentQuestionData(null, null, null, 0, null, null,false, 3, "Practice", 0, 0, null, null, null, null, 0, 0, 0, 0, 0, 0, null, null, true, null);
+        }
 
-        
+        alreadyAnsweredWords = new HashMap<String, Integer>();
+        loadInitialData(dop);
 
+        //Need to check if there is still some testItemData, and if so, reset testItemData to its
+        //new state.
+
+
+        if (currentUserData.getInstance().getUserType().equals("Administrator")){
+            currentUserName = currentUserData.getInstance().getSelectedTeacher();
+        } else {
+            currentUserName = currentUserData.getInstance().getUserName();
+        }
         audioTest = 0;
 
 
 
-
-
-
-        //setting testNum to 1 for testing purposes, in final version testNum will be
-        //set to the testID that was indicated in the previous screen.
-        currentQuestionData.setTestID(testId);
-        DatabaseOperations dop = new DatabaseOperations(ctx);
-        currentQuestionData.setDop(dop);
-        currentQuestionData.loadInitialData(dop);
-        currentQuestionData.loadQuestionData(currentQuestionData.getDop(), currentQuestionData.getTestID());
-
-        numQuestions = currentQuestionData.getQuestionList().length;
+        numQuestions = currentQuestionData.numTestItems;
         numQuestionsCorrect = 0;
         numQuestionsComplete = 0;
 
 
-        numPosAnswers = currentQuestionData.getNumPosAnswer();
+        numPosAnswers = currentQuestionData.numPosAnswer;
 
-        recordID = generateRandomID();
 
-        if (currentUserData.isPracticeMode() == false) {
+
+        if ((currentUserData.isPracticeMode() == false) && (continuingTest == false)) {
             dop.addNewTestCompletionRecord(dop, recordID, studentId, studentName, testId,
-                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
+                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete, currentUserData.getUserName());
         }
 
 
@@ -217,7 +248,7 @@ public class questionsController extends AppCompatActivity {
 
 
 
-        if (currentQuestionData.getNumPosAnswer() == 4){
+        if (numPosAnswers == 4){
 
             LinearLayout top = (LinearLayout) findViewById(R.id.top);
             RelativeLayout opt3Layout = (RelativeLayout) findViewById(R.id.opt3layout);
@@ -269,7 +300,7 @@ public class questionsController extends AppCompatActivity {
 
 
     public void performOnEnd(){
-        playMp3(currentQuestionData.getAudioBytes());
+        playMp3(currentAudio);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
@@ -303,7 +334,7 @@ public class questionsController extends AppCompatActivity {
         if (numPosAnswers == 4){
             opt4but.setEnabled(true);
         }
-        playMp3(currentQuestionData.getAudioBytes());
+        playMp3(currentAudio);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
@@ -341,11 +372,9 @@ public class questionsController extends AppCompatActivity {
     public void loadQuestion() {
 
 
-
-
         //determines rather we need to play third set of instructions here.
         String audio;
-//        if (currentQuestionData.getCurrentQtype() == "Practice"){
+//        if (currentQuestionData.currentQtype == "Practice"){
 //            audio = "play";
 //        } else {
 //            audio = "stop";
@@ -355,36 +384,28 @@ public class questionsController extends AppCompatActivity {
         //The following if statement sets the currentQuestionData to the next currentQuestionData IF and only IF
         //we are not on the first currentQuestionData. If we are loading the questions for the first time, we want
         //it to load the first currentQuestionData.
-        if (currentQuestionData.getFirstQuestion() == false) {
-            if ((currentQuestionData.getPracCorrect() == 2) || (currentQuestionData.getCurrentQIndex() == (currentQuestionData.getNumPractice() - 1))){
-                currentQuestionData.setCurrentQIndex(currentQuestionData.getNumPractice() - 1);
-                currentQuestionData.setCurrentQtype("Test");
-            }
-            currentQuestionData.setNextQuestion();
-
-            //code to set the current currentQuestionData to the next currentQuestionData OR
-            //forward them to the first practice item if they just successfully
-            //completed the second practice currentQuestionData.
-
+        if (currentQuestionData.firstQuestion == false) {
         } else {
-            currentQuestionData.setFirstQuestion(false);
+            currentQuestionData.firstQuestion = false;
         }
+
+        if ((currentQuestionData.pracCorrect == 2) || (numQuestionsComplete == currentQuestionData.numPracticeItems)){
+            currentQuestionData.currentQtype = "Test";
+        }
+
+
+
+        loadQuestionAssets();
 
 
         //currentQIndex describes the position in the questionList array that
         //the currentQuestionData is located at.
 
-       // currentQuestionData.setCurrentQIndex(currentQuestionData.getCurr);
-        currentQuestionData.findCurrentQNum();
-        currentQuestionData.setAttempts(0);
-        //THIS WILL BE REMOVED AND REPLACED WITH A QUERY TO SEE IF PROBLEM IS PRACTICE IN DATABASE
-        if (currentQuestionData.getCurrentQIndex() < currentQuestionData.getNumPractice()){
-            currentQuestionData.setCurrentQtype("Practice");
-        } else  {
-            currentQuestionData.setCurrentQtype("Test");
-        }
 
-        if (currentQuestionData.getCurrentQIndex() == 0){
+        currentQuestionData.attempts = 0;
+
+
+        if (numQuestionsComplete == 0){
             disableButtons();
             setButInvisible();
             mp = MediaPlayer.create(this, R.raw.practiceiteminstructions);
@@ -402,7 +423,7 @@ public class questionsController extends AppCompatActivity {
             setButInvisible();
             //mp = MediaPlayer.create(this, audID);
             //mp.start();
-            playMp3(currentQuestionData.getAudioBytes());
+            playMp3(currentAudio);
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                 @Override
@@ -412,21 +433,13 @@ public class questionsController extends AppCompatActivity {
             });
         }
 
-        Bitmap[] pics = new Bitmap[4];
-        pics[0] = currentQuestionData.getPic1Bitmap();
-        pics[1] = currentQuestionData.getPic2Bitmap();
-        pics[2] = currentQuestionData.getPic3Bitmap();
-        pics[3] = currentQuestionData.getPic4Bitmap();
-
-
-
 
         if (numPosAnswers == 4){
 //            int pic4id = this.getResources().getIdentifier("p" + currentQNum + "d", "drawable", this.getPackageName());
             Random rand = new Random();
             int prevn = n;
             while (n == prevn){
-                n = rand.nextInt(3) + 1;
+                n = rand.nextInt(4) + 1;
             }
             switch (n){
                 case 1 :
@@ -435,11 +448,11 @@ public class questionsController extends AppCompatActivity {
 //                    opt3.setBackground(getResources().getDrawable(pic3id));
 //                    opt4.setBackground(getResources().getDrawable(pic4id));
 
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt4.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    currentQuestionData.setCorrectAnswer(1);
+                    opt1.setBackground(new BitmapDrawable(getResources(), image1));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image2));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image3));
+                    opt4.setBackground(new BitmapDrawable(getResources(), image4));
+                    currentQuestionData.correctAnswer = 1;
                     mp.start();
                     break;
                 case 2:
@@ -447,11 +460,11 @@ public class questionsController extends AppCompatActivity {
 //                    opt2.setBackground(getResources().getDrawable(pic3id));
 //                    opt3.setBackground(getResources().getDrawable(pic1id));
 //                    opt4.setBackground(getResources().getDrawable(pic2id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    opt4.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    currentQuestionData.setCorrectAnswer(3);
+                    opt1.setBackground(new BitmapDrawable(getResources(), image4));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image3));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image1));
+                    opt4.setBackground(new BitmapDrawable(getResources(), image2));
+                    currentQuestionData.correctAnswer = 3;
                     mp.start();
                     break;
                 case 3:
@@ -459,11 +472,11 @@ public class questionsController extends AppCompatActivity {
 //                    opt2.setBackground(getResources().getDrawable(pic1id));
 //                    opt3.setBackground(getResources().getDrawable(pic4id));
 //                    opt4.setBackground(getResources().getDrawable(pic3id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt4.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    currentQuestionData.setCorrectAnswer(2);
+                    opt1.setBackground(new BitmapDrawable(getResources(), image2));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image1));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image3));
+                    opt4.setBackground(new BitmapDrawable(getResources(), image4));
+                    currentQuestionData.correctAnswer = 2;
                     mp.start();
                     break;
                 case 4:
@@ -471,11 +484,11 @@ public class questionsController extends AppCompatActivity {
 //                    opt2.setBackground(getResources().getDrawable(pic4id));
 //                    opt3.setBackground(getResources().getDrawable(pic2id));
 //                    opt4.setBackground(getResources().getDrawable(pic1id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[3]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    opt4.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    currentQuestionData.setCorrectAnswer(4);
+                    opt1.setBackground(new BitmapDrawable(getResources(), image3));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image4));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image2));
+                    opt4.setBackground(new BitmapDrawable(getResources(), image1));
+                    currentQuestionData.correctAnswer = 4;
                     mp.start();
                     break;
             }
@@ -487,10 +500,10 @@ public class questionsController extends AppCompatActivity {
             }
             switch (n) {
                 case 1:
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    currentQuestionData.setCorrectAnswer(1);
+                    opt1.setBackground(new BitmapDrawable(getResources(), image1));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image2));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image3));
+                    currentQuestionData.correctAnswer = 1;
 
                     mp.start();
                     break;
@@ -498,10 +511,10 @@ public class questionsController extends AppCompatActivity {
 //                    opt1.setBackground(getResources().getDrawable(pic3id));
 //                    opt2.setBackground(getResources().getDrawable(pic1id));
 //                    opt3.setBackground(getResources().getDrawable(pic2id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[0]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    currentQuestionData.setCorrectAnswer(2);
+                    opt1.setBackground(new BitmapDrawable(getResources(),image3));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image1));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image2));
+                    currentQuestionData.correctAnswer = 2;
 
                     mp.start();
                     break;
@@ -509,18 +522,395 @@ public class questionsController extends AppCompatActivity {
 //                    opt1.setBackground(getResources().getDrawable(pic2id));
 //                    opt2.setBackground(getResources().getDrawable(pic3id));
 //                    opt3.setBackground(getResources().getDrawable(pic1id));
-                    opt1.setBackground(new BitmapDrawable(getResources(), pics[1]));
-                    opt2.setBackground(new BitmapDrawable(getResources(), pics[2]));
-                    opt3.setBackground(new BitmapDrawable(getResources(), pics[0]));
+                    opt1.setBackground(new BitmapDrawable(getResources(), image2));
+                    opt2.setBackground(new BitmapDrawable(getResources(), image3));
+                    opt3.setBackground(new BitmapDrawable(getResources(), image1));
 
 
-                    currentQuestionData.setCorrectAnswer(3);
+                    currentQuestionData.correctAnswer = 3;
                     mp.start();
                     break;
             }
         }
-
     }
+
+
+
+    //This method computes the total number of filler items based on test size, as per the requirements given.
+    //It then finds how many items we have to complete to get those filler items, and stores those values
+    //in the fillerOrders.
+    public void findFillerNumAndIndex(){
+        //We set the filler item index to a new hashmap
+
+        currentQuestionData.fillerOrders = new HashMap<Integer, Integer>();
+
+        currentQuestionData.numFillerItems = 2;
+        double factor = .33;
+        currentQuestionData.fillerOrders.put(1, (int) Math.round(currentQuestionData.numTestItems * factor));
+        currentQuestionData.fillerOrders.put(2, (int) Math.round(currentQuestionData.numTestItems * (factor * 2)));
+
+        currentQuestionData.fillerIndex = new int[currentQuestionData.numFillerItems];
+    }
+
+
+
+    //Queries the test items for our test.
+    public void getTestItemsFromDatabase(){
+        currentQuestionData.testItemData = dop.getQuestionsForTest(dop, testId);
+        if (continuingTest == false){
+            recordID = generateRandomID();
+            resultId = 1;
+        } else if (continuingTest == true) {
+            Cursor mostRecentRecord = dop.getMostRecentCompletionRecord(dop, studentName, testName);
+            alreadyAnsweredWords = dop.getWordsAlreadyAnswered(dop, mostRecentRecord);
+            recordID = mostRecentRecord.getInt(4);
+            trueNumTestItemsComplete = mostRecentRecord.getInt(0);
+            numQuestionsCorrect = mostRecentRecord.getInt(2);
+            resultId = mostRecentRecord.getInt(0) + 1;
+        }
+        currentQuestionData.practiceItemData = dop.getPracItemSetsByTestID(dop, testId);
+
+        //setting those cursors to the first item so we don't get errors.
+        currentQuestionData.testItemData.moveToFirst();
+        currentQuestionData.practiceItemData.moveToFirst();
+    }
+
+
+
+
+
+
+    //Determines the size of the cursors and uses those to set the numPracItems, numTestItems, and totalTestSize
+    public void determineAndSetSizes(){
+        //setting the sizes based on how many elements are in those cursors.
+        currentQuestionData.numPracticeItems = currentQuestionData.practiceItemData.getCount();
+        currentQuestionData.numTestItems = currentQuestionData.testItemData.getCount();
+        currentQuestionData.totalTestSize = currentQuestionData.numPracticeItems + currentQuestionData.numTestItems;
+    }
+
+
+
+
+
+
+    //Load initial Data: Modify the currentQuestionData to load the assets needed for the test.
+    public void loadInitialData(DatabaseOperations dop){
+
+
+        getTestItemsFromDatabase();
+        determineAndSetSizes();
+        findFillerNumAndIndex();
+
+        if (currentQuestionData.numPracticeItems > 2) {
+            currentQuestionData.numPracticeItems = currentQuestionData.numPracticeItems - currentQuestionData.numFillerItems;
+        }
+
+        //Set the number of possible answers as the number of answers in the first item.
+        currentQuestionData.numPosAnswer = currentQuestionData.testItemData.getInt(8);
+
+        //Set the asset lists
+        currentQuestionData.testItemAssets = new HashMap<Integer, byte[][]>();
+        currentQuestionData.practiceAssets= new HashMap<Integer, byte[][]>();
+        currentQuestionData.fillerAssets = new HashMap<Integer, byte[][]>();
+
+        currentQuestionData.testWordIndex= new HashMap<Integer, String>();
+        currentQuestionData.pracWordIndex = new HashMap<Integer, String>();
+
+        if (alreadyAnsweredWords.size() > 0) {
+            currentQuestionData.testItemIndex = new int[currentQuestionData.numTestItems - alreadyAnsweredWords.size()];
+        } else {
+            currentQuestionData.testItemIndex = new int[currentQuestionData.numTestItems];
+        }
+        currentQuestionData.practiceItemIndex = new int[currentQuestionData.numPracticeItems];
+
+
+
+        //We need a random integer to store an index of our questionNum values for our test item hashmap,
+        //so we can randomly retrieve that questionNumber and its assets later.
+        int i = 0;
+        //Here we load the test item assets from the cursors into our test item hashmap so it is ready for use.
+        do {
+            String whatWord = currentQuestionData.testItemData.getString(9);
+            if (alreadyAnsweredWords.get(currentQuestionData.testItemData.getString(9)) == null) {
+
+                //Get the number of the item that will be inserted into the hashmap.
+                int questionNum = currentQuestionData.testItemData.getInt(1);
+
+                //generate an array of byte arrays, of size 5, so we can hold up to 4 image byte arrays, plus an audio byte []
+                byte[][] assetsToLoad = new byte[5][];
+                assetsToLoad[0] = currentQuestionData.testItemData.getBlob(3);
+                assetsToLoad[1] = currentQuestionData.testItemData.getBlob(4);
+                assetsToLoad[2] = currentQuestionData.testItemData.getBlob(5);
+
+//                image1 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[0]);
+//                image2 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[1]);
+//                image3 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[2]);
+//                if (currentQuestionData.numPosAnswer == 4) {
+//                    image4 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[3]);
+//                }
+
+                //check to see if there is a 4th item (based on the number of possible items) and load that into test.
+                if (currentQuestionData.numPosAnswer == 4) {
+                    assetsToLoad[3] = currentQuestionData.testItemData.getBlob(6);
+                }
+
+                //no matter what, audio goes in the last byte array.
+                assetsToLoad[4] = currentQuestionData.testItemData.getBlob(2);
+
+
+                //Finally, load all those assets into the testItemAssets hashmap for later use.
+                currentQuestionData.testItemAssets.put(questionNum, assetsToLoad);
+                currentQuestionData.testItemIndex[i] = questionNum;
+                currentQuestionData.testWordIndex.put(questionNum, currentQuestionData.testItemData.getString(9));
+                i++;
+            }
+
+        } while (currentQuestionData.testItemData.moveToNext());
+
+        currentQuestionData.shuffleArray(currentQuestionData.testItemIndex);
+
+        //Here we do the same thing, but for the practice items, checking to make sure that
+        //there actually are some practice items first.
+        //We also store the practiceItemNum in the appropriate indexes.
+        int j = 0;
+        int y = 0;
+        if (currentQuestionData.practiceItemData.getCount() != 0) {
+
+            //We need to take some of these practice items and put them in the filler item assets instead, so we
+            //will first put assets into the filler assets until we have reached the appropriate number.
+            int numItemsFilled = 0;
+            do {
+                //Get the number of the item that will be inserted into the hashmap.
+                int questionNum = currentQuestionData.practiceItemData.getInt(1);
+
+                //generate an array of byte arrays, of size 5, so we can hold up to 4 image byte arrays, plus an audio byte []
+                byte[][] assetsToLoad = new byte[5][];
+                assetsToLoad[0] = currentQuestionData.practiceItemData.getBlob(3);
+                assetsToLoad[1] = currentQuestionData.practiceItemData.getBlob(4);
+                assetsToLoad[2] = currentQuestionData.practiceItemData.getBlob(5);
+
+                //check to see if there is a 4th item (based on the number of possible items) and load that into test.
+                if (currentQuestionData.numPosAnswer == 4) {
+                    assetsToLoad[3] = currentQuestionData.practiceItemData.getBlob(6);
+                }
+
+                //no matter what, audio goes in the last byte array.
+                assetsToLoad[4] = currentQuestionData.practiceItemData.getBlob(2);
+
+
+                //Finally, load all those assets into the practiceItemAssets hashmap for later use.
+                //Depending on numItemsFilled, these go into either fillerItemsAssets or practiceItemAssets.
+                if (numItemsFilled < currentQuestionData.numFillerItems){
+                    currentQuestionData.fillerIndex[j] = questionNum;
+                    numItemsFilled++;
+                    j++;
+                    currentQuestionData.fillerAssets.put(j, assetsToLoad);
+                    fillerWordIndex.put(j, currentQuestionData.practiceItemData.getString(9));
+                } else {
+                    currentQuestionData.practiceAssets.put(questionNum, assetsToLoad);
+                    currentQuestionData.practiceItemIndex[y] = questionNum;
+                    y++;
+                }
+                currentQuestionData.pracWordIndex.put(questionNum, currentQuestionData.practiceItemData.getString(9));
+            } while (currentQuestionData.practiceItemData.moveToNext());
+        }
+
+        //if the number of practice items is not equal to zero, we set the current question type
+        //to practice to reflect that.
+        if ((currentQuestionData.numPracticeItems > 0) && (continuingTest != true)){
+            currentQuestionData.currentQtype = "Practice";
+        } else {
+            currentQuestionData.currentQtype = "Test";
+        }
+
+
+        //Lastly, we load the initial data from the lists into the current images and current audio.
+
+//        if (currentQuestionData.currentQtype.equals("Practice")){
+//            int currentNumber = currentQuestionData.practiceItemIndex[0];
+//            image1 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[0]);
+//            image2 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[1]);
+//            image3 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[2]);
+//            if (currentQuestionData.numPosAnswer == 4){
+//                image4 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[3]);
+//            }
+//            currentAudio = currentQuestionData.practiceAssets.get(currentNumber)[4];
+//        }
+    }
+
+
+    public void loadQuestionAssets(){
+        if ((currentQuestionData.numPracticeItems != 0) && (currentQuestionData.currentQtype.equals("Practice"))) {
+            if (numQuestionsComplete < currentQuestionData.numPracticeItems) {
+                int currentNumber = currentQuestionData.practiceItemIndex[numQuestionsComplete];
+                image1 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[0]);
+                image2 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[1]);
+                image3 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[2]);
+                if (currentQuestionData.numPosAnswer == 4) {
+                    image4 = getImage(currentQuestionData.practiceAssets.get(currentNumber)[3]);
+                }
+                currentAudio = currentQuestionData.practiceAssets.get(currentNumber)[4];
+            }
+        }
+
+
+        //Need to check if the numItemsComplete is enough that we can fill in a filler item.
+        //To do that, we must first check that there are some filler items,
+        //if yes, then we must check to see how many,
+        //if yes, then we must check to see if we have completed enough items to get a filler item.
+         else if (currentQuestionData.numFillerItems != 0){
+            if (currentQuestionData.numFillerItems == 1){
+
+                if ((numTestItemsComplete == currentQuestionData.fillerOrders.get(1)) && (fillerItemComplete == false)){
+                    currentQuestionData.currentQtype = "Filler";
+                    image1 = getImage(currentQuestionData.fillerAssets.get(1)[0]);
+                    image2 = getImage(currentQuestionData.fillerAssets.get(1)[1]);
+                    image3 = getImage(currentQuestionData.fillerAssets.get(1)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.fillerAssets.get(1)[3]);
+                    }
+                    currentAudio = currentQuestionData.fillerAssets.get(1)[4];
+                } else {
+                    currentQuestionData.currentQtype = "Test";
+                    int currentNumber = currentQuestionData.testItemIndex[numTestItemsComplete];
+                    image1 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[0]);
+                    image2 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[1]);
+                    image3 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[3]);
+                    }
+                    currentAudio = currentQuestionData.testItemAssets.get(currentNumber)[4];
+                }
+            }
+
+            if (currentQuestionData.numFillerItems == 2){
+
+                if ((trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(1)) && (fillerItemComplete == false)) {
+                    currentQuestionData.currentQtype = "Filler";
+                    image1 = getImage(currentQuestionData.fillerAssets.get(1)[0]);
+                    image2 = getImage(currentQuestionData.fillerAssets.get(1)[1]);
+                    image3 = getImage(currentQuestionData.fillerAssets.get(1)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.fillerAssets.get(1)[3]);
+                    }
+                    currentAudio = currentQuestionData.fillerAssets.get(1)[4];
+                } else if ((trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(2)) && (fillerItemComplete == false)){
+                    currentQuestionData.currentQtype = "Filler";
+                    image1 = getImage(currentQuestionData.fillerAssets.get(2)[0]);
+                    image2 = getImage(currentQuestionData.fillerAssets.get(2)[1]);
+                    image3 = getImage(currentQuestionData.fillerAssets.get(2)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.fillerAssets.get(2)[3]);
+                    }
+                    currentAudio = currentQuestionData.fillerAssets.get(2)[4];
+                } else {
+                    currentQuestionData.currentQtype = "Test";
+                    int currentNumber = currentQuestionData.testItemIndex[numTestItemsComplete];
+                    image1 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[0]);
+                    image2 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[1]);
+                    image3 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[3]);
+                    }
+                    currentAudio = currentQuestionData.testItemAssets.get(currentNumber)[4];
+                }
+            }
+
+            if (currentQuestionData.numFillerItems == 3){
+                if ((trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(1)) && (fillerItemComplete == false)) {
+                    currentQuestionData.currentQtype = "Filler";
+                    image1 = getImage(currentQuestionData.fillerAssets.get(1)[0]);
+                    image2 = getImage(currentQuestionData.fillerAssets.get(1)[1]);
+                    image3 = getImage(currentQuestionData.fillerAssets.get(1)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.fillerAssets.get(1)[3]);
+                    }
+                    currentAudio = currentQuestionData.fillerAssets.get(1)[4];
+                } else if ((trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(2)) && (fillerItemComplete == false)){
+                    currentQuestionData.currentQtype = "Filler";
+                    image1 = getImage(currentQuestionData.fillerAssets.get(2)[0]);
+                    image2 = getImage(currentQuestionData.fillerAssets.get(2)[1]);
+                    image3 = getImage(currentQuestionData.fillerAssets.get(2)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.fillerAssets.get(2)[3]);
+                    }
+                    currentAudio = currentQuestionData.fillerAssets.get(2)[4];
+                } else if ((trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(3)) && (fillerItemComplete == false)){
+                    currentQuestionData.currentQtype = "Filler";
+                    image1 = getImage(currentQuestionData.fillerAssets.get(3)[0]);
+                    image2 = getImage(currentQuestionData.fillerAssets.get(3)[1]);
+                    image3 = getImage(currentQuestionData.fillerAssets.get(3)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.fillerAssets.get(3)[3]);
+                    }
+                    currentAudio = currentQuestionData.fillerAssets.get(3)[4];
+                } else {
+                    currentQuestionData.currentQtype = "Test";
+                    int currentNumber = currentQuestionData.testItemIndex[numTestItemsComplete];
+                    image1 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[0]);
+                    image2 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[1]);
+                    image3 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[2]);
+                    if (currentQuestionData.numPosAnswer == 4) {
+                        image4 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[3]);
+                    }
+                    currentAudio = currentQuestionData.testItemAssets.get(currentNumber)[4];
+                }
+            }
+        }
+        else {
+            currentQuestionData.currentQtype = "Test";
+            int currentNumber = currentQuestionData.testItemIndex[numTestItemsComplete];
+            image1 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[0]);
+            image2 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[1]);
+            image3 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[2]);
+            if (currentQuestionData.numPosAnswer == 4) {
+                image4 = getImage(currentQuestionData.testItemAssets.get(currentNumber)[3]);
+            }
+            currentAudio = currentQuestionData.testItemAssets.get(currentNumber)[4];
+
+        }
+    }
+
+
+
+
+//    public Bitmap byteArrayToBitmap(byte[] byteArray){
+//        Bitmap background = BitmapFactory.decodeByteArray(byteArray, 0,
+//                byteArray.length);
+//        Bitmap back = Bitmap.createBitmap(background.getWidth(),
+//                background.getHeight(), Bitmap.Config.ARGB_8888);
+//        return back;
+//    }
+
+    public static Bitmap getImage(byte[] image) {
+        return BitmapFactory.decodeByteArray(image, 0, image.length);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //Message that appears when user answers incorrectly.
     public void tryAgainMessage() {
@@ -530,9 +920,9 @@ public class questionsController extends AppCompatActivity {
 
     //Behavior that is triggered when a user selects the wrong answer in the practice questions.
     public void incorrectAnswer(){
-        currentQuestionData.incrementAttempts();
-        if (currentQuestionData.getAttempts() >= 2){
-            playMp3(currentQuestionData.getAudioBytes());
+        currentQuestionData.attempts++;
+        if (currentQuestionData.attempts >= 2){
+            playMp3(currentAudio);
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                 @Override
@@ -569,28 +959,30 @@ public class questionsController extends AppCompatActivity {
     //the user will continue to the next currentQuestionData, they will have finished the test,
     //or they will have finished the practice questions.
     public void processAnswer(){
-        dop.updateTestCompletionRecord(dop, recordID, numQuestionsCorrect, numQuestionsComplete);
+        if (practiceMode == false) {
+            dop.updateTestCompletionRecord(dop, recordID, numQuestionsCorrect, trueNumTestItemsComplete);
+        }
         //Code to add +1 to pracCorrect if attempts = 0
         //so that when user gets two practice questions right on their first attempt
         //they are forwarded to the first real practice item regardless of rather
         //they finished all the practice questions.
-        if ((currentQuestionData.getAttempts() == 0) && (currentQuestionData.getCurrentQtype() == "Practice")){
-            currentQuestionData.incrementPracCorrect();
-        } else {
-            currentQuestionData.setPracCorrect(0);
+        numQuestionsComplete++;
+        if  ((currentQuestionData.currentQtype == "Practice") && (currentQuestionData.attempts == 0)){
+            currentQuestionData.pracCorrect++;
         }
+        currentQuestionData.attempts = 0;
 
-        if (currentQuestionData.getCurrentQIndex() == (currentQuestionData.getTestSize() + currentQuestionData.getNumPractice() - 1)) {
+        if (trueNumTestItemsComplete == currentQuestionData.numTestItems) {
             //go to last activity
             //RECORD RESULTS HERE
 //            dop.addNewTestCompletionRecord(dop, generateRandomID(), studentId, studentName, testId,
 //                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
 
-            currentQuestionData.setOldData(true);
+            currentQuestionData.oldData = true;
             startActivity(proceedIntent);
             this.finish();
-        } else if ((currentQuestionData.getCurrentQIndex() == (currentQuestionData.getNumPractice() - 1)
-                || currentQuestionData.getPracCorrect() == 2)){
+        } else if (((numQuestionsComplete == currentQuestionData.numPracticeItems) && (currentQuestionData.currentQtype.equals("Practice")))
+                || ((currentQuestionData.pracCorrect == 2) && (currentQuestionData.currentQtype.equals("Practice")))){
             transitionToTestItems();
         } else {
             loadQuestion();
@@ -636,6 +1028,53 @@ public class questionsController extends AppCompatActivity {
 
 
 
+//    switch (n){
+//        case 1 :
+////                    opt1.setBackground(getResources().getDrawable(pic1id));
+////                    opt2.setBackground(getResources().getDrawable(pic2id));
+////                    opt3.setBackground(getResources().getDrawable(pic3id));
+////                    opt4.setBackground(getResources().getDrawable(pic4id));
+//
+//            opt1.setBackground(new BitmapDrawable(getResources(), image1));
+//            opt2.setBackground(new BitmapDrawable(getResources(), image2));
+//            opt3.setBackground(new BitmapDrawable(getResources(), image3));
+//            opt4.setBackground(new BitmapDrawable(getResources(), image4));
+//            currentQuestionData.correctAnswer = 1;
+//            mp.start();
+//            break;
+//        case 2:
+////                    opt1.setBackground(getResources().getDrawable(pic4id));
+////                    opt2.setBackground(getResources().getDrawable(pic3id));
+////                    opt3.setBackground(getResources().getDrawable(pic1id));
+////                    opt4.setBackground(getResources().getDrawable(pic2id));
+//            opt1.setBackground(new BitmapDrawable(getResources(), image4));
+//            opt2.setBackground(new BitmapDrawable(getResources(), image3));
+//            opt3.setBackground(new BitmapDrawable(getResources(), image1));
+//            opt4.setBackground(new BitmapDrawable(getResources(), image2));
+//            currentQuestionData.correctAnswer = 3;
+//            mp.start();
+//            break;
+//        case 3:
+////                    opt1.setBackground(getResources().getDrawable(pic2id));
+////                    opt2.setBackground(getResources().getDrawable(pic1id));
+////                    opt3.setBackground(getResources().getDrawable(pic4id));
+////                    opt4.setBackground(getResources().getDrawable(pic3id));
+//            opt1.setBackground(new BitmapDrawable(getResources(), image2));
+//            opt2.setBackground(new BitmapDrawable(getResources(), image1));
+//            opt3.setBackground(new BitmapDrawable(getResources(), image3));
+//            opt4.setBackground(new BitmapDrawable(getResources(), image4));
+//            currentQuestionData.correctAnswer = 2;
+//            mp.start();
+//            break;
+//        case 4:
+////                    opt1.setBackground(getResources().getDrawable(pic3id));
+////                    opt2.setBackground(getResources().getDrawable(pic4id));
+////                    opt3.setBackground(getResources().getDrawable(pic2id));
+////                    opt4.setBackground(getResources().getDrawable(pic1id));
+//            opt1.setBackground(new BitmapDrawable(getResources(), image3));
+//            opt2.setBackground(new BitmapDrawable(getResources(), image4));
+//            opt3.setBackground(new BitmapDrawable(getResources(), image2));
+//            opt4.setBackground(new BitmapDrawable(getResources(), image1));
 
 
 
@@ -654,104 +1093,295 @@ public class questionsController extends AppCompatActivity {
     //of currentQuestionData answered.
     public void answer(View view) {
             boolean checked = ((RadioButton) view).isChecked();
-            numQuestionsComplete++;
+
+            int questionNum = 0;
+            String questionWord = null;
+            if (currentQuestionData.currentQtype.equalsIgnoreCase("Test")){
+                questionNum = currentQuestionData.testItemIndex[numTestItemsComplete];
+                questionWord = currentQuestionData.testWordIndex.get(questionNum);
+                trueNumTestItemsComplete++;
+                if (currentQuestionData.numFillerItems == 2){
+                    if ((trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(1)) ||
+                            (trueNumTestItemsComplete == currentQuestionData.fillerOrders.get(2))){
+                        fillerItemComplete = false;
+                    }
+                }
+
+            } else if (currentQuestionData.currentQtype.equals("Practice")){
+                questionNum = currentQuestionData.practiceItemIndex[numQuestionsComplete];
+                questionWord = currentQuestionData.pracWordIndex.get(questionNum);
+            } else if (currentQuestionData.currentQtype.equals("Filler")){
+                fillerItemComplete = true;
+                if (numTestItemsComplete == currentQuestionData.fillerOrders.get(1)){
+                    questionNum = currentQuestionData.fillerIndex[0];
+                    questionWord = fillerWordIndex.get(questionNum);
+                } else if ((currentQuestionData.fillerOrders.get(2) != null) && (numTestItemsComplete == currentQuestionData.fillerOrders.get(2))){
+                    questionNum = currentQuestionData.fillerIndex[1];
+                    questionWord = fillerWordIndex.get(questionNum);
+                } else if ((currentQuestionData.fillerOrders.get(3) != null) && (numTestItemsComplete == currentQuestionData.fillerOrders.get(3))) {
+                    questionNum = currentQuestionData.fillerIndex[2];
+                    questionWord = fillerWordIndex.get(questionNum);
+                }
+            }
+
+
+
+            String selectedAnswer = "";
             switch (view.getId()) {
+
                 case R.id.opt1:
-                    if (currentQuestionData.getCorrectAnswer() == 1){
-                        if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                    if (numPosAnswers == 4) {
+                        switch (n) {
+                            case 1:
+                                selectedAnswer = "A";
+                                break;
+                            case 2:
+                                selectedAnswer = "D";
+                                break;
+
+                            case 3:
+                                selectedAnswer = "B";
+                                break;
+
+                            case 4:
+                                selectedAnswer = "C";
+                                break;
+
                         }
-                        numQuestionsCorrect++;
+                    } else if (numPosAnswers == 3) {
+                        switch (n) {
+                            case 1:
+                                selectedAnswer = "A";
+                                break;
+                            case 2:
+                                selectedAnswer = "C";
+                                break;
+
+                            case 3:
+                                selectedAnswer = "B";
+                                break;
+
+
+                        }
+                    }
+                    if (currentQuestionData.correctAnswer == 1){
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numQuestionsCorrect++;
+                        }
                         resultId++;
                     } else {
                         if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+
                         }
                         resultId++;
                     }
 
-                    if ((currentQuestionData.getCorrectAnswer() == 1) ||
-                     (currentQuestionData.getCurrentQtype() != "Practice")) {
+                    if ((currentQuestionData.currentQtype.equals("Filler") || (currentQuestionData.correctAnswer == 1) || (currentQuestionData.currentQtype.equals("Test")))) {
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numTestItemsComplete++;
+                        }
                         processAnswer();
                     } else {
                         incorrectAnswer();
                     }
                     break;
                 case R.id.opt2:
-                    if (currentQuestionData.getCorrectAnswer() == 2){
-                        if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                    if (numPosAnswers == 4) {
+                        switch (n) {
+                            case 1:
+                                selectedAnswer = "B";
+                                break;
+                            case 2:
+                                selectedAnswer = "C";
+                                break;
+
+                            case 3:
+                                selectedAnswer = "A";
+                                break;
+
+                            case 4:
+                                selectedAnswer = "D";
+                                break;
+
                         }
-                        numQuestionsCorrect++;
+                    } else if (numPosAnswers == 3){
+                        switch (n) {
+                            case 1:
+                                selectedAnswer = "B";
+                                break;
+                            case 2:
+                                selectedAnswer = "A";
+                                break;
+
+                            case 3:
+                                selectedAnswer = "C";
+                                break;
+                        }
+
+                    }
+                    if (currentQuestionData.correctAnswer == 2){
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numQuestionsCorrect++;
+                        }
                         resultId++;
                     } else {
                         if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+
                         }
                         resultId++;
                     }
 
 
-                    if ((currentQuestionData.getCorrectAnswer() == 2) ||
-                            (currentQuestionData.getCurrentQtype() != "Practice")) {
+                    if ((currentQuestionData.currentQtype.equals("Filler") || (currentQuestionData.correctAnswer == 2) || (currentQuestionData.currentQtype.equals("Test")))) {
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numTestItemsComplete++;
+                        }
                         processAnswer();
                     } else {
                         incorrectAnswer();
                     }
                     break;
                 case R.id.opt3:
-                    if (currentQuestionData.getCorrectAnswer() == 3){
-                        if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                    if (numPosAnswers == 4) {
+                        switch (n) {
+                            case 1:
+                                selectedAnswer = "C";
+                                break;
+                            case 2:
+                                selectedAnswer = "A";
+                                break;
+
+                            case 3:
+                                selectedAnswer = "C";
+                                break;
+
+                            case 4:
+                                selectedAnswer = "B";
+                                break;
+
                         }
-                        numQuestionsCorrect++;
+                    } else if (numPosAnswers == 3) {
+                        switch (n) {
+                            case 1:
+                                selectedAnswer = "C";
+                                break;
+                            case 2:
+                                selectedAnswer = "B";
+                                break;
+
+                            case 3:
+                                selectedAnswer = "A";
+                                break;
+
+                        }
+                    }
+                    if (currentQuestionData.correctAnswer == 3){
+                        if (currentUserData.isPracticeMode() == false) {
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numQuestionsCorrect++;
+                        }
                         resultId++;
                     } else {
                         if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+
                         }
                         resultId++;
                     }
 
-                    if ((currentQuestionData.getCorrectAnswer() == 3) ||
-                            (currentQuestionData.getCurrentQtype() != "Practice")) {
+                    if ((currentQuestionData.currentQtype.equals("Filler") || (currentQuestionData.correctAnswer == 3) || (currentQuestionData.currentQtype.equals("Test")))) {
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numTestItemsComplete++;
+                        }
                         processAnswer();
                     } else {
                         incorrectAnswer();
                     }
                     break;
                 case R.id.opt4:
-                    if (currentQuestionData.getCorrectAnswer() == 4){
+                    switch (n){
+                        case 1:
+                            selectedAnswer = "D";
+                            break;
+                        case 2:
+                            selectedAnswer = "B";
+                            break;
+
+                        case 3:
+                            selectedAnswer = "D";
+                            break;
+
+                        case 4:
+                            selectedAnswer = "A";
+                            break;
+
+                    }
+                    if (currentQuestionData.correctAnswer == 4){
                         if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    true, testId, testName, resultId, recordID, studentId, studentName);
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    true, testId, testName, resultId, recordID, studentId, studentName,currentQuestionData.currentQtype, "A", currentUserName);
                         }
                         resultId++;
-                        numQuestionsCorrect++;
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numQuestionsCorrect++;
+                        }
                     } else {
                         if (currentUserData.isPracticeMode() == false) {
-                            dop.addNewResult(dop, currentQuestionData.getCurrentQuestionID(),
-                                    currentQuestionData.getCurrentQuestionWord(),
-                                    false, testId, testName, resultId, recordID, studentId, studentName);
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                        }
+                        if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
+                            dop.addNewResult(dop, questionNum,
+                                    questionWord,
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+
                         }
                         resultId++;
                     }
 
-                    if ((currentQuestionData.getCorrectAnswer() == 4) ||
-                            (currentQuestionData.getCurrentQtype() != "Practice")) {
+                    if ((currentQuestionData.currentQtype.equals("Filler") || (currentQuestionData.correctAnswer == 4) || (currentQuestionData.currentQtype.equals("Test")))) {
+                        if (currentQuestionData.currentQtype.equals("Test")) {
+                            numTestItemsComplete++;
+                        }
                         processAnswer();
                     } else {
                       incorrectAnswer(); //user answers incorrectly

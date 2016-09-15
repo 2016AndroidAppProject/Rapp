@@ -36,7 +36,7 @@
             android:hint="Password"
             android:layout_above="@+id/confirmPasswordField"
             android:layout_alignLeft="@+id/addNewUserButton"
-            android:imeActionLabel="actionDone"
+            android:imeOptions="actionDone"
             android:singleLine="true"/>
 
         <EditText
@@ -50,7 +50,8 @@
             android:layout_alignLeft="@+id/newPasswordField"
             android:layout_alignStart="@+id/newPasswordField"
             android:ems="10"
-            android:imeActionLabel="actionDone"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:singleLine="true"/>
 
         <EditText
@@ -65,7 +66,7 @@
             android:layout_alignLeft="@+id/addNewUserButton"
             android:layout_alignStart="@+id/addNewUserButton"
             android:layout_marginBottom="10dp"
-            android:imeActionLabel="actionDone"
+            android:imeOptions="actionDone"
             android:singleLine="true"/>
 
         <EditText
@@ -79,7 +80,8 @@
             android:layout_alignParentTop="true"
             android:layout_alignLeft="@+id/newUserNameField"
             android:layout_alignStart="@+id/newUserNameField"
-            android:imeActionLabel="actionDone"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:singleLine="true"/>
 
         <Spinner
@@ -89,6 +91,16 @@
             android:layout_below="@+id/userLastNameField"
             android:layout_centerHorizontal="true"
             android:background="#ffffff" />
+
+        <Spinner
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/deleteUserSpinner"
+            android:background="#ffffff"
+            android:layout_below="@+id/addNewUserButton"
+            android:layout_alignLeft="@+id/addNewUserButton"
+            android:layout_alignStart="@+id/addNewUserButton"
+            android:layout_marginTop="116dp" />
 
     </RelativeLayout>
 
@@ -113,7 +125,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tap to register new user"
+            android:text="Tap to update user"
             android:id="@+id/editUserButton"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
@@ -126,11 +138,12 @@
             android:ems="10"
             android:id="@+id/editNewPasswordField"
             android:textColor="#000000"
-            android:hint="Enter new password?"
+            android:hint="New Password?"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
             android:layout_above="@+id/editConfirmPasswordField"
-            android:layout_alignLeft="@+id/editUserButton"
-            android:imeActionLabel="actionDone"
-            android:singleLine="true" />
+            android:layout_alignLeft="@+id/editUserNameField"
+            android:layout_alignStart="@+id/editUserNameField" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -139,12 +152,13 @@
             android:hint="Enter new user name?"
             android:focusable="true"
             android:textColor="#000000"
-            android:layout_above="@+id/editNewPasswordField"
-            android:layout_alignLeft="@+id/editNewPasswordField"
-            android:layout_alignStart="@+id/editNewPasswordField"
             android:ems="10"
-            android:imeActionLabel="actionDone"
-            android:singleLine="true" />
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:layout_above="@+id/editNewPasswordField"
+            android:layout_alignLeft="@+id/editUserType"
+            android:layout_alignStart="@+id/editUserType" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -153,13 +167,13 @@
             android:ems="10"
             android:id="@+id/editConfirmPasswordField"
             android:textColor="#000000"
-            android:hint="Enter same password"
+            android:hint="Same Password?"
             android:layout_above="@+id/editUserButton"
-            android:layout_alignLeft="@+id/editUserButton"
-            android:layout_alignStart="@+id/editUserButton"
             android:layout_marginBottom="10dp"
-            android:imeActionLabel="actionDone"
-            android:singleLine="true" />
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:layout_alignLeft="@+id/editNewPasswordField"
+            android:layout_alignStart="@+id/editNewPasswordField" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -169,16 +183,16 @@
             android:focusable="true"
             android:textColor="#000000"
             android:ems="10"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
             android:layout_alignParentTop="true"
-            android:layout_alignLeft="@+id/editUserNameField"
-            android:layout_alignStart="@+id/editUserNameField"
-            android:imeActionLabel="actionDone"
-            android:singleLine="true" />
+            android:layout_centerHorizontal="true" />
 
         <Spinner
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:id="@+id/selectUserSpinner"
+            android:id="@+id/editUserSpinner"
             android:layout_below="@+id/editNewNameField"
             android:layout_centerHorizontal="true"
             android:background="#ffffff" />
@@ -186,12 +200,11 @@
         <Spinner
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner"
+            android:id="@+id/editUserType"
             android:background="#ffffff"
             android:layout_above="@+id/editUserNameField"
-            android:layout_alignLeft="@+id/selectUserSpinner"
-            android:layout_alignStart="@+id/selectUserSpinner"
-            android:layout_marginBottom="30dp" />
+            android:layout_alignLeft="@+id/editUserSpinner"
+            android:layout_alignStart="@+id/editUserSpinner" />
 
     </RelativeLayout>
 
@@ -223,10 +236,10 @@
         android:text="Change user type?"
         android:id="@+id/textView11"
         android:textSize="25dp"
-        android:layout_marginTop="63dp"
-        android:layout_below="@+id/textView10"
-        android:layout_toLeftOf="@+id/relativeLayout3"
-        android:layout_toStartOf="@+id/relativeLayout3" />
+        android:layout_marginBottom="20dp"
+        android:layout_above="@+id/textView30"
+        android:layout_alignLeft="@+id/textView10"
+        android:layout_alignStart="@+id/textView10" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -239,5 +252,59 @@
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/textView10"
         android:layout_alignEnd="@+id/textView10" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView30"
+        android:textSize="25dp"
+        android:lines="4"
+        android:text="Leave password fields blank if no password change is desired"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/textView11"
+        android:layout_alignEnd="@+id/textView11"
+        android:layout_alignLeft="@+id/textView11"
+        android:layout_alignStart="@+id/textView11" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="DELETE USERS"
+        android:id="@+id/textView31"
+        android:textSize="35dp"
+        android:textStyle="bold"
+        android:layout_below="@+id/textView30"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="51dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose user to delete:"
+        android:id="@+id/textView32"
+        android:textSize="25dp"
+        android:layout_below="@+id/textView31"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tap to delete user"
+        android:id="@+id/deleteButton"
+        android:layout_alignBottom="@+id/relativeLayout"
+        android:layout_alignRight="@+id/textView8"
+        android:layout_alignEnd="@+id/textView8" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tap to confirm deletion"
+        android:id="@+id/confirmDeleteButton"
+        android:layout_alignBottom="@+id/relativeLayout"
+        android:layout_toRightOf="@+id/deleteButton"
+        android:layout_toEndOf="@+id/deleteButton" />
 
 </RelativeLayout>

@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class selectionController extends AppCompatActivity {
     TextView practiceNotice;
@@ -39,9 +40,18 @@ public class selectionController extends AppCompatActivity {
     boolean studentSelected;
     boolean testSelected;
     Button beginButton;
+    Button restartButton;
+    Button continueButton;
+
+    boolean partialOrFullyComplete;
+    boolean continuingTest;
+    boolean completedTest;
 
 
     Spinner testSpinner;
+
+    HashMap<String, Boolean> partiallyComplete;
+    HashMap<String, Boolean> complete;
 
     int numStudents;
     int numTests;
@@ -60,6 +70,18 @@ public class selectionController extends AppCompatActivity {
         } else if ((userData.getInstance().getUserType().equals("Teacher")) &  ((studentSelected == false) || (testSelected == false))){
             Toast.makeText(getBaseContext(), "Please make a selection in every category to begin testing", Toast.LENGTH_LONG).show();
         } else {
+            userData.getInstance().setContinueTest(false);
+            startActivity(intent);
+        }
+    }
+
+    public void continueTest(View view) {
+        if (userData.getInstance().getUserType().equals("Administrator") & ((studentSelected == false) || (teacherSelected == false) || (testSelected == false))){
+            Toast.makeText(getBaseContext(), "Please make a selection in every category to begin testing", Toast.LENGTH_LONG).show();
+        } else if ((userData.getInstance().getUserType().equals("Teacher")) &  ((studentSelected == false) || (testSelected == false))){
+            Toast.makeText(getBaseContext(), "Please make a selection in every category to begin testing", Toast.LENGTH_LONG).show();
+        } else {
+            userData.getInstance().setContinueTest(true);
             startActivity(intent);
         }
     }
@@ -76,8 +98,19 @@ public class selectionController extends AppCompatActivity {
         testSelected = false;
 
         beginButton = (Button) this.findViewById(R.id.beginButton);
-        beginButton.setVisibility(View.INVISIBLE);
+        continueButton = (Button) this.findViewById(R.id.continueButton);
+        restartButton = (Button) this.findViewById(R.id.restartButton);
 
+        beginButton.setVisibility(View.INVISIBLE);
+        continueButton.setVisibility(View.INVISIBLE);
+        restartButton.setVisibility(View.INVISIBLE);
+
+
+        partialOrFullyComplete = false;
+        continuingTest = false;
+
+        partiallyComplete = new HashMap<String, Boolean>();
+        complete = new HashMap<String, Boolean>();
         practiceNotice = (TextView) this.findViewById(R.id.practiceNotice);
         practiceNotice.setVisibility(View.INVISIBLE);
         if (userData.getInstance().isPracticeMode() == true){
@@ -177,7 +210,37 @@ public class selectionController extends AppCompatActivity {
                     userData.getInstance().setSelectedTest(selectedTest);
                     studentSelectionLayout.setVisibility(View.VISIBLE);
 
-                    studentNames = dop.getStudentNames(dop, selectedTeacher);
+                    studentNames = dop.getActiveStudentNames(dop, selectedTeacher);
+
+                    for (int i = 1; i < studentNames.size(); i++){
+                        Cursor mostRecentRecord = dop.getMostRecentCompletionRecord(dop, studentNames.get(i), selectedTest);
+
+                        if ((mostRecentRecord == null) || (mostRecentRecord.getCount() == 0)) {
+                            complete.put(studentNames.get(i), false);
+                            partiallyComplete.put(studentNames.get(i), false);
+                            studentNames.set(i, studentNames.get(i) + " has not started the test");
+                        } else {
+                            mostRecentRecord.moveToFirst();
+
+                            int testComplete = mostRecentRecord.getInt(0);
+                            int testTotal = mostRecentRecord.getInt(1);
+                            if (mostRecentRecord.getInt(0) == mostRecentRecord.getInt(1)) {
+                                complete.put(studentNames.get(i), true);
+                                partiallyComplete.put(studentNames.get(i), false);
+                                studentNames.set(i, studentNames.get(i) + "   completed all questions");
+
+                            }
+
+                            if (mostRecentRecord.getInt(0) < mostRecentRecord.getInt(1)) {
+                                partiallyComplete.put(studentNames.get(i), true);
+                                complete.put(studentNames.get(i), false);
+                                studentNames.set(i, studentNames.get(i) + "   completed " + mostRecentRecord.getInt(0) + " out of " +
+                                        mostRecentRecord.getInt(1) + " questions");
+                            }
+                        }
+                    }
+
+
                     studentAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, studentNames);
                     studentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     studentSpinner.setAdapter(studentAdapter);
@@ -203,10 +266,22 @@ public class selectionController extends AppCompatActivity {
                 //Need to, first off, prevent behavior from automatically being triggered
                 //when screen is created.
                 if (studentSelected == true) {
-                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
-                    selectedStudent = (String) parent.getItemAtPosition(position);
+                    continueButton.setVisibility(View.INVISIBLE);
+                    restartButton.setVisibility(View.INVISIBLE);
+                    beginButton.setVisibility(View.INVISIBLE);
+
+                    String[] selectedString = ((String) parent.getItemAtPosition(position)).split(" ");
+                    selectedStudent = selectedString[0];
                     userData.getInstance().setSelectedStudent(selectedStudent);
-                    beginButton.setVisibility(View.VISIBLE);
+                    if (partiallyComplete.get(selectedStudent) == true) {
+                        continueButton.setVisibility(View.VISIBLE);
+                        restartButton.setVisibility(View.VISIBLE);
+                    } else if (complete.get(selectedStudent) == true) {
+                        restartButton.setVisibility(View.VISIBLE);
+                    } else {
+                        beginButton.setVisibility(View.VISIBLE);
+                    }
+                    Toast.makeText(getBaseContext(), selectedStudent, Toast.LENGTH_LONG).show();
                 } else {
                     studentSelected = true;
                 }
@@ -260,7 +335,7 @@ public class selectionController extends AppCompatActivity {
 //                                Toast.makeText(getApplicationContext(), "There are currently no students registered", Toast.LENGTH_SHORT).show();
 //                            } else {
 //
-//                                ArrayList<String> studentNames = dop.getStudentNames(dop, selectedTeacher);
+//                                ArrayList<String> studentNames = dop.getActiveStudentNames(dop, selectedTeacher);
 //                                if ((studentNames.size() == 0) && (currentUserData.getInstance().getUserType().equals("Teacher"))) {
 //                                    Toast.makeText(getApplicationContext(), "There are no students registered in your class. Please" +
 //                                            " contact the administrators for assistance.", Toast.LENGTH_SHORT).show();
@@ -318,7 +393,7 @@ public class selectionController extends AppCompatActivity {
 ////                Toast.makeText(getApplicationContext(), "There are currently no students registered", Toast.LENGTH_SHORT).show();
 ////            } else {
 ////
-////                ArrayList<String> studentNames = dop.getStudentNames(dop, selectedTeacher);
+////                ArrayList<String> studentNames = dop.getActiveStudentNames(dop, selectedTeacher);
 ////                if ((studentNames.size() == 0) && (currentUserData.getInstance().getUserType().equals("Teacher"))) {
 ////                    Toast.makeText(getApplicationContext(), "There are no students registered in your class. Please" +
 ////                            " contact the administrators for assistance.", Toast.LENGTH_SHORT).show();

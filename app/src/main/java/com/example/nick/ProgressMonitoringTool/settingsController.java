@@ -23,7 +23,7 @@ public class settingsController extends AppCompatActivity {
         setContentView(R.layout.settings_screen);
 
         resultsSetupButton = (Button) findViewById(R.id.resultsSetup);
-        testSetupButton = (Button) findViewById(R.id.testSetup);
+
         userSetupButton = (Button) findViewById(R.id.addUsersSetup);
         classSetupButton = (Button) findViewById(R.id.classroomSetup);
 
@@ -39,12 +39,6 @@ public class settingsController extends AppCompatActivity {
             }
         });
 
-        testSetupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(goToTestsSetup);
-            }
-        });
 
         userSetupButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -53,7 +53,7 @@ public class doneController extends AppCompatActivity {
 
 
         testNotice = (TextView) findViewById(R.id.testNotice);
-        testNotice.setText(question.getInstance().getCurrentQtype());
+
     }
 
 

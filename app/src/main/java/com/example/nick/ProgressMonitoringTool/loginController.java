@@ -20,7 +20,7 @@ import android.widget.Button;
 //The loginController class is the first activity of the application. It is responsible for managing the
 //login layout, allowing the user to attempt to login in, and validate their credentials.
 // Beacuse it is the first activity, it is also responsible for initializing the userData and
-// questionData classes so that they are ready to hold data. The loginController.java will
+// testItemData classes so that they are ready to hold data. The loginController.java will
 //be responsible for sending the users credentials to the databases, and assuming they are valid, it
 //will be responsible for fetching that users information and storing their information in the userData class.
 
@@ -62,14 +62,28 @@ public class loginController extends AppCompatActivity {
         DOP = new DatabaseOperations(CTX);
 
         //Following code is used to ensure that there is a blank item at the top of all the records
-        Cursor studentCR = DOP.getStudentInfo(DOP);
+        Cursor studentCR = DOP.getActiveStudentInfo(DOP);
         Cursor userCR = DOP.getUserInfo(DOP);
         Cursor testCR = DOP.getTests(DOP);
         Cursor pracItemCR = DOP.getPracItemSets(DOP);
         Cursor resultModeCR = DOP.getResultMode(DOP);
+        Cursor results = DOP.getAllResults(DOP);
+
+
+//        dop.addNewResult(dop, questionNum,
+//                questionWord,
+//                true, testId, testName, resultId,
+//                recordID, studentId, studentName,
+//                currentQuestionData.currentQtype, "A", currentUserName);
+
+        if (results.getCount() == 0){
+            DOP.addNewResult(DOP, 0, "", true, 0, "", 0, 0, 0, "", "", "A", "");
+        }
+
+
 
         if (resultModeCR.getCount() == 0){
-            DOP.addNewSettings(DOP, "disaggregated", true, "All");
+            DOP.addNewSettings(DOP, "wordAndChild", true, "All");
         }
 
         if (pracItemCR.getCount() == 0){
@@ -86,7 +100,7 @@ public class loginController extends AppCompatActivity {
         }
 
         if (userCR.getCount() == 0){
-            DOP.addNewUser(DOP, "", "", "", "");
+            DOP.addNewUser(DOP, "", "", "", "", 0);
         }
 
 
@@ -156,7 +170,7 @@ public class loginController extends AppCompatActivity {
 
                 //Placeholder for loggin in as administrator until we have a user type
                 //column for our account info table.
-                if ((enteredName.equals("admin") && (enteredPassword.equals("admin")))) {
+                if ((enteredName.equals("admin") && (enteredPassword.equals("golinkoff")))) {
                     Toast.makeText(getApplicationContext(), "Redirecting...", Toast.LENGTH_SHORT).show();
                     currentUserData.getInstance().setUserName(enteredName);
                     currentUserData.getInstance().setPassword(enteredPassword);

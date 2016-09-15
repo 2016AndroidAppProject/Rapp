@@ -19,6 +19,7 @@ public class tableData {
         public static final String USER_PASSWORD = "user_password";
         public static final String USER_TYPE = "user_type";
         public static final String USER_LASTNAME = "user_lastname";
+        public static final String USER_ID = "user_id";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
@@ -31,6 +32,7 @@ public class tableData {
         public static final String STUDENT_FIRSTNAME = "student_firstname";
         public static final String STUDENT_ID = "student_id";
         public static final String TEACHER_NAME = "teacher_name";
+        public static final String STATUS = "status";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
@@ -48,6 +50,7 @@ public class tableData {
         public static final String TEST_NAME = "test_name";
         public static final String TEST_ID = "test_id";
         public static final String DATE = "date";
+        public static final String TEST_GIVER = "test_giver";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
@@ -59,11 +62,15 @@ public class tableData {
         public static final String RECORD_ID = "record_id";
         public static final String QUESTION_ID = "question_id";
         public static final String WORD = "word";
+        public static final String ANSWER = "answer";
         public static final String CORRECT = "correct";
         public static final String TEST_ID = "test_id";
         public static final String TEST_NAME = "test_name";
         public static final String STUDENT_ID = "student_id";
         public static final String STUDENT_NAME = "student_name";
+        public static final String TEST_GIVER = "test_giver";
+
+        public static final String TYPE = "type";
 
         public static final String DATABASE_NAME = "Rapp_info";
 
