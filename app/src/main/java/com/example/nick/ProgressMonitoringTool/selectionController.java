@@ -156,6 +156,7 @@ public class selectionController extends AppCompatActivity {
                     ArrayAdapter<String> testAdapter;
                     //Need to, first off, prevent behavior from automatically being triggered
                     //when screen is created.
+                    studentSelectionLayout.setVisibility(View.INVISIBLE);
                     if (teacherSelected == true) {
                         Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                         selectedTeacher = (String) parent.getItemAtPosition(position);
@@ -168,6 +169,9 @@ public class selectionController extends AppCompatActivity {
                         testSpinner.setAdapter(testAdapter);
 
                         testSelectionLayout.setVisibility(View.VISIBLE);
+                        studentSelectionLayout.setVisibility(View.INVISIBLE);
+                        testSelected = false;
+                        studentSelected = false;
                     } else {
                         teacherSelected = true;
                     }
@@ -189,19 +193,24 @@ public class selectionController extends AppCompatActivity {
             testAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, testNames);
             testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             testSpinner.setAdapter(testAdapter);
-
-
-
-
             selectedTeacher = userData.getInstance().getUserRealName();
+            beginButton.setVisibility(View.INVISIBLE);
+            continueButton.setVisibility(View.INVISIBLE);
+            restartButton.setVisibility(View.INVISIBLE);
         }
 
         testSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             ArrayList<String> studentNames;
             ArrayAdapter<String> studentAdapter;
 
+
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                continueButton.setVisibility(View.INVISIBLE);
+                restartButton.setVisibility(View.INVISIBLE);
+                beginButton.setVisibility(View.INVISIBLE);
                 //Need to, first off, prevent behavior from automatically being triggered
                 //when screen is created.
                 if (testSelected == true) {
@@ -213,12 +222,12 @@ public class selectionController extends AppCompatActivity {
                     studentNames = dop.getActiveStudentNames(dop, selectedTeacher);
 
                     for (int i = 1; i < studentNames.size(); i++){
-                        Cursor mostRecentRecord = dop.getMostRecentCompletionRecord(dop, studentNames.get(i), selectedTest);
+                        Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudent(dop, studentNames.get(i), selectedTest);
 
                         if ((mostRecentRecord == null) || (mostRecentRecord.getCount() == 0)) {
                             complete.put(studentNames.get(i), false);
                             partiallyComplete.put(studentNames.get(i), false);
-                            studentNames.set(i, studentNames.get(i) + " has not started the test");
+                            studentNames.set(i, studentNames.get(i) + ": has not started the test");
                         } else {
                             mostRecentRecord.moveToFirst();
 
@@ -227,26 +236,28 @@ public class selectionController extends AppCompatActivity {
                             if (mostRecentRecord.getInt(0) == mostRecentRecord.getInt(1)) {
                                 complete.put(studentNames.get(i), true);
                                 partiallyComplete.put(studentNames.get(i), false);
-                                studentNames.set(i, studentNames.get(i) + "   completed all questions");
+                                studentNames.set(i, studentNames.get(i) + ":   completed all questions");
 
                             }
 
                             if (mostRecentRecord.getInt(0) < mostRecentRecord.getInt(1)) {
                                 partiallyComplete.put(studentNames.get(i), true);
                                 complete.put(studentNames.get(i), false);
-                                studentNames.set(i, studentNames.get(i) + "   completed " + mostRecentRecord.getInt(0) + " out of " +
+                                studentNames.set(i, studentNames.get(i) + ":   completed " + mostRecentRecord.getInt(0) + " out of " +
                                         mostRecentRecord.getInt(1) + " questions");
                             }
                         }
                     }
 
-
+                    studentSelected = false;
                     studentAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, studentNames);
                     studentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     studentSpinner.setAdapter(studentAdapter);
 
+
                 } else {
                     testSelected = true;
+                    studentSelectionLayout.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -265,12 +276,11 @@ public class selectionController extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //Need to, first off, prevent behavior from automatically being triggered
                 //when screen is created.
-                if (studentSelected == true) {
-                    continueButton.setVisibility(View.INVISIBLE);
-                    restartButton.setVisibility(View.INVISIBLE);
-                    beginButton.setVisibility(View.INVISIBLE);
-
-                    String[] selectedString = ((String) parent.getItemAtPosition(position)).split(" ");
+                beginButton.setVisibility(View.INVISIBLE);
+                continueButton.setVisibility(View.INVISIBLE);
+                restartButton.setVisibility(View.INVISIBLE);
+                if ((studentSelected == true) && (!selectedTest.equals(""))){
+                    String[] selectedString = ((String) parent.getItemAtPosition(position)).split(":");
                     selectedStudent = selectedString[0];
                     userData.getInstance().setSelectedStudent(selectedStudent);
                     if (partiallyComplete.get(selectedStudent) == true) {

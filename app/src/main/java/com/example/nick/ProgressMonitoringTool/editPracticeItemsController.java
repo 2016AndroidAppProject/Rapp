@@ -8,8 +8,11 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.File;
@@ -30,10 +33,15 @@ public class editPracticeItemsController extends AppCompatActivity {
     File[] imagesFiles;
     Bitmap[] images;
 
+    Button deleteButton;
+    Button confirmDeleteButton;
+
     String newPISetName;
     EditText newPISetField;
 
     DatabaseOperations dop;
+
+    Spinner deleteSpinner;
 
 
     Context ctx;
@@ -42,7 +50,10 @@ public class editPracticeItemsController extends AppCompatActivity {
 
     boolean validFileExtensions;
     boolean invalidFileContent;
+    boolean pracItemSelected;
     String invalidFileMessage;
+
+    String setToDelete;
 
 
     @Override
@@ -53,6 +64,16 @@ public class editPracticeItemsController extends AppCompatActivity {
         addPIButton = (Button) findViewById(R.id.addNewPracSetButton);
         ctx = this;
 
+        deleteButton = (Button) findViewById(R.id.deleteButton);
+        confirmDeleteButton = (Button) findViewById(R.id.confirmDeleteButton);
+
+        deleteButton.setVisibility(View.VISIBLE);
+        confirmDeleteButton.setVisibility(View.INVISIBLE);
+
+        pracItemSelected = false;
+
+        deleteSpinner = (Spinner) findViewById(R.id.deletePracticeItemSpinner);
+
         validFileExtensions = true;
 
         invalidFileContent = false;
@@ -62,6 +83,70 @@ public class editPracticeItemsController extends AppCompatActivity {
         newPISetField = (EditText) findViewById(R.id.addPracItemSet);
 
         dop = new DatabaseOperations(ctx);
+
+        ArrayList<String> pracItemNames = dop.getPracNames();
+        ArrayAdapter<String> pracAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, pracItemNames);
+        pracAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        deleteSpinner.setAdapter(pracAdapter);
+
+        if (pracItemNames.size() == 0){
+            Toast.makeText(getBaseContext(), "There are no practice item sets currently registered", Toast.LENGTH_LONG).show();
+        }
+
+        deleteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if ((pracItemSelected == true)  && (!parent.getItemAtPosition(position).equals("NO PRACTICE ITEM")) && (!parent.getItemAtPosition(position).equals(""))) {
+                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
+                    setToDelete = (String) parent.getItemAtPosition(position);
+                    confirmDeleteButton.setVisibility(View.INVISIBLE);
+                    deleteButton.setVisibility(View.VISIBLE);
+                } else {
+                    pracItemSelected = true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (setToDelete.equals("")) {
+                    Toast.makeText(getBaseContext(), "Select a test to delete", Toast.LENGTH_LONG).show();
+                } else {
+                    confirmDeleteButton.setVisibility(View.VISIBLE);
+                    Toast.makeText(getBaseContext(), "Hit CONFIRMDELETE to delete " + setToDelete, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        confirmDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dop.deletePracItem(dop, setToDelete);
+                Toast.makeText(getBaseContext(), setToDelete + " deleted!", Toast.LENGTH_LONG).show();
+                confirmDeleteButton.setVisibility(View.INVISIBLE);
+                ArrayList<String> pracItemNames = dop.getPracNames();
+                ArrayAdapter<String> pracAdapter = new ArrayAdapter<String>
+                        (ctx, android.R.layout.simple_spinner_item, pracItemNames);
+                pracAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                deleteSpinner.setAdapter(pracAdapter);
+
+                if (pracItemNames.size() == 0){
+                    Toast.makeText(getBaseContext(), "There are no practice item sets currently registered", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
 
 
         addPIButton.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +187,15 @@ public class editPracticeItemsController extends AppCompatActivity {
                                     //detect if file created is an actual file
                                     if (newPIDir.exists()){
                                         loadPISet();
+                                        ArrayList<String> pracItemNames = dop.getPracNames();
+                                        ArrayAdapter<String> pracAdapter = new ArrayAdapter<String>
+                                                (ctx, android.R.layout.simple_spinner_item, pracItemNames);
+                                        pracAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                        deleteSpinner.setAdapter(pracAdapter);
+
+                                        if (pracItemNames.size() == 0){
+                                            Toast.makeText(getBaseContext(), "There are no practice item sets currently registered", Toast.LENGTH_LONG).show();
+                                        }
 
                                     } else {
                                         Toast.makeText(getApplicationContext(),

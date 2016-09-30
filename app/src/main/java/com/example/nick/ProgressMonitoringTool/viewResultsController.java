@@ -55,11 +55,9 @@ public class viewResultsController extends AppCompatActivity {
         settings = dop.getResultMode(dop);
         settings.moveToFirst();
         resultsMode = settings.getString(0);
-
         aggregatedScore = (TextView) findViewById(R.id.aggregated);
 
-        modeNotice = (TextView) findViewById(R.id.modeNotice);
-        modeNotice.setText(resultsMode);
+
 
 
         testSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -69,49 +67,54 @@ public class viewResultsController extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ArrayList<String> testNames;
                 ArrayAdapter<String> testAdapter;
+
+                aggregatedScore.setText("");
+                resultsView.setVisibility(View.INVISIBLE);
                 //Need to, first off, prevent behavior from automatically being triggered
                 //when screen is created.
                 if (testSelected == true) {
                     selectedTest = (String) parent.getItemAtPosition(position);
                     if (resultsMode.equals("wordAndChild")) {
-                        results = dop.getResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
+                        results = dop.getRecentResultsForTeacherAndTest(dop, selectedTest, currentUserData.getInstance().getUserName());
                         if (results.getCount() == 0){
                             Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
-                            resultsView.setAdapter(resultsAdapter);
                         } else {
+                            resultsView.setVisibility(View.VISIBLE);
                             results.moveToFirst();
                             resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
                             resultsView.setAdapter(resultsAdapter);
 
                         }
                     } else if (resultsMode.equals("word")){
-                        results = dop.getResultWordsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
+                        results = dop.getRecentResultsForTeacherAndTest(dop, selectedTest, currentUserData.getInstance().getUserName());
                         if (results.getCount() == 0){
                             Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
-                            resultsView.setAdapter(resultsAdapter);
                         } else {
+                            resultsView.setVisibility(View.VISIBLE);
                             results.moveToFirst();
                             resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
                             resultsView.setAdapter(resultsAdapter);
 
                         }
                     } else if (resultsMode.equals("child")){
-                        results = dop.getCompletionRecordsByTestForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
+                        results = dop.getRecentCompletionRecordsByTestForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
+                        int test = results.getCount();
                         if (results.getCount() == 0){
                             Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
-                            resultsView.setAdapter(resultsAdapter);
                         } else {
+                            resultsView.setVisibility(View.VISIBLE);
                             results.moveToFirst();
                             resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
                             resultsView.setAdapter(resultsAdapter);
-
                         }
                     } else if (resultsMode.equals("Average")){
-                        aggregatedScore.setText(" Students answered correctly "
-                                + String.valueOf(dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName())) + "% of the time.");
+                        if (dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName()) == -1.0){
+                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                        } else {
+                            resultsView.setVisibility(View.VISIBLE);
+                            aggregatedScore.setText(" Students answered correctly "
+                                    + String.valueOf(dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName())) + "% of the time.");
+                        }
                     } else if (resultsMode.equals("noResults")){
                         Toast.makeText(getBaseContext(), "Viewing results is currently disabled", Toast.LENGTH_LONG).show();
                     }

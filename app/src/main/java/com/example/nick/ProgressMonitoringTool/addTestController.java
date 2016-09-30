@@ -30,6 +30,8 @@ public class addTestController extends AppCompatActivity {
     String pathToNewTestDir;
     EditText newTestDirField;
     Button newTestButton;
+    Button deleteTestButton;
+    Button confirmDeleteButton;
     String newTestDirName;
     File[] imagesFiles;
     Bitmap[] images;
@@ -45,6 +47,13 @@ public class addTestController extends AppCompatActivity {
     ArrayAdapter<String> pracAdapter;
     String selectedPracItem;
     boolean pracItemSelected;
+    boolean testItemSelected;
+
+    Spinner deleteTestSpinner;
+    String testToDelete;
+
+    Cursor tests;
+
 
 
     DatabaseOperations dop;
@@ -72,6 +81,13 @@ public class addTestController extends AppCompatActivity {
         AdministratorOnly = (RadioButton) findViewById(R.id.administratorOnly);
         AdministratorAndTeacher = (RadioButton) findViewById(R.id.administratorAndTeacher);
         pracItemSelected = false;
+        testItemSelected = false;
+
+        deleteTestButton = (Button) findViewById(R.id.deleteTestButton);
+        confirmDeleteButton = (Button) findViewById(R.id.confirmDeleteButton);
+
+        confirmDeleteButton.setVisibility(View.INVISIBLE);
+        deleteTestSpinner = (Spinner) findViewById(R.id.deleteTestSpinner);
 
         selectedPracItem = "";
 
@@ -79,11 +95,15 @@ public class addTestController extends AppCompatActivity {
 
         invalidFileContent = false;
 
+
+
         invalidFileMessage = "";
 
 
 
         dop = new DatabaseOperations(ctx);
+
+        tests = dop.getTests(dop);
 
         pracItemSpinner = (Spinner) findViewById(R.id.pracItemSpinner);
 
@@ -116,6 +136,73 @@ public class addTestController extends AppCompatActivity {
 
             }
         });
+
+
+        ArrayList<String> testNames = dop.getTestNamesForAdministrators(tests);
+        ArrayAdapter<String> testAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, testNames);
+        testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        deleteTestSpinner.setAdapter(testAdapter);
+
+        if (testNames.size() == 1){
+            Toast.makeText(getBaseContext(), "There are no tests currently registered", Toast.LENGTH_LONG).show();
+        }
+
+        deleteTestSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if ((testItemSelected == true) && (!parent.getItemAtPosition(position).equals(""))) {
+                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
+                    testToDelete = (String) parent.getItemAtPosition(position);
+                    confirmDeleteButton.setVisibility(View.INVISIBLE);
+                    deleteTestButton.setVisibility(View.VISIBLE);
+                } else {
+                    testItemSelected = true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        deleteTestButton.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    if (testToDelete.equals("")) {
+                                                        Toast.makeText(getBaseContext(), "Select a test to delete", Toast.LENGTH_LONG).show();
+                                                    } else {
+                                                        confirmDeleteButton.setVisibility(View.VISIBLE);
+                                                        Toast.makeText(getBaseContext(), "Hit CONFIRMDELETE to delete " + testToDelete, Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
+
+        confirmDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dop.deleteTest(dop, testToDelete);
+                Toast.makeText(getBaseContext(), testToDelete + " deleted!", Toast.LENGTH_LONG).show();
+                 confirmDeleteButton.setVisibility(View.INVISIBLE);
+                tests = dop.getTests(dop);
+                ArrayList<String> testNames = dop.getTestNamesForAdministrators(tests);
+                ArrayAdapter<String> testAdapter = new ArrayAdapter<String>
+                        (ctx, android.R.layout.simple_spinner_item, testNames);
+                testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                deleteTestSpinner.setAdapter(testAdapter);
+
+                if (testNames.size() == 0){
+                    Toast.makeText(getBaseContext(), "There are no tests currently registered", Toast.LENGTH_LONG).show();
+                    dop.addNewTest(dop, "", "", 0, 0);
+                }
+
+                }
+            });
 
 
 
@@ -228,6 +315,16 @@ public class addTestController extends AppCompatActivity {
                                         //detect if file created is an actual file
                                         if (newTestDir.exists()) {
                                             loadTest();
+                                            tests = dop.getTests(dop);
+                                            ArrayList<String> testNames = dop.getTestNamesForAdministrators(tests);
+                                            ArrayAdapter<String> testAdapter = new ArrayAdapter<String>
+                                                    (ctx, android.R.layout.simple_spinner_item, testNames);
+                                            testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                            deleteTestSpinner.setAdapter(testAdapter);
+
+                                            if (testNames.size() == 0){
+                                                Toast.makeText(getBaseContext(), "There are no tests currently registered", Toast.LENGTH_LONG).show();
+                                            }
 
                                         } else {
                                             Toast.makeText(getApplicationContext(),
@@ -256,6 +353,9 @@ public class addTestController extends AppCompatActivity {
         newTestId = generateTestID(dop);
         imagesFiles = newTestDir.listFiles();
 
+
+        confirmDeleteButton.setVisibility(View.INVISIBLE);
+        deleteTestButton.setVisibility(View.VISIBLE);
 
         //sort the images from the directory by question
             ArrayList<File[]> filesSorted = getSortedFileList(imagesFiles);
@@ -635,12 +735,18 @@ public class addTestController extends AppCompatActivity {
         byte[] audioBlob = null;
 
         boolean valid = false;
-        String[] brokenDownFileName = new String[4];
         String fullFilePath = file.getAbsolutePath();
         String[] splitFilePath = fullFilePath.split("/");
         String fileName =  splitFilePath[splitFilePath.length - 1];
-        brokenDownFileName = fileName.split("-");
+        String[] brokenDownFileName = fileName.split("-");
         String[] lastPart = brokenDownFileName[brokenDownFileName.length - 1].split("\\.");
+        if ((brokenDownFileName.length != 3)){
+            invalidFileContent = true;
+            invalidFileMessage = "The file name " + file.getPath() + " is not formatted correctly." +
+                    " Please ensure that it is of the exact format p#Letter-word-type.";
+        }
+
+
 
         if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg")) {
             try {

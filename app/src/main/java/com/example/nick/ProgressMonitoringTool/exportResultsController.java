@@ -128,12 +128,12 @@ public class exportResultsController extends AppCompatActivity {
         //To have a list of string arrays that we can print.
 
         //Create table
-        resultsTable = new String[results.getCount() + 4][results.getCount() + 4];
+        resultsTable = new String[(results.getCount() * 6) + 4][(results.getCount() * 6) + 4];
 
 
         //Create a top row string array. It is as long as the results cursor is to ensure it
         //can accomodate enough words, even if every result is a new and unique word.
-        String[] topRow = new String[results.getCount() + 4];
+        String[] topRow = new String[(results.getCount() * 6) + 4];
 
         results.moveToFirst();
 
@@ -156,7 +156,13 @@ public class exportResultsController extends AppCompatActivity {
 
 
         int recordID = 0;
+        int orderCompleted = 0;
         String date = "";
+
+        String upperLeft = "";
+        String upperRight = "";
+        String lowerLeft = "";
+        String lowerRight = "";
 
         do {
 
@@ -172,6 +178,12 @@ public class exportResultsController extends AppCompatActivity {
             String testGiver = completionRecord.getString(5);
             String type = results.getString(6);
             int correctInt = results.getInt(4);
+
+            orderCompleted = results.getInt(7);
+            lowerRight = results.getString(8);
+            lowerLeft = results.getString(9);
+            upperLeft = results.getString(10);
+            upperRight = results.getString(11);
             if (correctInt == 1){
                 correct = "CORRECT";
             }
@@ -187,11 +199,31 @@ public class exportResultsController extends AppCompatActivity {
                 numWords++;
                 words.put(word, numWords);
                 resultsTable[0][numWords] = word;
+                numWords++;
+                resultsTable[0][numWords] = "orderGiven";
+                numWords++;
+                resultsTable[0][numWords] = word + "-lower-left";
+                numWords++;
+                resultsTable[0][numWords] = word + "-lower-right";
+                numWords++;
+                resultsTable[0][numWords] = word + "-upper-left";
+                numWords++;
+                resultsTable[0][numWords] = word + "-upper-right";
             } else if (type.equalsIgnoreCase("Practice")){
                 numWords++;
                 numAttempts++;
                 words.put(word + String.valueOf(numAttempts), numWords);
                 resultsTable[0][numWords] = word + String.valueOf(numAttempts);
+                numWords++;
+                resultsTable[0][numWords] = "orderGiven";
+                numWords++;
+                resultsTable[0][numWords] = word + "-lower-left";
+                numWords++;
+                resultsTable[0][numWords] = word + "-lower-right";
+                numWords++;
+                resultsTable[0][numWords] = word + "-upper-left";
+                numWords++;
+                resultsTable[0][numWords] = word + "-upper-right";
             }
 
             if (students.get(studentName) == null){
@@ -213,8 +245,18 @@ public class exportResultsController extends AppCompatActivity {
             }
             if ((type.equalsIgnoreCase("Practice") && (numAttempts > 1))){
                     resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts))] = answer;
+                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 1] = String.valueOf(orderCompleted);
+                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 2] = lowerLeft;
+                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 3] = lowerRight;
+                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 4] = upperLeft;
+                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 5] = upperRight;
             } else {
                 resultsTable[dates.get(date)][words.get(word)] = answer;
+                resultsTable[dates.get(date)][words.get(word) + 1] = String.valueOf(orderCompleted);
+                resultsTable[dates.get(date)][words.get(word) + 2] = lowerLeft;
+                resultsTable[dates.get(date)][words.get(word) + 3] = lowerRight;
+                resultsTable[dates.get(date)][words.get(word) + 4] = upperLeft;
+                resultsTable[dates.get(date)][words.get(word) + 5] = upperRight;
             }
         } while (results.moveToNext());
 

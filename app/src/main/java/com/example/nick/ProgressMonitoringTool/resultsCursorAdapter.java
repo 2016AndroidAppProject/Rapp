@@ -32,6 +32,8 @@ public class resultsCursorAdapter extends CursorAdapter {
     Cursor settings;
 
     String testMode;
+
+
     HashMap<String, Double> wordsCorrectPercentages;
 
     public resultsCursorAdapter(Context context, Cursor cursor, int flags) {
@@ -42,7 +44,10 @@ public class resultsCursorAdapter extends CursorAdapter {
         settings = dop.getResultMode(dop);
         settings.moveToFirst();
         testMode = settings.getString(0);
-        wordsCorrectPercentages = dop.getWordsCorrrect(dop, dop.getAllResults(dop));
+        if (testMode.equalsIgnoreCase("word")) {
+            wordsCorrectPercentages = dop.getWordsCorrect(dop, cursor);
+        }
+
 
     }
 
@@ -57,68 +62,74 @@ public class resultsCursorAdapter extends CursorAdapter {
     // such as setting the text on a TextView.
     @Override
     public void bindView(View view, Context context, Cursor resultCursor) {
+            // Find fields to populate in inflated template
+
+            // Extract properties from cursor
+
+            if (testMode.equals("wordAndChild")) {
+                    TextView resultStudent = (TextView) view.findViewById(R.id.student);
+                    TextView resultWord = (TextView) view.findViewById(R.id.word);
+                    TextView resultCorrect = (TextView) view.findViewById(R.id.correct);
+                    TextView resultTestCompletionDate = (TextView) view.findViewById(R.id.testCompletionDate);
+
+                    int test = resultCursor.getInt(6);
+                    recordCursor = dop.getCompletionRecordByID(dop, resultCursor.getInt(6));
+                    recordCursor.moveToFirst();
+                    date = recordCursor.getString(3);
 
 
 
+                    studentName = resultCursor.getString(8) + " got ";
+                    word = resultCursor.getString(1);
+                    if (resultCursor.getInt(2) == 1) {
+                        correct = "Correct on ";
+                    } else if (resultCursor.getInt(2) == 0) {
+                        correct = "Incorrect on";
+                    }
 
-        // Find fields to populate in inflated template
+                    //percentageCorrect = ((double) recordCursor.getInt(2)) / recordCursor.getInt(0);
+                    //percentageComplete = ((double) recordCursor.getInt(0)) / recordCursor.getInt(1);
 
-        // Extract properties from cursor
+                    // Populate fields with extracted properties
+                    resultStudent.setText(studentName);
+                    resultWord.setText(word);
+                    resultCorrect.setText(correct);
+                    resultTestCompletionDate.setText(date);
+                    //resultTestPercentageCorrect.setText(String.valueOf(percentageCorrect));
+                    //resultTestPercentageComplete.setText(String.valueOf(percentageComplete));
+                } else if (testMode.equals("word")) {
 
-        if (testMode.equals("wordAndChild")) {
-            TextView resultStudent = (TextView) view.findViewById(R.id.student);
-            TextView resultWord = (TextView) view.findViewById(R.id.word);
-            TextView resultCorrect = (TextView) view.findViewById(R.id.correct);
-            TextView resultTestCompletionDate = (TextView) view.findViewById(R.id.testCompletionDate);
-
-                            if (resultCursor.getInt(1) != recordFetched) {
-                                recordCursor = dop.getCompletionRecordByID(dop, resultCursor.getInt(1));
-                                recordCursor.moveToFirst();
-                                recordFetched = resultCursor.getInt(1);
-                            }
-
-
-                            studentName = resultCursor.getString(3) + " got ";
-                            word = resultCursor.getString(2);
-                            if (resultCursor.getInt(4) == 1) {
-                                correct = "Correct on ";
-                            } else if (resultCursor.getInt(4) == 0) {
-                                correct = "Incorrect on";
-                            }
-                            date = recordCursor.getString(3);
-                            //percentageCorrect = ((double) recordCursor.getInt(2)) / recordCursor.getInt(0);
-                            //percentageComplete = ((double) recordCursor.getInt(0)) / recordCursor.getInt(1);
-
-                            // Populate fields with extracted properties
-                            resultStudent.setText(studentName);
-                            resultWord.setText(word);
-                            resultCorrect.setText(correct);
-                            resultTestCompletionDate.setText(date);
-                            //resultTestPercentageCorrect.setText(String.valueOf(percentageCorrect));
-                            //resultTestPercentageComplete.setText(String.valueOf(percentageComplete));
-        } else
-        if (testMode.equals("word")){
+                    TextView resultWord = (TextView) view.findViewById(R.id.word);
+                    TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
+                    word = resultCursor.getString(1);
 
 
-            TextView resultWord = (TextView) view.findViewById(R.id.word);
-            TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
-            word = resultCursor.getString(1);
-            percentageCorrect = wordsCorrectPercentages.get(word) * 100;
-            double finalPercCorrect = (double) Math.round(percentageCorrect * 100) / 100;
+                    percentageCorrect = wordsCorrectPercentages.get(word) * 100;
+                    double finalPercCorrect = (double) Math.round(percentageCorrect * 100) / 100;
 
-            resultWord.setText("Students answered  " + word + " correctly");
-            resultTestPercentageCorrect.setText(String.valueOf(finalPercCorrect) + "% of the time");
 
-        } else if (testMode.equals("child")){
-            TextView resultStudent = (TextView) view.findViewById(R.id.student);
-            TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
+                    resultWord.setText("Students answered  " + word + " correctly");
+                    resultTestPercentageCorrect.setText(String.valueOf(finalPercCorrect) + "% of the time");
 
-            studentName = resultCursor.getString(1);
-            percentageCorrect = (((double) resultCursor.getInt(2) / resultCursor.getInt(5)) * 100);
-            double finalPercCorrect = (double) Math.round(percentageCorrect * 100) / 100;
+            } else if (testMode.equals("child")) {
+                    TextView resultStudent = (TextView) view.findViewById(R.id.student);
+                    TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
 
-            resultStudent.setText(studentName + " answered correctly ");
-            resultTestPercentageCorrect.setText(finalPercCorrect + "% of the time.");
-        }
-    }
+
+                    studentName = resultCursor.getString(1);
+                    int numCorrect = resultCursor.getInt(2);
+                    int numTotal = resultCursor.getInt(5);
+                    if ((numCorrect == 0) && (numTotal == 0)) {
+                        percentageCorrect = 0.0;
+                    } else {
+                        percentageCorrect = (((double) numCorrect / numTotal) * 100);
+                    }
+                    double finalPercCorrect = (double) Math.round(percentageCorrect * 100) / 100;
+
+                    resultStudent.setText(studentName + " answered correctly ");
+                    resultTestPercentageCorrect.setText(finalPercCorrect + "% of the time.");
+                }
+
+
+            }
 }

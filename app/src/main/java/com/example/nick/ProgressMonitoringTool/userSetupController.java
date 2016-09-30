@@ -237,8 +237,12 @@ public class userSetupController extends AppCompatActivity {
 
                                                 @Override
                                                 public void onClick(View v) {
-                                                    Toast.makeText(getBaseContext(), "Press the confirm button if you are sure you want to delete " + userToDelete, Toast.LENGTH_LONG).show();
-                                                    confirmDeleteUserButton.setVisibility(View.VISIBLE);
+                                                    if (userToDelete.equals("")){
+                                                        Toast.makeText(getBaseContext(), "Please select a user you wish to delete", Toast.LENGTH_LONG).show();
+                                                    } else {
+                                                        Toast.makeText(getBaseContext(), "Press the confirm button if you are sure you want to delete " + userToDelete, Toast.LENGTH_LONG).show();
+                                                        confirmDeleteUserButton.setVisibility(View.VISIBLE);
+                                                    }
                                                 }
                                             });
 

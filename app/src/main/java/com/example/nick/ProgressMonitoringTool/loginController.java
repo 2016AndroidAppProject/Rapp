@@ -77,7 +77,7 @@ public class loginController extends AppCompatActivity {
 //                currentQuestionData.currentQtype, "A", currentUserName);
 
         if (results.getCount() == 0){
-            DOP.addNewResult(DOP, 0, "", true, 0, "", 0, 0, 0, "", "", "A", "");
+            DOP.addNewResult(DOP, 0, "", true, 0, "", 0, 0, 0, "", "", "A", "", 0, "", "", "", "");
         }
 
 

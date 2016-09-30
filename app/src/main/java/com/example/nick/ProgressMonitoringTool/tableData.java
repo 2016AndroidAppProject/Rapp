@@ -69,6 +69,11 @@ public class tableData {
         public static final String STUDENT_ID = "student_id";
         public static final String STUDENT_NAME = "student_name";
         public static final String TEST_GIVER = "test_giver";
+        public static final String ORDER_COMPLETED = "order_completed";
+        public static final String LOWER_RIGHT = "lower_right";
+        public static final String LOWER_LEFT = "lower_left";
+        public static final String UPPER_LEFT = "upper_left";
+        public static final String UPPER_RIGHT = "upper_right";
 
         public static final String TYPE = "type";
 

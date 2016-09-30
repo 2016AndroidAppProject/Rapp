@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
+import android.os.Handler;
 
 
 ////This class is part of the controller component of the model-view-controller design.
@@ -68,6 +69,12 @@ public class questionsController extends AppCompatActivity {
     RadioButton opt3but;
     RadioButton opt4but;
 
+
+    String upperLeft;
+    String upperRight;
+    String lowerRight;
+    String lowerLeft;
+
     Context ctx;
 
     int n;
@@ -107,6 +114,7 @@ public class questionsController extends AppCompatActivity {
     HashMap<String, Integer> alreadyAnsweredWords;
 
     String currentUserName;
+    Handler handler;
 
 
 
@@ -165,10 +173,13 @@ public class questionsController extends AppCompatActivity {
     //or add a 4th layout if needed if the numPosAnswers is 4.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testquestions_screen);
         mp = new MediaPlayer();
         ctx = this;
+
+        handler = new Handler();
 
         numTestItemsComplete = 0;
         trueNumTestItemsComplete = 0;
@@ -342,6 +353,7 @@ public class questionsController extends AppCompatActivity {
                 audioTest++;
             }
         });
+        audioLoop();
     }
 
     public void setButVisible(){
@@ -452,6 +464,10 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), image2));
                     opt3.setBackground(new BitmapDrawable(getResources(), image3));
                     opt4.setBackground(new BitmapDrawable(getResources(), image4));
+                    lowerLeft = "A";
+                    lowerRight = "B";
+                    upperLeft = "C";
+                    upperRight = "D";
                     currentQuestionData.correctAnswer = 1;
                     mp.start();
                     break;
@@ -464,6 +480,10 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), image3));
                     opt3.setBackground(new BitmapDrawable(getResources(), image1));
                     opt4.setBackground(new BitmapDrawable(getResources(), image2));
+                    lowerLeft = "D";
+                    lowerRight = "C";
+                    upperLeft = "A";
+                    upperRight = "B";
                     currentQuestionData.correctAnswer = 3;
                     mp.start();
                     break;
@@ -476,6 +496,10 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), image1));
                     opt3.setBackground(new BitmapDrawable(getResources(), image3));
                     opt4.setBackground(new BitmapDrawable(getResources(), image4));
+                    lowerLeft = "B";
+                    lowerRight = "A";
+                    upperLeft = "C";
+                    upperRight = "D";
                     currentQuestionData.correctAnswer = 2;
                     mp.start();
                     break;
@@ -488,6 +512,10 @@ public class questionsController extends AppCompatActivity {
                     opt2.setBackground(new BitmapDrawable(getResources(), image4));
                     opt3.setBackground(new BitmapDrawable(getResources(), image2));
                     opt4.setBackground(new BitmapDrawable(getResources(), image1));
+                    lowerLeft = "C";
+                    lowerRight = "D";
+                    upperLeft = "B";
+                    upperRight = "A";
                     currentQuestionData.correctAnswer = 4;
                     mp.start();
                     break;
@@ -503,6 +531,10 @@ public class questionsController extends AppCompatActivity {
                     opt1.setBackground(new BitmapDrawable(getResources(), image1));
                     opt2.setBackground(new BitmapDrawable(getResources(), image2));
                     opt3.setBackground(new BitmapDrawable(getResources(), image3));
+                    lowerLeft = "A";
+                    lowerRight = "B";
+                    upperLeft = "C";
+                    upperRight = "NONE";
                     currentQuestionData.correctAnswer = 1;
 
                     mp.start();
@@ -514,6 +546,10 @@ public class questionsController extends AppCompatActivity {
                     opt1.setBackground(new BitmapDrawable(getResources(),image3));
                     opt2.setBackground(new BitmapDrawable(getResources(), image1));
                     opt3.setBackground(new BitmapDrawable(getResources(), image2));
+                    lowerLeft = "C";
+                    lowerRight = "A";
+                    upperLeft = "B";
+                    upperRight = "NONE";
                     currentQuestionData.correctAnswer = 2;
 
                     mp.start();
@@ -525,6 +561,10 @@ public class questionsController extends AppCompatActivity {
                     opt1.setBackground(new BitmapDrawable(getResources(), image2));
                     opt2.setBackground(new BitmapDrawable(getResources(), image3));
                     opt3.setBackground(new BitmapDrawable(getResources(), image1));
+                    lowerLeft = "B";
+                    lowerRight = "C";
+                    upperLeft = "A";
+                    upperRight = "NONE";
 
 
                     currentQuestionData.correctAnswer = 3;
@@ -532,6 +572,8 @@ public class questionsController extends AppCompatActivity {
                     break;
             }
         }
+
+
     }
 
 
@@ -540,16 +582,20 @@ public class questionsController extends AppCompatActivity {
     //It then finds how many items we have to complete to get those filler items, and stores those values
     //in the fillerOrders.
     public void findFillerNumAndIndex(){
-        //We set the filler item index to a new hashmap
+        if (currentQuestionData.numPracticeItems > 0) {
+            //We set the filler item index to a new hashmap
 
-        currentQuestionData.fillerOrders = new HashMap<Integer, Integer>();
+            currentQuestionData.fillerOrders = new HashMap<Integer, Integer>();
 
-        currentQuestionData.numFillerItems = 2;
-        double factor = .33;
-        currentQuestionData.fillerOrders.put(1, (int) Math.round(currentQuestionData.numTestItems * factor));
-        currentQuestionData.fillerOrders.put(2, (int) Math.round(currentQuestionData.numTestItems * (factor * 2)));
+            currentQuestionData.numFillerItems = 2;
+            double factor = .33;
+            currentQuestionData.fillerOrders.put(1, (int) Math.round(currentQuestionData.numTestItems * factor));
+            currentQuestionData.fillerOrders.put(2, (int) Math.round(currentQuestionData.numTestItems * (factor * 2)));
 
-        currentQuestionData.fillerIndex = new int[currentQuestionData.numFillerItems];
+            currentQuestionData.fillerIndex = new int[currentQuestionData.numFillerItems];
+        } else {
+            currentQuestionData.numFillerItems = 0;
+        }
     }
 
 
@@ -561,7 +607,7 @@ public class questionsController extends AppCompatActivity {
             recordID = generateRandomID();
             resultId = 1;
         } else if (continuingTest == true) {
-            Cursor mostRecentRecord = dop.getMostRecentCompletionRecord(dop, studentName, testName);
+            Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudent(dop, studentName, testName);
             alreadyAnsweredWords = dop.getWordsAlreadyAnswered(dop, mostRecentRecord);
             recordID = mostRecentRecord.getInt(4);
             trueNumTestItemsComplete = mostRecentRecord.getInt(0);
@@ -616,7 +662,7 @@ public class questionsController extends AppCompatActivity {
         currentQuestionData.testWordIndex= new HashMap<Integer, String>();
         currentQuestionData.pracWordIndex = new HashMap<Integer, String>();
 
-        if (alreadyAnsweredWords.size() > 0) {
+        if (alreadyAnsweredWords != null) {
             currentQuestionData.testItemIndex = new int[currentQuestionData.numTestItems - alreadyAnsweredWords.size()];
         } else {
             currentQuestionData.testItemIndex = new int[currentQuestionData.numTestItems];
@@ -631,7 +677,7 @@ public class questionsController extends AppCompatActivity {
         //Here we load the test item assets from the cursors into our test item hashmap so it is ready for use.
         do {
             String whatWord = currentQuestionData.testItemData.getString(9);
-            if (alreadyAnsweredWords.get(currentQuestionData.testItemData.getString(9)) == null) {
+            if ((alreadyAnsweredWords == null) || (alreadyAnsweredWords.get(currentQuestionData.testItemData.getString(9)) == null)) {
 
                 //Get the number of the item that will be inserted into the hashmap.
                 int questionNum = currentQuestionData.testItemData.getInt(1);
@@ -933,6 +979,19 @@ public class questionsController extends AppCompatActivity {
         } else {
             tryAgainMessage();
         }
+        audioLoop();
+
+    }
+
+    public void audioLoop(){
+        handler.removeCallbacksAndMessages(null);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                playMp3(currentAudio);
+            }
+        }, 10000);
+
     }
 
     //Behavior that is triggered when the user successfully completes a second practice currentQuestionData.
@@ -979,6 +1038,7 @@ public class questionsController extends AppCompatActivity {
 //                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete);
 
             currentQuestionData.oldData = true;
+            handler.removeCallbacksAndMessages(null);
             startActivity(proceedIntent);
             this.finish();
         } else if (((numQuestionsComplete == currentQuestionData.numPracticeItems) && (currentQuestionData.currentQtype.equals("Practice")))
@@ -1168,7 +1228,7 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName);
+                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         if (currentQuestionData.currentQtype.equals("Test")) {
                             numQuestionsCorrect++;
@@ -1178,12 +1238,12 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
 
                         }
                         resultId++;
@@ -1236,7 +1296,8 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName);
+                                    true, testId, testName, resultId, recordID, studentId, studentName,
+                                    currentQuestionData.currentQtype, "A", currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight );
                         }
                         if (currentQuestionData.currentQtype.equals("Test")) {
                             numQuestionsCorrect++;
@@ -1246,12 +1307,12 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
 
                         }
                         resultId++;
@@ -1305,7 +1366,7 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName);
+                                    true, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, "A", currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         if (currentQuestionData.currentQtype.equals("Test")) {
                             numQuestionsCorrect++;
@@ -1315,12 +1376,12 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
 
                         }
                         resultId++;
@@ -1357,7 +1418,7 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    true, testId, testName, resultId, recordID, studentId, studentName,currentQuestionData.currentQtype, "A", currentUserName);
+                                    true, testId, testName, resultId, recordID, studentId, studentName,currentQuestionData.currentQtype, "A", currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         resultId++;
                         if (currentQuestionData.currentQtype.equals("Test")) {
@@ -1367,12 +1428,12 @@ public class questionsController extends AppCompatActivity {
                         if (currentUserData.isPracticeMode() == false) {
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
                         }
                         if (currentQuestionData.currentQtype.equalsIgnoreCase("Filler")){
                             dop.addNewResult(dop, questionNum,
                                     questionWord,
-                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName);
+                                    false, testId, testName, resultId, recordID, studentId, studentName, currentQuestionData.currentQtype, selectedAnswer, currentUserName, trueNumTestItemsComplete, lowerLeft, lowerRight, upperLeft, upperRight);
 
                         }
                         resultId++;

@@ -22,7 +22,6 @@ public class testsController extends AppCompatActivity {
         setContentView(R.layout.tests_screen);
 
         editPracticeItemsButton = (Button) findViewById(R.id.editPrac);
-        editTestsButton = (Button) findViewById(R.id.editTests);
         createTestButton = (Button) findViewById(R.id.createNewTest);
 
         goToEditTests = new Intent(this, editTestsController.class);
@@ -36,12 +35,6 @@ public class testsController extends AppCompatActivity {
             }
         });
 
-        editTestsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(goToEditTests);
-            }
-        });
 
         createTestButton.setOnClickListener(new View.OnClickListener() {
             @Override

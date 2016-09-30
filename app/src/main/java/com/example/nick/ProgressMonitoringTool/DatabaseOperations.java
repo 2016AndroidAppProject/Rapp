@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class DatabaseOperations extends SQLiteOpenHelper {
@@ -164,6 +165,11 @@ public class DatabaseOperations extends SQLiteOpenHelper {
             tableData.RESULTS.TYPE + " TEXT," +
             tableData.RESULTS.ANSWER + " TEXT," +
             tableData.RESULTS.TEST_GIVER + " TEXT," +
+            tableData.RESULTS.ORDER_COMPLETED + " INTEGER," +
+            tableData.RESULTS.LOWER_LEFT + " TEXT," +
+            tableData.RESULTS.LOWER_RIGHT + " TEXT," +
+            tableData.RESULTS.UPPER_LEFT + " TEXT," +
+            tableData.RESULTS.UPPER_RIGHT + " TEXT," +
 
             "FOREIGN KEY (" + tableData.RESULTS.RECORD_ID + ") REFERENCES " +
             tableData.TESTCOMPLETIONRECORDS.TABLE_NAME + "(" + tableData.TESTCOMPLETIONRECORDS.RECORD_ID + ")," +
@@ -271,7 +277,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     public void addNewResult(DatabaseOperations dop, int questionID, String word,
                              boolean correct, int testID, String testName, int resultID,
                              int recordID, int studentID, String studentName, String type, String answer,
-                             String testGiver){
+                             String testGiver, int orderGiven, String lowerLeft, String lowerRight, String upperLeft, String upperRight){
         SQLiteDatabase SQLD = dop.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -287,6 +293,11 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         cv.put(tableData.RESULTS.TYPE, type);
         cv.put(tableData.RESULTS.ANSWER, answer);
         cv.put(tableData.RESULTS.TEST_GIVER, testGiver);
+        cv.put(tableData.RESULTS.ORDER_COMPLETED, orderGiven);
+        cv.put(tableData.RESULTS.LOWER_RIGHT, lowerRight);
+        cv.put(tableData.RESULTS.LOWER_LEFT, lowerLeft);
+        cv.put(tableData.RESULTS.UPPER_LEFT, upperLeft);
+        cv.put(tableData.RESULTS.UPPER_RIGHT, upperRight);
         long k = SQLD.insert(tableData.RESULTS.TABLE_NAME, null, cv);
 
         Log.d("Database operations", "New result inserted");
@@ -629,6 +640,25 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         SQ.delete(tableData.USERINFO.TABLE_NAME, whereClause, new String[] {String.valueOf(id)} );
     }
 
+    public void deleteTest(DatabaseOperations dop, String testName){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        int testID = this.getTestIDByName(dop, testName);
+        String whereClause = tableData.TESTS.TEST_ID + "=?";
+        String whereResultsClause = tableData.QUESTIONS.TEST_ID + "=?";
+        SQ.delete(tableData.TESTS.TABLE_NAME, whereClause, new String[] {String.valueOf(testID)} );
+        SQ.delete(tableData.QUESTIONS.TABLE_NAME, whereResultsClause, new String[] {String.valueOf(testID)});
+    }
+
+    public void deletePracItem(DatabaseOperations dop, String pracItemName){
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        int testID = this.getPracIDByName(pracItemName);
+        String whereClause = tableData.PRACTICEITEMSETS.PRAC_ID + "=?";
+        String whereResultsClause = tableData.QUESTIONS.TEST_ID + "=?";
+        SQ.delete(tableData.PRACTICEITEMSETS.TABLE_NAME, whereClause, new String[] {String.valueOf(testID)} );
+        SQ.delete(tableData.QUESTIONS.TABLE_NAME, whereResultsClause, new String[] {String.valueOf(testID)});
+    }
+
+
 
 
 
@@ -687,7 +717,10 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getResults(DatabaseOperations dop, String testName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.ANSWER, tableData.RESULTS.TYPE};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME,
+                tableData.RESULTS.CORRECT, tableData.RESULTS.ANSWER, tableData.RESULTS.TYPE,
+                tableData.RESULTS.ORDER_COMPLETED, tableData.RESULTS.LOWER_RIGHT, tableData.RESULTS.LOWER_LEFT,
+                tableData.RESULTS.UPPER_LEFT, tableData.RESULTS.UPPER_RIGHT};
         String whereClause = tableData.RESULTS.TEST_NAME + "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 whereClause, new String[] {testName}, null, null, null);
@@ -699,7 +732,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getResultsForTeacher(DatabaseOperations dop, String testName, String teacherName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.ANSWER};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.ANSWER, tableData.RESULTS.TYPE, tableData.RESULTS.TEST_NAME};
         String whereClause = tableData.RESULTS.TEST_NAME + "=? AND " +
                 tableData.RESULTS.TEST_GIVER + "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
@@ -709,7 +742,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getResultsByCompletionID(DatabaseOperations dop, int recordID){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.TYPE, tableData.RESULTS.ANSWER};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.TYPE, tableData.RESULTS.ANSWER, tableData.RESULTS.TYPE};
         String whereClause = tableData.RESULTS.RECORD_ID+ "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 whereClause, new String[] {String.valueOf(recordID)}, null, null, null);
@@ -718,7 +751,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getResultsForStudent(DatabaseOperations dop, String studentName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.TYPE};
         String whereClause = tableData.RESULTS.STUDENT_NAME+ "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 whereClause, new String[] {studentName}, null, null, null);
@@ -729,24 +762,66 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     public Cursor getAllResults(DatabaseOperations dop){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.TYPE};
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 null, null, null, null, null);
         return CR;
     }
 
 
+
     //    String whereClause = tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME+ "=? AND " + tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=?";
 //    Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
 //            whereClause, new String[] {studentName, testName}, null, null, null);
-    public Cursor getResultWordsForTeacher(DatabaseOperations dop, String testName, String teacherName){
+    public Cursor getResultsByTeacherAndTest(DatabaseOperations dop, String testName, String teacherName){
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.WORD};
+        String[] columns = {tableData.RESULTS.RESULT_ID, tableData.RESULTS.RECORD_ID, tableData.RESULTS.WORD, tableData.RESULTS.STUDENT_NAME, tableData.RESULTS.CORRECT, tableData.RESULTS.TYPE, tableData.RESULTS.TEST_NAME};
         String whereClause = tableData.RESULTS.TEST_NAME + "=? AND " + tableData.RESULTS.TEST_GIVER + "=?";
         Cursor CR = SQ.query(tableData.RESULTS.TABLE_NAME, columns,
                 whereClause, new String[] {testName, teacherName}, tableData.RESULTS.WORD, null, null);
         return CR;
     }
+
+    public Map<Integer, Integer> getRecentRecordIDS(DatabaseOperations dop, String testName, String teacherName){
+        Map<Integer, Integer> recordIDs = new HashMap<Integer, Integer>();
+        Cursor CR = getResultsForTeacher(dop, testName, teacherName);
+        if (CR.getCount() == 0){
+            return null;
+        } else {
+            CR.moveToFirst();
+            do {
+                int recordID = recordID = dop.getMostRecentCompletionRecordIDForStudent(dop, CR.getString(3), CR.getString(7));
+                if ((CR.getInt(1) == recordID) && (CR.getInt(1) != 0)){
+                    recordIDs.put(recordID, 0);
+                }
+            } while (CR.moveToNext());
+            return recordIDs;
+        }
+    }
+
+    public Cursor getRecentResultsForTeacherAndTest(DatabaseOperations dop, String testName, String teacherName){
+        Map<Integer, Integer> recentRecordIDs = getRecentRecordIDS(dop, testName, teacherName);
+        String[] recentIDArg = generateRecentIDs(recentRecordIDs);
+        SQLiteDatabase SQ = dop.getReadableDatabase();
+        String whereClause = "";
+        for (Map.Entry<Integer, Integer> entry : recentRecordIDs.entrySet()){
+            whereClause = whereClause + tableData.RESULTS.RECORD_ID + " IN (?) AND ";
+        }
+        Cursor CR = SQ.rawQuery("SELECT * FROM " + tableData.RESULTS.TABLE_NAME + " WHERE " + whereClause + tableData.RESULTS.TYPE + " IN (?)", recentIDArg);
+        return CR;
+    }
+
+    public String[] generateRecentIDs(Map<Integer, Integer> recordIDs) {
+        String[] IDs = new String[recordIDs.size() + 1];
+        int i = 0;
+        for (Map.Entry<Integer, Integer> entry : recordIDs.entrySet()) {
+            IDs[i] = Integer.toString(entry.getKey());
+            i++;
+        }
+        IDs[i] = "Test";
+        return IDs;
+    }
+
 
 
     public Cursor getResultWords(DatabaseOperations dop, String testName){
@@ -771,16 +846,11 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         return CR;
     }
 
-    public Cursor getCompletionRecordsByTestForTeacher(DatabaseOperations dop, String testName, String teacherName){
+    public Cursor getRecentCompletionRecordsByTestForTeacher(DatabaseOperations dop, String testName, String teacherName){
+        Map<Integer, Integer> recentRecordIDs = getRecentRecordIDS(dop, testName, teacherName);
+        String[] recentIDArg = generateRecentIDs(recentRecordIDs);
         SQLiteDatabase SQ = dop.getReadableDatabase();
-        String[] columns = {tableData.TESTCOMPLETIONRECORDS.RECORD_ID, tableData.TESTCOMPLETIONRECORDS.STUDENT_NAME,
-                tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCORRECT, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONS,
-                tableData.TESTCOMPLETIONRECORDS.DATE, tableData.TESTCOMPLETIONRECORDS.NUM_QUESTIONSCOMPLETE, tableData.TESTCOMPLETIONRECORDS.TEST_GIVER};
-        String whereClause = tableData.TESTCOMPLETIONRECORDS.TEST_NAME + "=? AND " + tableData.TESTCOMPLETIONRECORDS.TEST_GIVER + "=?";
-        Cursor CR = SQ.query(tableData.TESTCOMPLETIONRECORDS.TABLE_NAME, columns,
-                whereClause, new String[] {testName, teacherName}, null, null, null);
-
-        ArrayList<String> students = new ArrayList<String>();
+        Cursor CR = SQ.rawQuery("SELECT * FROM " + tableData.TESTCOMPLETIONRECORDS.TABLE_NAME + " WHERE " + tableData.TESTCOMPLETIONRECORDS.RECORD_ID + " IN (?)", recentIDArg);
         return CR;
     }
 
@@ -803,11 +873,19 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         int totalResults = 0;
         int correctResults = 0;
         Cursor CR = dop.getResultsForTeacher(dop, testName, teacherName);
+        if (CR.getCount() == 0){
+            return -1.0;
+        }
         CR.moveToFirst();
         do {
-            totalResults++;
-            if (CR.getInt(4) == 1){
-                correctResults++;
+            int recordID = recordID = dop.getMostRecentCompletionRecordIDForStudent(dop, CR.getString(3), CR.getString(7));
+            if (CR.getInt(1) == recordID) {
+                if (!CR.getString(6).equalsIgnoreCase("Practice")) {
+                    totalResults++;
+                    if (CR.getInt(4) == 1) {
+                        correctResults++;
+                    }
+                }
             }
         } while (CR.moveToNext());
 
@@ -818,9 +896,11 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
 
 
-    public HashMap<String, Double> getWordsCorrrect(DatabaseOperations dop, Cursor resultsForTest){
+    public HashMap<String, Double> getWordsCorrect(DatabaseOperations dop, Cursor resultsForTest){
         HashMap<String, int[]> wordsCorrect = new HashMap<String, int[]>();
         HashMap<String, Double> wordsCorrectPercentages = new HashMap<String, Double>();
+
+        int recordID = -1;
 
         resultsForTest.moveToFirst();
 
@@ -828,33 +908,39 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         //that word pops up in results.
         //the second value stores the number of times that word was correctly answered in the result.
         do {
-            if (wordsCorrect.get(resultsForTest.getString(2)) == null){
-                int[] numCorrect = new int[2];
-                numCorrect[0] = 1;
-                if (resultsForTest.getInt(4) == 1){
-                    numCorrect[1] = 1;
-                } else if (resultsForTest.getInt(4) == 0){
-                    numCorrect[1] = 0;
+            recordID = dop.getMostRecentCompletionRecordIDForStudent(dop, resultsForTest.getString(8), resultsForTest.getString(4));
+            if (resultsForTest.getInt(6) == recordID) {
+                    if ((wordsCorrect.size() == 0) || (wordsCorrect.get(resultsForTest.getString(1)) == null)) {
+                        int[] numCorrect = new int[2];
+                        numCorrect[0] = 1;
+                        if (resultsForTest.getInt(2) == 1) {
+                            numCorrect[1] = 1;
+                        } else if (resultsForTest.getInt(2) == 0) {
+                            numCorrect[1] = 0;
+                        }
+                        wordsCorrect.put(resultsForTest.getString(1), numCorrect);
+                    } else {
+                        int[] numCorrect = new int[2];
+                        numCorrect[0] = wordsCorrect.get(resultsForTest.getString(1))[0] + 1;
+                        if (resultsForTest.getInt(2) == 1) {
+                            numCorrect[1] = wordsCorrect.get(resultsForTest.getString(1))[1] + 1;
+                        } else if (resultsForTest.getInt(2) == 0) {
+                            numCorrect[1] = wordsCorrect.get(resultsForTest.getString(1))[1];
+                            ;
+                        }
+                        wordsCorrect.put(resultsForTest.getString(1), numCorrect);
+                    }
                 }
-                wordsCorrect.put(resultsForTest.getString(2), numCorrect);
-            } else {
-                int[] numCorrect = new int[2];
-                numCorrect[0] = wordsCorrect.get(resultsForTest.getString(2))[0] + 1;
-                if (resultsForTest.getInt(4) == 1){
-                    numCorrect[1] = wordsCorrect.get(resultsForTest.getString(2))[1] + 1;
-                } else if (resultsForTest.getInt(4) == 0){
-                    numCorrect[1] = wordsCorrect.get(resultsForTest.getString(2))[1];;
-                }
-                wordsCorrect.put(resultsForTest.getString(2), numCorrect);
+
+            }
+            while (resultsForTest.moveToNext()) ;
+
+            for (String word : wordsCorrect.keySet()) {
+                wordsCorrectPercentages.put(word, ((double) wordsCorrect.get(word)[1] / wordsCorrect.get(word)[0]));
             }
 
-        } while (resultsForTest.moveToNext());
+            return wordsCorrectPercentages;
 
-        for (String word : wordsCorrect.keySet()) {
-            wordsCorrectPercentages.put(word, ((double) wordsCorrect.get(word)[1] / wordsCorrect.get(word)[0]));
-        }
-
-        return wordsCorrectPercentages;
 
     }
 
@@ -870,7 +956,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     }
 
 
-    public Cursor getMostRecentCompletionRecord(DatabaseOperations dop, String studentName, String testName){
+
+
+    public Cursor getMostRecentCompletionRecordbyStudent(DatabaseOperations dop, String studentName, String testName){
         Cursor completionRecords = dop.getCompletionRecordsByStudentAndTest(dop, studentName, testName);
         String currentDate = "0000-0000-0000 00:00:00";
         int newestRecordID = 0;
@@ -891,6 +979,18 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         return newestRecord;
     }
 
+    public int getMostRecentCompletionRecordIDForStudent(DatabaseOperations dop, String studentName, String testName){
+        Cursor mostRecentRecord = getMostRecentCompletionRecordbyStudent(dop,studentName,testName);
+        mostRecentRecord.moveToFirst();
+        if (mostRecentRecord.getCount() == 0){
+            return -1;
+        } else {
+            mostRecentRecord.moveToFirst();
+            int recordID = mostRecentRecord.getInt(4);
+            return recordID;
+        }
+    }
+
     public Cursor getMostRecentResultsByCompletionRecord(DatabaseOperations dop, Cursor completionRecord){
         completionRecord.moveToFirst();
         int recordID = completionRecord.getInt(4);
@@ -902,6 +1002,9 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     public HashMap<String, Integer> getWordsAlreadyAnswered(DatabaseOperations dop, Cursor completionRecord){
         Cursor recentResults = getMostRecentResultsByCompletionRecord(dop, completionRecord);
         recentResults.moveToFirst();
+        if (recentResults.getCount() == 0){
+            return null;
+        }
         HashMap wordsAlreadyAnswered = new HashMap<String, Integer>();
         int i =0;
         do {
