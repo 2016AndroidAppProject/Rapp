@@ -160,7 +160,8 @@ public class selectionController extends AppCompatActivity {
                     if (teacherSelected == true) {
                         Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                         selectedTeacher = (String) parent.getItemAtPosition(position);
-                        userData.getInstance().setSelectedTeacher(selectedTeacher);
+                        String userName = dop.getUserNameFor(dop, selectedTeacher);
+                        userData.getInstance().setSelectedTeacher(userName);
 
                         Cursor tc = dop.getTests(dop);
                         testNames = dop.getTestNamesForAdministrators(tc);
@@ -222,7 +223,12 @@ public class selectionController extends AppCompatActivity {
                     studentNames = dop.getActiveStudentNames(dop, selectedTeacher);
 
                     for (int i = 1; i < studentNames.size(); i++){
-                        Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudent(dop, studentNames.get(i), selectedTest);
+                        Cursor mostRecentRecord = null;
+                        if (currentUserData.getInstance().getUserType().equals("Administrator")) {
+                            mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentNames.get(i), selectedTest, "Admin");
+                        } else {
+                            mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentNames.get(i), selectedTest, selectedTeacher);
+                        }
 
                         if ((mostRecentRecord == null) || (mostRecentRecord.getCount() == 0)) {
                             complete.put(studentNames.get(i), false);

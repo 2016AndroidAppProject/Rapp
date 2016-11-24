@@ -26,11 +26,12 @@
             android:layout_height="wrap_content"
             android:text="CREATE NEW PRACTICE ITEM SET"
             android:id="@+id/addNewPracSetButton"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
             android:padding="25dp"
             android:textSize="35dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginTop="35dp"
+            android:layout_below="@+id/pracItemDirField"
+            android:layout_centerHorizontal="true" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -50,11 +51,59 @@
             android:id="@+id/pracItemDirField"
             android:hint="Enter name of new practice set assets folder"
             android:textSize="25dp"
-            android:layout_centerVertical="true"
-            android:layout_alignLeft="@+id/addPracItemSet"
-            android:layout_alignStart="@+id/addPracItemSet"
             android:inputType="text"
             android:imeOptions="actionDone"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:layout_below="@+id/addPracItemSet"
+            android:layout_alignLeft="@+id/addPracItemSet"
+            android:layout_alignStart="@+id/addPracItemSet"
+            android:layout_marginTop="41dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Choose a practice Item Set to delete:"
+            android:id="@+id/textView34"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:layout_below="@+id/addNewPracSetButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="65dp" />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/deletePracticeItemSpinner"
+            android:background="#FFFFFF"
+            android:layout_below="@+id/textView34"
+            android:layout_alignLeft="@+id/addNewPracSetButton"
+            android:layout_alignStart="@+id/addNewPracSetButton"
+            android:layout_alignRight="@+id/pracItemDirField"
+            android:layout_alignEnd="@+id/pracItemDirField" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DELETE SET"
+            android:id="@+id/deleteButton"
+            android:padding="25dp"
+            android:textSize="35dp"
+            android:textStyle="bold"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/deletePracticeItemSpinner"
+            android:layout_alignStart="@+id/deletePracticeItemSpinner" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CONFIRM DELETE"
+            android:id="@+id/confirmDeleteButton"
+            android:padding="25dp"
+            android:textSize="35dp"
+            android:textStyle="bold"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/deletePracticeItemSpinner"
+            android:layout_alignEnd="@+id/deletePracticeItemSpinner" />
     </RelativeLayout>
 </RelativeLayout>

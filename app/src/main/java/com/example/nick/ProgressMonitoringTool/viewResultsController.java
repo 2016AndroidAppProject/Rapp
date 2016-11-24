@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class viewResultsController extends AppCompatActivity {
 
@@ -65,6 +66,9 @@ public class viewResultsController extends AppCompatActivity {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+//                dop.close();
+//                dop = new DatabaseOperations(ctx);
                 ArrayList<String> testNames;
                 ArrayAdapter<String> testAdapter;
 
@@ -74,51 +78,66 @@ public class viewResultsController extends AppCompatActivity {
                 //when screen is created.
                 if (testSelected == true) {
                     selectedTest = (String) parent.getItemAtPosition(position);
-                    if (resultsMode.equals("wordAndChild")) {
-                        results = dop.getRecentResultsForTeacherAndTest(dop, selectedTest, currentUserData.getInstance().getUserName());
-                        if (results.getCount() == 0){
-                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                        } else {
-                            resultsView.setVisibility(View.VISIBLE);
-                            results.moveToFirst();
-                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
-                            resultsView.setAdapter(resultsAdapter);
+                    if (selectedTest.equals("")){
+                        Toast.makeText(getBaseContext(), "No Test Selected", Toast.LENGTH_LONG).show();
+                    } else {
+                        if (resultsMode.equals("wordAndChild")) {
+                            results = dop.getRecentResultsForTeacherAndTest(dop, selectedTest, currentUserData.getInstance().getUserName());
+                            if ((results == null) || (results.getCount() == 0)) {
+                                Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            } else {
+                                resultsView.setVisibility(View.VISIBLE);
+                                results.moveToFirst();
+                                resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, null, 0);
+                                resultsView.setAdapter(resultsAdapter);
+                                results.close();
 
-                        }
-                    } else if (resultsMode.equals("word")){
-                        results = dop.getRecentResultsForTeacherAndTest(dop, selectedTest, currentUserData.getInstance().getUserName());
-                        if (results.getCount() == 0){
-                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                        } else {
-                            resultsView.setVisibility(View.VISIBLE);
-                            results.moveToFirst();
-                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
-                            resultsView.setAdapter(resultsAdapter);
 
+
+                            }
+                        } else if (resultsMode.equals("word")) {
+                            results = dop.getRecentResultsForTeacherAndTest(dop, selectedTest, currentUserData.getInstance().getUserName());
+                            if (results.getCount() == 0) {
+                                Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            } else {
+                                resultsView.setVisibility(View.VISIBLE);
+                                results.moveToFirst();
+                                HashMap<String, Double> wordsCorrectPercentages = dop.getWordsCorrect(dop, results);
+                                Cursor recentWords = dop.getRecentResultWords(dop, selectedTest, currentUserData.getInstance().getUserName());
+                                resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, recentWords, wordsCorrectPercentages, 0);
+                                resultsView.setAdapter(resultsAdapter);
+                                results.close();
+
+
+
+                            }
+                        } else if (resultsMode.equals("child")) {
+                            results = dop.getRecentCompletionRecordsByTestForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
+                            int test = results.getCount();
+                            if (results.getCount() == 0) {
+                                Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            } else {
+                                resultsView.setVisibility(View.VISIBLE);
+                                results.moveToFirst();
+                                resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, null, 0);
+                                resultsView.setAdapter(resultsAdapter);
+                                results.close();
+
+                            }
+                        } else if (resultsMode.equals("Average")) {
+                            if (dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName()) == -1.0) {
+                                Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
+                            } else {
+                                resultsView.setVisibility(View.VISIBLE);
+                                aggregatedScore.setText(" Students answered correctly "
+                                        + String.valueOf(dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName())) + "% of the time.");
+
+                            }
+                        } else if (resultsMode.equals("noResults")) {
+                            Toast.makeText(getBaseContext(), "Viewing results is currently disabled", Toast.LENGTH_LONG).show();
                         }
-                    } else if (resultsMode.equals("child")){
-                        results = dop.getRecentCompletionRecordsByTestForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName());
-                        int test = results.getCount();
-                        if (results.getCount() == 0){
-                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                        } else {
-                            resultsView.setVisibility(View.VISIBLE);
-                            results.moveToFirst();
-                            resultsCursorAdapter resultsAdapter = new resultsCursorAdapter(ctx, results, 0);
-                            resultsView.setAdapter(resultsAdapter);
-                        }
-                    } else if (resultsMode.equals("Average")){
-                        if (dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName()) == -1.0){
-                            Toast.makeText(getBaseContext(), "There are no results available for this test", Toast.LENGTH_LONG).show();
-                        } else {
-                            resultsView.setVisibility(View.VISIBLE);
-                            aggregatedScore.setText(" Students answered correctly "
-                                    + String.valueOf(dop.percentageCorrectResultsForTeacher(dop, selectedTest, currentUserData.getInstance().getUserName())) + "% of the time.");
-                        }
-                    } else if (resultsMode.equals("noResults")){
-                        Toast.makeText(getBaseContext(), "Viewing results is currently disabled", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                     }
-                    Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
 
 
 

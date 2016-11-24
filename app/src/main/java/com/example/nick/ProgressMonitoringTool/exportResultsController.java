@@ -60,7 +60,7 @@ public class exportResultsController extends AppCompatActivity {
 
 
         tests = dop.getTests(dop);
-        testNames = dop.getTestNamesForAdministrators(tests);
+        testNames = dop.getTestNamesForExport(dop);
         testAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, testNames);
         testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         testSpinner.setAdapter(testAdapter);
@@ -128,37 +128,57 @@ public class exportResultsController extends AppCompatActivity {
         //To have a list of string arrays that we can print.
 
         //Create table
-        resultsTable = new String[(results.getCount() * 6) + 4][(results.getCount() * 6) + 4];
+        resultsTable = new String[(results.getCount())][(results.getCount() * 24)];
 
 
         //Create a top row string array. It is as long as the results cursor is to ensure it
         //can accomodate enough words, even if every result is a new and unique word.
-        String[] topRow = new String[(results.getCount() * 6) + 4];
+
 
         results.moveToFirst();
 
-        topRow[0] = "STUDENT";
-        topRow[1] = "DATE RECORDED";
-        topRow[2] = "TEST GIVER";
-        resultsTable[0] = topRow;
+        resultsTable[0][0] = "RECORD ID";
+        resultsTable[0][1] = "STUDENT";
+        resultsTable[0][2] = "DATE RECORDED";
+        resultsTable[0][3] = "TEST GIVER";
+        resultsTable[0][4] = "TEACHER";
+
+        int numWords = 1; // corresponds to the number of words encountered
+        //Only goes up by 1 when a new word is encountered.
+        // If the new word is also a practice word, we will increment numWords by 4 instead of 1
+        //starts at 1 to leave room for our header information.
+
+        int numRecords = 0; //corresponds to the number of records encountered,
+        // only goes up by 1 when a new recordID is encountered.
+
+        int recordLocation = 0; //allows us to fetch the vertical location of a set of results for a student
+        //if those results have already been added.
+
+        int wordLocation = 0; //allows us to fetch the horizontal location of a word and its set of columns if
+        //a result for that word was already processed.
 
 
-        //How many words and students have so far been calculated.
-        int numWords = 2;
-        int numRecords = 0;
-
-        //Number of practice item tries, so we can report all practice item attempts
-        int numAttempts = 1;
+        //A hashmap that keeps track of the words already encountered, and which column in the table the word for that result is.
+        // (Note, it only stores one word for a practice word, even though multiple practice attempts on that same word may exist.
+        // When a new word is encountered in a result, we add that word to the word hashmap. If that result is a practice item, we
+        // will add space for four results on the table.
         HashMap<String, Integer> words = new HashMap<String, Integer>();
-        HashMap<String, Integer> students = new HashMap<String, Integer>();
-        HashMap<String, Integer> dates = new HashMap<String, Integer>();
+        //A hashmap that keeps track of the recordID's we have encountered.
+        HashMap<Integer, Integer> recordIDs = new HashMap<Integer, Integer>();
+
+        //A hashmap that stores any words that are practice words and the recordID together, and the number of times that
+        //practice word has been attempted in that recordID. If the number of attempts is 1 but we are encountering that
+        //word and recordID combo for the second time, we would increment numAttempts to 2 and so on. Then, we would get the horizontal
+        //location of that word in the table from the word hashmap, and add (6 * num attempts)
+        HashMap<String, Integer> numAttemptsIndex = new HashMap<String, Integer>();
 
 
-
+        //Here we instantiate the variables which will make up the header information for each set of results
         int recordID = 0;
         int orderCompleted = 0;
         String date = "";
 
+        //Here we instantiate the variables which will make up the location information for each specific result.
         String upperLeft = "";
         String upperRight = "";
         String lowerLeft = "";
@@ -167,98 +187,143 @@ public class exportResultsController extends AppCompatActivity {
         do {
 
 
-
+            //fetching the information from that particular result, and the connected recordID.
             recordID =  Integer.valueOf(results.getString(1));
             Cursor completionRecord = dop.getCompletionRecordByID(dop, recordID);
-            completionRecord.moveToFirst();
-            date = completionRecord.getString(3);
-            String word = results.getString(2);
-            String studentName = results.getString(3);
-            String correct = "INCORRECT";
-            String testGiver = completionRecord.getString(5);
-            String type = results.getString(6);
-            int correctInt = results.getInt(4);
+            if (completionRecord.getCount() == 1) {
+                    completionRecord.moveToFirst();
+                    date = completionRecord.getString(3);
+                    String word = results.getString(2);
+                    String studentName = results.getString(3);
+                    int studentID = completionRecord.getInt(6);
+                    String teacherName = dop.getTeacherNameByStudentID(studentID, dop);
+                    String correct = "INCORRECT";
+                    String testGiver = completionRecord.getString(5);
+                    String type = results.getString(6);
+                    int correctInt = results.getInt(4);
+                    orderCompleted = results.getInt(7);
+                    lowerRight = results.getString(8);
+                    lowerLeft = results.getString(9);
+                    upperLeft = results.getString(10);
+                    upperRight = results.getString(11);
+                    if (correctInt == 1) {
+                        correct = "CORRECT";
+                    }
+                    String answer = results.getString(5);
+                    //Check if that word is currently in the top row, if not, add it at the end.
 
-            orderCompleted = results.getInt(7);
-            lowerRight = results.getString(8);
-            lowerLeft = results.getString(9);
-            upperLeft = results.getString(10);
-            upperRight = results.getString(11);
-            if (correctInt == 1){
-                correct = "CORRECT";
+                    //Code for adding a new header information and row when a different set of results is encountered.
+                    if (recordIDs.get(recordID) == null) {
+                        numRecords++;
+                        recordIDs.put(recordID, numRecords);
+                        resultsTable[numRecords][0] = String.valueOf(recordID);
+                        resultsTable[numRecords][1] = studentName;
+                        resultsTable[numRecords][2] = date;
+                        resultsTable[numRecords][3] = testGiver;
+                        resultsTable[numRecords][4] = teacherName;
+                        recordLocation = numRecords;
+
+                        //code for fetching the vertical location of the result set if we have already begun processing it.
+                    } else {
+                        recordLocation = recordIDs.get(recordID);
+
+                    }
+
+                    //Code for adding a new word if that word has not been encountered before.
+                    if ((words.get(word) == null) && (words.get(word + "1") == null) && (words.get(word + "2") == null)
+                            && (words.get(word + "3") == null) && (words.get(word + "4") == null)) {
+                        //If it is not a practice word
+                        if (!type.equalsIgnoreCase("Practice")) {
+                            numWords++;
+                            words.put(word, (numWords - 1) * 6);
+                            resultsTable[0][words.get(word)] = word;
+                            resultsTable[0][words.get(word) + 1] = "Order-completed-" + word;
+                            resultsTable[0][words.get(word) + 2] = word + "-lower-left";
+                            resultsTable[0][words.get(word) + 3] = word + "-lower-right";
+                            resultsTable[0][words.get(word) + 4] = word + "-upper-left";
+                            resultsTable[0][words.get(word) + 5] = word + "-upper-right";
+                            wordLocation = words.get(word);
+
+                        } else { //if word is a practice word
+                            numWords++;
+                            words.put(word + "1", (numWords - 1) * 6);
+                            resultsTable[0][words.get(word + "1")] = word + "1";
+                            resultsTable[0][words.get(word + "1") + 1] = "Order-completed-" + word;
+                            resultsTable[0][words.get(word + "1") + 2] = word + "1" + "-lower-left";
+                            resultsTable[0][words.get(word + "1") + 3] = word + "1" + "-lower-right";
+                            resultsTable[0][words.get(word + "1") + 4] = word + "1" + "-upper-left";
+                            resultsTable[0][words.get(word + "1") + 5] = word + "1" + "-upper-right";
+                            numWords++;
+                            words.put(word + "2", (numWords - 1) * 6);
+                            resultsTable[0][words.get(word + "2")] = word + "2";
+                            resultsTable[0][words.get(word + "2") + 1] = "Order-completed-" + word;
+                            resultsTable[0][words.get(word + "2") + 2] = word + "2" + "-lower-left";
+                            resultsTable[0][words.get(word + "2") + 3] = word + "2" + "-lower-right";
+                            resultsTable[0][words.get(word + "2") + 4] = word + "2" + "-upper-left";
+                            resultsTable[0][words.get(word + "2") + 5] = word + "2" + "-upper-right";
+                            numWords++;
+                            words.put(word + "3", (numWords - 1) * 6);
+                            resultsTable[0][words.get(word + "3")] = word + "3";
+                            resultsTable[0][words.get(word + "3") + 1] = "Order-completed-" + word;
+                            resultsTable[0][words.get(word + "3") + 2] = word + "3" + "-lower-left";
+                            resultsTable[0][words.get(word + "3") + 3] = word + "3" + "-lower-right";
+                            resultsTable[0][words.get(word + "3") + 4] = word + "3" + "-upper-left";
+                            resultsTable[0][words.get(word + "3") + 5] = word + "3" + "-upper-right";
+                            numWords++;
+                            words.put(word + "4", (numWords - 1) * 6);
+                            resultsTable[0][words.get(word + "4")] = word + "4";
+                            resultsTable[0][words.get(word + "4") + 1] = "Order-completed-" + word;
+                            resultsTable[0][words.get(word + "4") + 2] = word + "4" + "-lower-left";
+                            resultsTable[0][words.get(word + "4") + 3] = word + "4" + "-lower-right";
+                            resultsTable[0][words.get(word + "4") + 4] = word + "4" + "-upper-left";
+                            resultsTable[0][words.get(word + "4") + 5] = word + "4" + "-upper-right";
+                            wordLocation = words.get(word + "1");
+                            numAttemptsIndex.put(word + recordID, 1);
+                        }
+                    } else {
+                        if (type.equalsIgnoreCase("Practice")) {
+                            int numAttempts = 0;
+
+                            if (numAttemptsIndex.get(word + recordID) == null) {
+                                numAttemptsIndex.put(word + recordID, 0);
+                            } else {
+                                numAttempts = numAttemptsIndex.get(word + recordID);
+                            }
+                            switch (numAttempts) {
+                                case 0:
+                                    wordLocation = words.get(word + "1");
+                                    numAttemptsIndex.put(word + recordID, 1);
+                                    break;
+                                case 1:
+                                    wordLocation = words.get(word + "2");
+                                    numAttemptsIndex.put(word + recordID, 2);
+                                    break;
+
+                                case 2:
+                                    wordLocation = words.get(word + "3");
+                                    numAttemptsIndex.put(word + recordID, 3);
+                                    break;
+
+                                case 3:
+                                    wordLocation = words.get(word + "4");
+                                    numAttemptsIndex.put(word + recordID, 3);
+                                    break;
+                            }
+                        } else {
+                            wordLocation = words.get(word);
+                        }
+                    }
+                    resultsTable[recordLocation][wordLocation] = answer;
+                    resultsTable[recordLocation][wordLocation + 1] = String.valueOf(orderCompleted);
+                    resultsTable[recordLocation][wordLocation + 2] = lowerLeft;
+                    resultsTable[recordLocation][wordLocation + 3] = lowerRight;
+                    resultsTable[recordLocation][wordLocation + 4] = upperLeft;
+                    resultsTable[recordLocation][wordLocation + 5] = upperRight;
+
+
             }
-            String answer = results.getString(5);
-            //Check if that word is currently in the top row, if not, add it at the end.
+            } while (results.moveToNext());
 
-
-
-
-
-            if (words.get(word) == null){
-                numAttempts = 1;
-                numWords++;
-                words.put(word, numWords);
-                resultsTable[0][numWords] = word;
-                numWords++;
-                resultsTable[0][numWords] = "orderGiven";
-                numWords++;
-                resultsTable[0][numWords] = word + "-lower-left";
-                numWords++;
-                resultsTable[0][numWords] = word + "-lower-right";
-                numWords++;
-                resultsTable[0][numWords] = word + "-upper-left";
-                numWords++;
-                resultsTable[0][numWords] = word + "-upper-right";
-            } else if (type.equalsIgnoreCase("Practice")){
-                numWords++;
-                numAttempts++;
-                words.put(word + String.valueOf(numAttempts), numWords);
-                resultsTable[0][numWords] = word + String.valueOf(numAttempts);
-                numWords++;
-                resultsTable[0][numWords] = "orderGiven";
-                numWords++;
-                resultsTable[0][numWords] = word + "-lower-left";
-                numWords++;
-                resultsTable[0][numWords] = word + "-lower-right";
-                numWords++;
-                resultsTable[0][numWords] = word + "-upper-left";
-                numWords++;
-                resultsTable[0][numWords] = word + "-upper-right";
-            }
-
-            if (students.get(studentName) == null){
-                numRecords++;
-                students.put(studentName, numRecords);
-                dates.put(date, numRecords);
-                resultsTable[numRecords][0] = studentName;
-                resultsTable[numRecords][1] = date;
-                resultsTable[numRecords][2] = testGiver;
-            }
-
-            if (dates.get(date) == null){
-                numRecords++;
-                dates.put(date, numRecords);
-                students.put(studentName, numRecords);
-                resultsTable[numRecords][0] = studentName;
-                resultsTable[numRecords][1] = date;
-                resultsTable[numRecords][2] = testGiver;
-            }
-            if ((type.equalsIgnoreCase("Practice") && (numAttempts > 1))){
-                    resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts))] = answer;
-                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 1] = String.valueOf(orderCompleted);
-                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 2] = lowerLeft;
-                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 3] = lowerRight;
-                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 4] = upperLeft;
-                resultsTable[dates.get(date)][words.get(word + String.valueOf(numAttempts)) + 5] = upperRight;
-            } else {
-                resultsTable[dates.get(date)][words.get(word)] = answer;
-                resultsTable[dates.get(date)][words.get(word) + 1] = String.valueOf(orderCompleted);
-                resultsTable[dates.get(date)][words.get(word) + 2] = lowerLeft;
-                resultsTable[dates.get(date)][words.get(word) + 3] = lowerRight;
-                resultsTable[dates.get(date)][words.get(word) + 4] = upperLeft;
-                resultsTable[dates.get(date)][words.get(word) + 5] = upperRight;
-            }
-        } while (results.moveToNext());
 
         results.close();
 
@@ -273,6 +338,9 @@ public class exportResultsController extends AppCompatActivity {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String strDate = sdf.format(new Date());
+
+        strDate = strDate.replace(':', '-');
+        strDate = strDate.replace(" ","");
 
 
         File file = new File(exportDir, selectedTest + strDate + ".csv");

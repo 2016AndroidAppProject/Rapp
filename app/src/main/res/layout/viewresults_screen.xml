@@ -26,10 +26,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/resultsList"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="false"
         android:background="#FFFFFF"
-        android:layout_below="@+id/textView17" />
+        android:layout_below="@+id/textView17"
+        android:layout_alignRight="@+id/textView24"
+        android:layout_alignEnd="@+id/textView24" />
 
     <Spinner
         android:layout_width="400dp"
@@ -55,34 +55,25 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Current Result mode is:"
-        android:id="@+id/textView24"
-        android:textStyle="bold"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/testsSpinner"
-        android:layout_toEndOf="@+id/testsSpinner"
-        android:layout_marginLeft="43dp"
-        android:layout_marginStart="43dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Disaggregated"
-        android:id="@+id/modeNotice"
-        android:layout_below="@+id/textView22"
-        android:layout_alignLeft="@+id/textView24"
-        android:layout_alignStart="@+id/textView24" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/aggregated"
         android:layout_above="@+id/resultsList"
         android:layout_toRightOf="@+id/textView17"
         android:layout_toEndOf="@+id/textView17"
         android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="For accurate results, ensure all students have 100% completed the selected test."
+        android:id="@+id/textView24"
+        android:textSize="25dp"
+        android:layout_alignBaseline="@+id/textView22"
+        android:layout_alignBottom="@+id/textView22"
+        android:layout_toRightOf="@+id/testsSpinner"
+        android:layout_toEndOf="@+id/testsSpinner"
+        android:layout_marginLeft="33dp"
+        android:layout_marginStart="33dp" />
 
 </RelativeLayout>

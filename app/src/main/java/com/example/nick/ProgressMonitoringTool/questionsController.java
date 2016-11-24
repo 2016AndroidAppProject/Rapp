@@ -110,6 +110,7 @@ public class questionsController extends AppCompatActivity {
 
     boolean continuingTest;
     boolean practiceMode;
+    boolean play;
 
     HashMap<String, Integer> alreadyAnsweredWords;
 
@@ -180,6 +181,7 @@ public class questionsController extends AppCompatActivity {
         ctx = this;
 
         handler = new Handler();
+        play = true;
 
         numTestItemsComplete = 0;
         trueNumTestItemsComplete = 0;
@@ -224,7 +226,7 @@ public class questionsController extends AppCompatActivity {
 
 
         if (currentUserData.getInstance().getUserType().equals("Administrator")){
-            currentUserName = currentUserData.getInstance().getSelectedTeacher();
+            currentUserName = "Admin";
         } else {
             currentUserName = currentUserData.getInstance().getUserName();
         }
@@ -243,9 +245,8 @@ public class questionsController extends AppCompatActivity {
 
         if ((currentUserData.isPracticeMode() == false) && (continuingTest == false)) {
             dop.addNewTestCompletionRecord(dop, recordID, studentId, studentName, testId,
-                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete, currentUserData.getUserName());
+                    testName, numQuestions, numQuestionsCorrect, numQuestionsComplete, currentUserName);
         }
-
 
 
 
@@ -607,7 +608,7 @@ public class questionsController extends AppCompatActivity {
             recordID = generateRandomID();
             resultId = 1;
         } else if (continuingTest == true) {
-            Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudent(dop, studentName, testName);
+            Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentName, testName, currentUserName);
             alreadyAnsweredWords = dop.getWordsAlreadyAnswered(dop, mostRecentRecord);
             recordID = mostRecentRecord.getInt(4);
             trueNumTestItemsComplete = mostRecentRecord.getInt(0);
@@ -988,7 +989,9 @@ public class questionsController extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                playMp3(currentAudio);
+                if (play == true) {
+                    playMp3(currentAudio);
+                }
             }
         }, 10000);
 
@@ -997,6 +1000,8 @@ public class questionsController extends AppCompatActivity {
     //Behavior that is triggered when the user successfully completes a second practice currentQuestionData.
     public void transitionToTestItems(){
         disableButtons();
+        mp.release();
+        play = false;
         mp = MediaPlayer.create(this, R.raw.transitiontotestitems);
         mp.start();
         opt1.setVisibility(View.GONE);
@@ -1010,6 +1015,7 @@ public class questionsController extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 proceedOnEnd();
+                play = true;
             }
         });
     }

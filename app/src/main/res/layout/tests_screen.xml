@@ -38,37 +38,27 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="EDIT EXISTING TEST"
-                android:id="@+id/editTests"
-                android:textSize="35dp"
-                android:padding="20dp"
-                android:layout_alignTop="@+id/createNewTest"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_weight=".33" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="EDIT/ADD PRACTICE ITEM SETS"
+                android:text="ADD/DELETE PRACTICE ITEM SETS"
                 android:id="@+id/editPrac"
                 android:textSize="35dp"
                 android:padding="20dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_weight="0.33" />
+                android:layout_weight="0.5"
+                android:layout_marginRight="50dp" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="CREATE NEW TEST"
+                android:text="ADD/DELETE TESTS"
                 android:id="@+id/createNewTest"
                 android:textSize="35dp"
                 android:padding="20dp"
                 android:layout_alignTop="@+id/editPrac"
                 android:layout_centerHorizontal="true"
-                android:layout_weight="0.33" />
+                android:layout_weight="0.5"
+                android:layout_marginLeft="50dp" />
 
         </LinearLayout>
 

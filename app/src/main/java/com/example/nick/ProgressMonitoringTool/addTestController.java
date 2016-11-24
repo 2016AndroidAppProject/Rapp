@@ -1,9 +1,11 @@
 package com.example.nick.ProgressMonitoringTool;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +18,10 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +61,6 @@ public class addTestController extends AppCompatActivity {
     Cursor tests;
 
 
-
     DatabaseOperations dop;
 
 
@@ -65,7 +70,14 @@ public class addTestController extends AppCompatActivity {
 
     boolean validFileExtensions;
     boolean invalidFileContent;
+
+    boolean misorderedItems;
     String invalidFileMessage;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -95,10 +107,10 @@ public class addTestController extends AppCompatActivity {
 
         invalidFileContent = false;
 
+        
 
 
         invalidFileMessage = "";
-
 
 
         dop = new DatabaseOperations(ctx);
@@ -113,7 +125,7 @@ public class addTestController extends AppCompatActivity {
         pracAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         pracItemSpinner.setAdapter(pracAdapter);
 
-        if (pracItemNames.size() == 0){
+        if (pracItemNames.size() == 0) {
             Toast.makeText(getBaseContext(), "There are no practice item sets currently registered", Toast.LENGTH_LONG).show();
         }
 
@@ -144,7 +156,7 @@ public class addTestController extends AppCompatActivity {
         testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         deleteTestSpinner.setAdapter(testAdapter);
 
-        if (testNames.size() == 1){
+        if (testNames.size() == 1) {
             Toast.makeText(getBaseContext(), "There are no tests currently registered", Toast.LENGTH_LONG).show();
         }
 
@@ -171,16 +183,16 @@ public class addTestController extends AppCompatActivity {
         });
 
         deleteTestButton.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    if (testToDelete.equals("")) {
-                                                        Toast.makeText(getBaseContext(), "Select a test to delete", Toast.LENGTH_LONG).show();
-                                                    } else {
-                                                        confirmDeleteButton.setVisibility(View.VISIBLE);
-                                                        Toast.makeText(getBaseContext(), "Hit CONFIRMDELETE to delete " + testToDelete, Toast.LENGTH_LONG).show();
-                                                    }
-                                                }
-                                            });
+            @Override
+            public void onClick(View v) {
+                if (testToDelete.equals("")) {
+                    Toast.makeText(getBaseContext(), "Select a test to delete", Toast.LENGTH_LONG).show();
+                } else {
+                    confirmDeleteButton.setVisibility(View.VISIBLE);
+                    Toast.makeText(getBaseContext(), "Hit CONFIRMDELETE to delete " + testToDelete, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         confirmDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,7 +200,7 @@ public class addTestController extends AppCompatActivity {
 
                 dop.deleteTest(dop, testToDelete);
                 Toast.makeText(getBaseContext(), testToDelete + " deleted!", Toast.LENGTH_LONG).show();
-                 confirmDeleteButton.setVisibility(View.INVISIBLE);
+                confirmDeleteButton.setVisibility(View.INVISIBLE);
                 tests = dop.getTests(dop);
                 ArrayList<String> testNames = dop.getTestNamesForAdministrators(tests);
                 ArrayAdapter<String> testAdapter = new ArrayAdapter<String>
@@ -196,24 +208,19 @@ public class addTestController extends AppCompatActivity {
                 testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 deleteTestSpinner.setAdapter(testAdapter);
 
-                if (testNames.size() == 0){
+                if (testNames.size() == 0) {
                     Toast.makeText(getBaseContext(), "There are no tests currently registered", Toast.LENGTH_LONG).show();
                     dop.addNewTest(dop, "", "", 0, 0);
                 }
 
-                }
-            });
-
-
-
-
+            }
+        });
 
 
 //        picturesDirPath = Environment.getExternalStorageDirectory() + "/Pictures";
 //        Bitmap bitmap1 = BitmapFactory.decodeFile(picturesDirPath + "/Test1/p9c-devise-verb-hi.jpg");
-       // picturesDir =
-               // Environment.DIRECTORY_PICTURES);
-
+        // picturesDir =
+        // Environment.DIRECTORY_PICTURES);
 
 
 //        File subDirectory = new File(directory, "Test1");
@@ -322,7 +329,7 @@ public class addTestController extends AppCompatActivity {
                                             testAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                             deleteTestSpinner.setAdapter(testAdapter);
 
-                                            if (testNames.size() == 0){
+                                            if (testNames.size() == 0) {
                                                 Toast.makeText(getBaseContext(), "There are no tests currently registered", Toast.LENGTH_LONG).show();
                                             }
 
@@ -346,6 +353,18 @@ public class addTestController extends AppCompatActivity {
                 }
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+
+    public void checkForMismatches(ArrayList<File[]> sortedFiles){
+        for (int i = 0; i < sortedFiles.size(); i++){
+            if (sortedFiles.get(i)[4] == null){
+                misorderedItems = true;
+            }
+        }
     }
 
     public void loadTest() {
@@ -358,9 +377,14 @@ public class addTestController extends AppCompatActivity {
         deleteTestButton.setVisibility(View.VISIBLE);
 
         //sort the images from the directory by question
-            ArrayList<File[]> filesSorted = getSortedFileList(imagesFiles);
-            //create questions based on the files, and insert into question table
-        if (invalidFileContent == true){
+        ArrayList<File[]> filesSorted = getSortedFileList(imagesFiles);
+        checkForMismatches(filesSorted);
+        //create questions based on the files, and insert into question table
+        if (misorderedItems == true){
+            Toast.makeText(getApplicationContext(),
+                    "One of the items is incorrectly numbered, please check all the items.",
+                    Toast.LENGTH_LONG).show();
+         } else if (invalidFileContent == true) {
             Toast.makeText(getApplicationContext(),
                     invalidFileMessage,
                     Toast.LENGTH_LONG).show();
@@ -381,16 +405,9 @@ public class addTestController extends AppCompatActivity {
     }
 
 
-
-
-
 //        Log.v("Files", newTestDir.exists() + " EXISTS");
 //        Log.v("Files", newTestDir.isDirectory() + "IS DIRECTORY");
 //        Log.v("Files", newTestDir.listFiles() + " LIST FILES");
-
-
-
-
 
 
 //        //This int declares how many items we should be inserting into a question.
@@ -489,8 +506,7 @@ public class addTestController extends AppCompatActivity {
 //        }
 
 
-
-    public void insertNewQuestions(ArrayList<File[]> sortedList){
+    public void insertNewQuestions(ArrayList<File[]> sortedList) {
         //creating the options which will be used to fetch the bitmaps from the the directory.
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -504,7 +520,7 @@ public class addTestController extends AppCompatActivity {
         byte[] con_foilBlob = null;
         byte[] phon_foilBlob = null;
 
-        for (int i = 0; i < sortedList.size(); i++){
+        for (int i = 0; i < sortedList.size(); i++) {
 
             String[] fileName1 = getFileName(sortedList.get(i)[0]);
             String extension1 = (fileName1[fileName1.length - 1].split("\\."))[1];
@@ -512,14 +528,14 @@ public class addTestController extends AppCompatActivity {
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
                 try {
                     targetBlob = dop.jpgToByteArray(target);
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
-            } else if (extension1.equalsIgnoreCase("png")){
+            } else if (extension1.equalsIgnoreCase("png")) {
                 target = BitmapFactory.decodeFile(sortedList.get(i)[1].getAbsolutePath(), options);
                 try {
                     targetBlob = dop.pngToByteArray(target);
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
             }
@@ -532,15 +548,15 @@ public class addTestController extends AppCompatActivity {
                 them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
                 try {
                     them_foilBlob = dop.jpgToByteArray(them_foil);
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
-            } else if (extension1.equalsIgnoreCase("png")){
+            } else if (extension1.equalsIgnoreCase("png")) {
 
                 them_foil = BitmapFactory.decodeFile(sortedList.get(i)[0].getAbsolutePath(), options);
                 try {
                     them_foilBlob = dop.pngToByteArray(them_foil);
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
             }
@@ -551,21 +567,21 @@ public class addTestController extends AppCompatActivity {
                 con_foil = BitmapFactory.decodeFile(sortedList.get(i)[2].getAbsolutePath(), options);
                 try {
                     con_foilBlob = dop.jpgToByteArray(con_foil);
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
-            } else if (extension1.equalsIgnoreCase("png")){
+            } else if (extension1.equalsIgnoreCase("png")) {
                 con_foil = BitmapFactory.decodeFile(sortedList.get(i)[2].getAbsolutePath(), options);
                 try {
                     con_foilBlob = dop.pngToByteArray(con_foil);
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
             }
 
             try {
                 audio = dop.audioToByteArray(sortedList.get(i)[4]);
-            } catch (IOException io){
+            } catch (IOException io) {
                 audio = null;
             }
 
@@ -578,14 +594,14 @@ public class addTestController extends AppCompatActivity {
                     phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
                     try {
                         phon_foilBlob = dop.jpgToByteArray(phon_foil);
-                    } catch (IOException e){
+                    } catch (IOException e) {
 
                     }
-                } else if (extension4.equalsIgnoreCase("png")){
-                        phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
+                } else if (extension4.equalsIgnoreCase("png")) {
+                    phon_foil = BitmapFactory.decodeFile(sortedList.get(i)[3].getAbsolutePath(), options);
                     try {
                         phon_foilBlob = dop.pngToByteArray(phon_foil);
-                    } catch (IOException e){
+                    } catch (IOException e) {
 
                     }
                 }
@@ -604,16 +620,16 @@ public class addTestController extends AppCompatActivity {
             //some numbers are greater than 10, so we account for that here.
             if (questionIndex.length == 3) {
                 questionNum = Character.getNumericValue(questionIndex[1]);
-            } else if (questionIndex.length == 4){
+            } else if (questionIndex.length == 4) {
                 questionNum = (Character.getNumericValue(questionIndex[1]) * 10) + Character.getNumericValue(questionIndex[2]);
-            } else if (questionIndex.length == 5){
+            } else if (questionIndex.length == 5) {
                 questionNum = (Character.getNumericValue(questionIndex[1]) * 100) +
-                        (Character.getNumericValue(questionIndex[2]) * 10) + Character.getNumericValue(questionIndex[3]) ;
+                        (Character.getNumericValue(questionIndex[2]) * 10) + Character.getNumericValue(questionIndex[3]);
 
             }
-            if (sortedList.get(i)[3] != null){
-                 dop.addQuestion(dop, word, type, difficulty, them_foilBlob, targetBlob, con_foilBlob,
-                         phon_foilBlob, audio, newTestId, questionNum, 4);
+            if (sortedList.get(i)[3] != null) {
+                dop.addQuestion(dop, word, type, difficulty, them_foilBlob, targetBlob, con_foilBlob,
+                        phon_foilBlob, audio, newTestId, questionNum, 4);
 
             } else {
                 dop.addQuestion(dop, word, type, difficulty, them_foilBlob, targetBlob, con_foilBlob,
@@ -624,14 +640,12 @@ public class addTestController extends AppCompatActivity {
     }
 
 
-
-
     //Beacuse other kinds of files exist can exist inside the directory and also beacuse we want to
     //break the process down, we will go through the directory and load all the files
     //into an array list of arrays; the array list is an array list beacuse we dont know
     //exactly how much files will be thrown out of the directory, but each array in the array list
     //has only 4 files; the test files will be sorted out by the prefix at the beginning of their file name.
-    public ArrayList<File[]> getSortedFileList(File[] listOfImageFiles){
+    public ArrayList<File[]> getSortedFileList(File[] listOfImageFiles) {
         ArrayList<File[]> sortedFiles = new ArrayList<File[]>();
         //need a hashmap to keep track of where in our array list an array with a certain question number
         //is stored.
@@ -640,18 +654,18 @@ public class addTestController extends AppCompatActivity {
         int index = 0;
         int questionNum = 0;
         char itemLetter = ' ';
-        for (int i = 0; i < listOfImageFiles.length; i++){
+        for (int i = 0; i < listOfImageFiles.length; i++) {
             String[] fileName = new String[0];
             fileName = getFileName(listOfImageFiles[i]);
             isFileContentValid(listOfImageFiles[i]);
-            if ((validFileExtensions == false) || (invalidFileContent == true)){
+            if ((validFileExtensions == false) || (invalidFileContent == true)) {
                 break;
             }
             char[] questionIndex = fileName[0].toCharArray();
 
             //some numbers are greater than 10, so we account for that here.
             if (questionIndex[0] == 'a') {
-                if (questionIndex.length == 2){
+                if (questionIndex.length == 2) {
                     questionNum = Character.getNumericValue(questionIndex[1]);
                 } else if (questionIndex.length == 3) {
                     questionNum = (Character.getNumericValue(questionIndex[1]) * 10) + Character.getNumericValue(questionIndex[2]);
@@ -671,50 +685,50 @@ public class addTestController extends AppCompatActivity {
             }
 
             //if there is no array of files having that questionNum
-            if (indexer.get(questionNum) == null){
+            if (indexer.get(questionNum) == null) {
                 indexer.put(questionNum, newIndex);
                 newIndex++;
                 //add a new array list of files to the array of array lists
                 //the array is size 5, allowing for up to 4 image BLOBs and an audio BLOB
                 sortedFiles.add(new File[5]);
-                if (questionIndex[0] == 'a'){
+                if (questionIndex[0] == 'a') {
                     itemLetter = 'z';
-                } else if (questionIndex.length == 3){
+                } else if (questionIndex.length == 3) {
                     itemLetter = questionIndex[2];
-                } else if (questionIndex.length == 4){
+                } else if (questionIndex.length == 4) {
                     itemLetter = questionIndex[3];
                 }
                 //add the file we are currently iterating on to that array
-                if (itemLetter == 'a'){
+                if (itemLetter == 'a') {
                     (sortedFiles.get(sortedFiles.size() - 1))[0] = listOfImageFiles[i];
-                } else if (itemLetter == 'b'){
+                } else if (itemLetter == 'b') {
                     (sortedFiles.get(sortedFiles.size() - 1))[1] = listOfImageFiles[i];
-                } else if (itemLetter == 'c'){
+                } else if (itemLetter == 'c') {
                     (sortedFiles.get(sortedFiles.size() - 1))[2] = listOfImageFiles[i];
-                } else if (itemLetter == 'd'){
+                } else if (itemLetter == 'd') {
                     (sortedFiles.get(sortedFiles.size() - 1))[3] = listOfImageFiles[i];
-                } else if (itemLetter == 'z'){ //handling an audio file
+                } else if (itemLetter == 'z') { //handling an audio file
                     (sortedFiles.get(sortedFiles.size() - 1))[4] = listOfImageFiles[i];
                 }
-            //if there is an array of files having that questionNum
+                //if there is an array of files having that questionNum
             } else {
                 index = indexer.get(questionNum);
                 if (questionIndex[0] == 'a') {
                     itemLetter = 'z';
-                } else if (questionIndex.length == 3){
+                } else if (questionIndex.length == 3) {
                     itemLetter = questionIndex[2];
-                } else if (questionIndex.length == 4){
+                } else if (questionIndex.length == 4) {
                     itemLetter = questionIndex[3];
                 }
-                if (itemLetter == 'a'){
+                if (itemLetter == 'a') {
                     (sortedFiles.get(index))[0] = listOfImageFiles[i];
-                } else if (itemLetter == 'b'){
+                } else if (itemLetter == 'b') {
                     (sortedFiles.get(index))[1] = listOfImageFiles[i];
-                } else if (itemLetter == 'c'){
+                } else if (itemLetter == 'c') {
                     (sortedFiles.get(index)[2]) = listOfImageFiles[i];
-                } else if (itemLetter == 'd'){
+                } else if (itemLetter == 'd') {
                     (sortedFiles.get(index))[3] = listOfImageFiles[i];
-                } else if (itemLetter == 'z'){ //Handling an audio file
+                } else if (itemLetter == 'z') { //Handling an audio file
                     (sortedFiles.get(index))[4] = listOfImageFiles[i];
                 }
                 //go to the array in the arrayList having the
@@ -726,7 +740,7 @@ public class addTestController extends AppCompatActivity {
     }
 
 
-    public void isFileContentValid(File file){
+    public void isFileContentValid(File file) {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -737,15 +751,36 @@ public class addTestController extends AppCompatActivity {
         boolean valid = false;
         String fullFilePath = file.getAbsolutePath();
         String[] splitFilePath = fullFilePath.split("/");
-        String fileName =  splitFilePath[splitFilePath.length - 1];
+        String fileName = splitFilePath[splitFilePath.length - 1];
         String[] brokenDownFileName = fileName.split("-");
         String[] lastPart = brokenDownFileName[brokenDownFileName.length - 1].split("\\.");
-        if ((brokenDownFileName.length != 3)){
+        boolean whatever = true;
+        boolean whateverPartDeux = true;
+        int length = brokenDownFileName[0].length();
+        if (length == 3) {
+            whatever = Character.isDigit(brokenDownFileName[0].charAt(1));
+        } else if (length == 4) {
+            whatever = Character.isDigit(brokenDownFileName[0].charAt(1));
+            whateverPartDeux = Character.isDigit(brokenDownFileName[0].charAt(2));
+        }
+        boolean number = true;
+        boolean size = true;
+        boolean extension = true;
+        if ((whatever == false) || (whateverPartDeux == false)) {
+            number = false;
+        }
+        if ((brokenDownFileName.length != 3) && (brokenDownFileName.length != 4)) {
+            size = false;
+        }
+        if (!(lastPart[1].equalsIgnoreCase("mp3") == false) && !(lastPart[1].equalsIgnoreCase("jpg") == false)
+                && !(lastPart[1].equalsIgnoreCase("jpeg") == false) && !(lastPart[1].equalsIgnoreCase("png") == false)) {
+            extension = false;
+        }
+        if ((number == false) || (size == false) || (extension == false)) {
             invalidFileContent = true;
             invalidFileMessage = "The file name " + file.getPath() + " is not formatted correctly." +
                     " Please ensure that it is of the exact format p#Letter-word-type.";
         }
-
 
 
         if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg")) {
@@ -756,35 +791,33 @@ public class addTestController extends AppCompatActivity {
                 invalidFileContent = true;
                 invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
                         " Please convert the file again (Save it as a proper file type in a image editing program).";
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 invalidFileContent = true;
                 invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
                         " Please convert the file again (Save it as a proper file type in a image editing program).";
             }
-        } else if (lastPart[1].equalsIgnoreCase("png")){
+        } else if (lastPart[1].equalsIgnoreCase("png")) {
             try {
-                    currentImage = BitmapFactory.decodeFile(fullFilePath, options);
-                    currentBlob = dop.jpgToByteArray(currentImage);
-                } catch (IOException e){
+                currentImage = BitmapFactory.decodeFile(fullFilePath, options);
+                currentBlob = dop.jpgToByteArray(currentImage);
+            } catch (IOException e) {
                 invalidFileContent = true;
                 invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
                         " Please convert the file again (Save it as a proper file type in a image editing program).";
 
-            }
-            catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 invalidFileContent = true;
                 invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
                         " Please convert the file again (Save it as a proper file type in a image editing program).";
             }
-        } else if (lastPart[1].equalsIgnoreCase("mp3")){
+        } else if (lastPart[1].equalsIgnoreCase("mp3")) {
             try {
                 audioBlob = dop.audioToByteArray(file);
-            } catch (IOException e){
+            } catch (IOException e) {
                 invalidFileContent = true;
                 invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
                         " Please convert the file again (Save it as a proper file type in a image editing program).";
-            }
-            catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 invalidFileContent = true;
                 invalidFileMessage = "The file " + file.getPath() + " did not convert file types correctly." +
                         " Please convert the file again (Save it as a proper file type in a image editing program).";
@@ -795,15 +828,15 @@ public class addTestController extends AppCompatActivity {
     }
 
 
-    public String[] getFileName(File file){
+    public String[] getFileName(File file) {
         String[] brokenDownFileName = new String[4];
         String fullFilePath = file.getAbsolutePath();
         String[] splitFilePath = fullFilePath.split("/");
-        String fileName =  splitFilePath[splitFilePath.length - 1];
+        String fileName = splitFilePath[splitFilePath.length - 1];
         brokenDownFileName = fileName.split("-");
         String[] lastPart = brokenDownFileName[brokenDownFileName.length - 1].split("\\.");
-        if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg")  ||
-                lastPart[1].equalsIgnoreCase("png") || lastPart[1].equalsIgnoreCase("mp3")){
+        if (lastPart[1].equalsIgnoreCase("jpg") || lastPart[1].equalsIgnoreCase("jpeg") ||
+                lastPart[1].equalsIgnoreCase("png") || lastPart[1].equalsIgnoreCase("mp3")) {
             return brokenDownFileName;
         }
         validFileExtensions = false;
@@ -813,7 +846,7 @@ public class addTestController extends AppCompatActivity {
 
 
     //Activity that takes place at end of test loading process is everything goes successfully
-    public void finishLoading(){
+    public void finishLoading() {
         //Code here for creating new test in database based
         //on given test name and conditions given.
         // you can go on
@@ -827,7 +860,7 @@ public class addTestController extends AppCompatActivity {
 
 
     //Method to set the items of the actual test to null.
-    public void resetUIItems(){
+    public void resetUIItems() {
         //set all the items of the addTest interface to blank.
         AdministratorOnly.setChecked(false);
         AdministratorAndTeacher.setChecked(false);
@@ -835,11 +868,11 @@ public class addTestController extends AppCompatActivity {
         newTestNameField.setText("");
     }
 
-    public int generateTestID(DatabaseOperations DOP){
+    public int generateTestID(DatabaseOperations DOP) {
         int id = 1;
         Cursor CR = DOP.getTests(DOP);
         int numTests = CR.getCount();
-        if (numTests == 0){
+        if (numTests == 0) {
             return id;
         }
         CR.moveToFirst();
@@ -853,7 +886,7 @@ public class addTestController extends AppCompatActivity {
     }
 
 
-    public boolean isUniqueId(int newId, Cursor CR){
+    public boolean isUniqueId(int newId, Cursor CR) {
         do {
             if (newId == CR.getInt(1)) {
                 return false;
@@ -863,16 +896,16 @@ public class addTestController extends AppCompatActivity {
         return true;
     }
 
-    public boolean isUnique(DatabaseOperations DOP, String testName){
+    public boolean isUnique(DatabaseOperations DOP, String testName) {
         Cursor CR = DOP.getTests(DOP);
         int numTests = CR.getCount();
-        if (numTests == 0){
+        if (numTests == 0) {
             return true;
         }
         CR.moveToFirst();
         do {
 
-            if (testName.equalsIgnoreCase(CR.getString(2))){
+            if (testName.equalsIgnoreCase(CR.getString(2))) {
                 return false;
             }
         }
@@ -881,21 +914,61 @@ public class addTestController extends AppCompatActivity {
     }
 
 
-
-    public static boolean isExternalStorageWritable(){
+    public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if(Environment.MEDIA_MOUNTED.equals(state)){
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
         }
         return false;
     }
 
-    public static boolean isExternalStorageReadable(){
+    public static boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if(Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)
-                || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)
+                || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             return true;
         }
         return false;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "addTestController Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.nick.ProgressMonitoringTool/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "addTestController Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.nick.ProgressMonitoringTool/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 }

@@ -36,7 +36,7 @@ public class resultsCursorAdapter extends CursorAdapter {
 
     HashMap<String, Double> wordsCorrectPercentages;
 
-    public resultsCursorAdapter(Context context, Cursor cursor, int flags) {
+    public resultsCursorAdapter(Context context, Cursor cursor, HashMap<String, Double> wordsCorrect, int flags) {
         super(context, cursor, 0);
         dop = new DatabaseOperations(context);
         recordFetched = -1;
@@ -44,10 +44,7 @@ public class resultsCursorAdapter extends CursorAdapter {
         settings = dop.getResultMode(dop);
         settings.moveToFirst();
         testMode = settings.getString(0);
-        if (testMode.equalsIgnoreCase("word")) {
-            wordsCorrectPercentages = dop.getWordsCorrect(dop, cursor);
-        }
-
+        wordsCorrectPercentages = wordsCorrect;
 
     }
 
@@ -101,7 +98,7 @@ public class resultsCursorAdapter extends CursorAdapter {
 
                     TextView resultWord = (TextView) view.findViewById(R.id.word);
                     TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
-                    word = resultCursor.getString(1);
+                    word = resultCursor.getString(0);
 
 
                     percentageCorrect = wordsCorrectPercentages.get(word) * 100;
@@ -116,8 +113,8 @@ public class resultsCursorAdapter extends CursorAdapter {
                     TextView resultTestPercentageCorrect = (TextView) view.findViewById(R.id.percentageCorrect);
 
 
-                    studentName = resultCursor.getString(1);
-                    int numCorrect = resultCursor.getInt(2);
+                    studentName = resultCursor.getString(2);
+                    int numCorrect = resultCursor.getInt(6);
                     int numTotal = resultCursor.getInt(5);
                     if ((numCorrect == 0) && (numTotal == 0)) {
                         percentageCorrect = 0.0;
