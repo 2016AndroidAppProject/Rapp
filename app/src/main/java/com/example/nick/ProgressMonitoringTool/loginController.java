@@ -102,6 +102,20 @@ public class loginController extends AppCompatActivity {
         if (userCR.getCount() == 0){
             DOP.addNewUser(DOP, "", "", "", "", 0);
         }
+        //Following code was used to test the export results function by adding in sets of results.
+        DOP.addNewTest(DOP, "testForTesting1", "Administrator", 1, 1);
+        DOP.addNewTest(DOP, "testForTesting2", "Administrator", 2, 2);
+        DOP.addNewTest(DOP, "testForTesting3", "Administrator", 3, 3);
+        DOP.addNewTest(DOP, "testForTesting4", "Administrator", 4, 4);
+
+        DOP.addSetsTestResults("testForTesting1", 120);
+        DOP.addSetsTestResults("testForTesting2", 120);
+        DOP.addSetsTestResults("testForTesting3", 120);
+        DOP.addSetsTestResults("testForTesting4", 120);
+
+
+
+
 
 
 

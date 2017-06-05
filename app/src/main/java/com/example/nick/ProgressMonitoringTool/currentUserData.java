@@ -22,13 +22,13 @@ public class currentUserData {
     private String selectedStudent;
     private boolean practiceMode;
     private boolean continueTest;
-
+    private Integer selectedStudentId;
 //    private Activity prevAct;
 //    private Activity currentAct;
 
     public currentUserData(String userName, String password, String userType, String userRealName,
                            String selectedTeacher, String selectedTest, String selectedStudent, boolean practiceMode,
-                           boolean continueTest) {
+                           boolean continueTest, Integer selectedStudentId) {
         this.userName = userName;
         this.password = password;
         this.userType = userType;
@@ -37,12 +37,13 @@ public class currentUserData {
         this.selectedStudent = selectedStudent;
         this.practiceMode = practiceMode;
         this.continueTest = continueTest;
+        this.selectedStudentId = selectedStudentId;
     }
 
 
     //SINGLETON PATTERN: The user is instantiated here so that the user is ready to hold data when initialized in
     //the other class. The userData is initialized in the loginController.java class.
-    private static final currentUserData CURRENT_USER_DATA = new currentUserData(null, null, null, null, null, null, null, false, false);
+    private static final currentUserData CURRENT_USER_DATA = new currentUserData(null, null, null, null, null, null, null, false, false, 0);
 //
 //    public Activity getPrevAct() {
 //        return prevAct;
@@ -133,6 +134,14 @@ public class currentUserData {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public void setSelectedStudentId(Integer selectedStudentId) {
+        this.selectedStudentId = selectedStudentId;
+    }
+
+    public int getSelectedStudentId() {
+        return selectedStudentId;
     }
 
     //    Unclear if we need these boolean values

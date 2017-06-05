@@ -212,7 +212,7 @@ public class questionsController extends AppCompatActivity {
         testName = currentUserData.getSelectedTest();
         studentName = currentUserData.getSelectedStudent();
 
-        studentId = dop.getStudentIDByName(dop, currentUserData.getSelectedStudent());
+        studentId = currentUserData.getSelectedStudentId();
 
         if (currentQuestionData.oldData == true){
             currentQuestionData =  new currentQuestionData(null, null, null, 0, null, null,false, 3, "Practice", 0, 0, null, null, null, null, 0, 0, 0, 0, 0, 0, null, null, true, null);
@@ -225,11 +225,11 @@ public class questionsController extends AppCompatActivity {
         //new state.
 
 
-        if (currentUserData.getInstance().getUserType().equals("Administrator")){
-            currentUserName = "Admin";
-        } else {
+//        if (currentUserData.getInstance().getUserType().equals("Administrator")){
+//            currentUserName = "Admin";
+//        } else {
             currentUserName = currentUserData.getInstance().getUserName();
-        }
+       // }
         audioTest = 0;
 
 
@@ -608,7 +608,7 @@ public class questionsController extends AppCompatActivity {
             recordID = generateRandomID();
             resultId = 1;
         } else if (continuingTest == true) {
-            Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentName, testName, currentUserName);
+            Cursor mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentId, testName, currentUserName);
             alreadyAnsweredWords = dop.getWordsAlreadyAnswered(dop, mostRecentRecord);
             recordID = mostRecentRecord.getInt(4);
             trueNumTestItemsComplete = mostRecentRecord.getInt(0);

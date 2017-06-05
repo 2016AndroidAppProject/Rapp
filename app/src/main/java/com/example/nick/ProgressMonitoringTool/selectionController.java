@@ -55,6 +55,9 @@ public class selectionController extends AppCompatActivity {
 
     int numStudents;
     int numTests;
+
+    HashMap<String, Integer> studentIdMapper;
+     //number for fetching the id of the student so we can store it in userData
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -104,6 +107,8 @@ public class selectionController extends AppCompatActivity {
         beginButton.setVisibility(View.INVISIBLE);
         continueButton.setVisibility(View.INVISIBLE);
         restartButton.setVisibility(View.INVISIBLE);
+
+        studentIdMapper = new HashMap<String, Integer>();
 
 
         partialOrFullyComplete = false;
@@ -203,6 +208,7 @@ public class selectionController extends AppCompatActivity {
         testSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             ArrayList<String> studentNames;
             ArrayAdapter<String> studentAdapter;
+            ArrayList<Integer> studentIds;
 
 
 
@@ -221,13 +227,16 @@ public class selectionController extends AppCompatActivity {
                     studentSelectionLayout.setVisibility(View.VISIBLE);
 
                     studentNames = dop.getActiveStudentNames(dop, selectedTeacher);
+                    studentIds = dop.getActiveStudentIds(dop, selectedTeacher);
+
 
                     for (int i = 1; i < studentNames.size(); i++){
+                        studentIdMapper.put(studentNames.get(i), studentIds.get(i));
                         Cursor mostRecentRecord = null;
                         if (currentUserData.getInstance().getUserType().equals("Administrator")) {
-                            mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentNames.get(i), selectedTest, "Admin");
+                            mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentIds.get(i), selectedTest, "Admin");
                         } else {
-                            mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentNames.get(i), selectedTest, selectedTeacher);
+                            mostRecentRecord = dop.getMostRecentCompletionRecordbyStudentByTeacher(dop, studentIds.get(i), selectedTest, selectedTeacher);
                         }
 
                         if ((mostRecentRecord == null) || (mostRecentRecord.getCount() == 0)) {
@@ -289,6 +298,7 @@ public class selectionController extends AppCompatActivity {
                     String[] selectedString = ((String) parent.getItemAtPosition(position)).split(":");
                     selectedStudent = selectedString[0];
                     userData.getInstance().setSelectedStudent(selectedStudent);
+                    userData.getInstance().setSelectedStudentId(studentIdMapper.get(selectedStudent));
                     if (partiallyComplete.get(selectedStudent) == true) {
                         continueButton.setVisibility(View.VISIBLE);
                         restartButton.setVisibility(View.VISIBLE);

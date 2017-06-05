@@ -38,6 +38,8 @@ public class exportResultsController extends AppCompatActivity {
     Cursor tests;
     Cursor results;
     Spinner testSpinner;
+    boolean successfull;
+    String strDate;
 
     String[][] resultsTable;
 
@@ -51,6 +53,8 @@ public class exportResultsController extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.export_screen);
+
+        successfull = false;
 
         ctx = this;
         dop = new DatabaseOperations(ctx);
@@ -85,7 +89,6 @@ public class exportResultsController extends AppCompatActivity {
                 if (testSelected == true) {
                     Toast.makeText(getBaseContext(), parent.getItemAtPosition(position) + " selected", Toast.LENGTH_LONG).show();
                     selectedTest = (String) parent.getItemAtPosition(position);
-                    results = dop.getResults(dop, selectedTest);
                 } else {
                     testSelected = true;
                 }
@@ -107,10 +110,17 @@ public class exportResultsController extends AppCompatActivity {
                 if (selectedTest.equals("")){
                     Toast.makeText(getBaseContext(), "Please select a test to export results.", Toast.LENGTH_LONG).show();
                 } else {
+                    results = dop.getResults(dop, selectedTest);
                     if (results.getCount() == 0){
                         Toast.makeText(getBaseContext(), "There are no results available for that test.", Toast.LENGTH_LONG).show();
                     } else {
+
                         exportResults(results);
+                        if (successfull = true){
+                            Toast.makeText(getBaseContext(), "File " + selectedTest + strDate + ".csv exported to local directory", Toast.LENGTH_LONG).show();
+                            strDate = "";
+                            successfull = false;
+                        }
                     }
                 }
 
@@ -122,13 +132,44 @@ public class exportResultsController extends AppCompatActivity {
     }
 
 
+//    private String[] sortWordArray(String[] words){
+//
+//    }
+
+    private HashMap<String, Integer> getWordIndexes(Cursor results){
+        results.moveToFirst();
+        int resultsCount = results.getCount();
+        String[] words = new String[resultsCount];
+        HashMap<String, Integer> wordIndexes = new HashMap<String, Integer>();
+
+        int i = 0;
+        do {
+            words[i] = results.getString(2);
+            i++;
+        } while (results.moveToNext());
+
+        //words = sortWordArray(words);
+
+        for (i = 0; i < words.length; i++){
+            wordIndexes.put(words[i], i);
+
+        }
+
+
+        return wordIndexes;
+    }
+
+
 
     public void exportResults(Cursor results){
         //Before we can export results, we must populate our results table with the right values.
         //To have a list of string arrays that we can print.
 
+        int resultCount = results.getCount();
+
+        HashMap<String, Integer> wordIndexes = getWordIndexes(results);
         //Create table
-        resultsTable = new String[(results.getCount())][(results.getCount() * 24)];
+        resultsTable = new String[(resultCount)][((resultCount) * 8) + 50];
 
 
         //Create a top row string array. It is as long as the results cursor is to ensure it
@@ -196,7 +237,7 @@ public class exportResultsController extends AppCompatActivity {
                     String word = results.getString(2);
                     String studentName = results.getString(3);
                     int studentID = completionRecord.getInt(6);
-                    String teacherName = dop.getTeacherNameByStudentID(studentID, dop);
+                    String teacherName = dop.getTeacherNameByStudentID(studentID, dop, studentName);
                     String correct = "INCORRECT";
                     String testGiver = completionRecord.getString(5);
                     String type = results.getString(6);
@@ -236,6 +277,9 @@ public class exportResultsController extends AppCompatActivity {
                         if (!type.equalsIgnoreCase("Practice")) {
                             numWords++;
                             words.put(word, (numWords - 1) * 6);
+                            if (words.get(word) == 179){
+                                String heyhey = "HEYFUCKYOUMANG!";
+                            }
                             resultsTable[0][words.get(word)] = word;
                             resultsTable[0][words.get(word) + 1] = "Order-completed-" + word;
                             resultsTable[0][words.get(word) + 2] = word + "-lower-left";
@@ -322,6 +366,7 @@ public class exportResultsController extends AppCompatActivity {
 
 
             }
+            completionRecord.close();
             } while (results.moveToNext());
 
 
@@ -337,13 +382,14 @@ public class exportResultsController extends AppCompatActivity {
             exportDir.mkdirs();
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String strDate = sdf.format(new Date());
+        strDate = sdf.format(new Date());
 
         strDate = strDate.replace(':', '-');
         strDate = strDate.replace(" ","");
 
 
         File file = new File(exportDir, selectedTest + strDate + ".csv");
+
         try
         {
             file.createNewFile();
@@ -352,6 +398,7 @@ public class exportResultsController extends AppCompatActivity {
             for (int i = 0; i < resultsTable.length; i++){
                 csvWrite.writeNext(resultsTable[i]);
             }
+            successfull = true;
 //            {
 //                //Which column you want to exprort
 //                String arrStr[] ={results.getString(3), results.getString(2),results.getString(4),
@@ -359,7 +406,7 @@ public class exportResultsController extends AppCompatActivity {
 //                csvWrite.writeNext(arrStr);
 //            }
             csvWrite.close();
-            Toast.makeText(getBaseContext(), "File " + selectedTest + strDate + ".csv exported to local directory", Toast.LENGTH_LONG).show();
+
         }
         catch(Exception sqlEx)
         {
