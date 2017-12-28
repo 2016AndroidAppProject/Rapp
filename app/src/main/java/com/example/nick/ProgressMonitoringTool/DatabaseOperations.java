@@ -284,6 +284,8 @@ public class DatabaseOperations extends SQLiteOpenHelper {
 
     }
 
+    
+
     public void addSetsTestResults(String testName, int numberOfResults){
         //String test = RandomStringUtils.randomAlphanumeric(17).toUpperCase();
         Random rand = new Random();
@@ -306,6 +308,7 @@ public class DatabaseOperations extends SQLiteOpenHelper {
                 String word = RandomStringUtils.randomAlphanumeric(5).toLowerCase();
                 boolean correct;
                 if (j <= questionsCorrect) {
+
                     correct = true;
                 } else {
                     correct = false;

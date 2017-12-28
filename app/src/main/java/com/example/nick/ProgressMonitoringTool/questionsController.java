@@ -219,6 +219,7 @@ public class questionsController extends AppCompatActivity {
         }
 
         alreadyAnsweredWords = new HashMap<String, Integer>();
+        currentUserName = currentUserData.getInstance().getUserName();
         loadInitialData(dop);
 
         //Need to check if there is still some testItemData, and if so, reset testItemData to its
@@ -228,7 +229,7 @@ public class questionsController extends AppCompatActivity {
 //        if (currentUserData.getInstance().getUserType().equals("Administrator")){
 //            currentUserName = "Admin";
 //        } else {
-            currentUserName = currentUserData.getInstance().getUserName();
+
        // }
         audioTest = 0;
 
